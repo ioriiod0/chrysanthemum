@@ -33,7 +33,7 @@ public:
     template <typename Tuple,typename Data_type,typename Iterator,std::size_t N>
     struct helper
     {
-        static bool do_parse(std::tuple<Args...>& t,Data_type& data,Iterator& first,Iterator last)
+        static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
         {
             if(!std::get<std::tuple_size<Tuple>::value-N>(t)(first,last))
                 return false;
@@ -45,7 +45,7 @@ public:
     template <typename Tuple,typename Data_type,typename Iterator>
     struct helper<Tuple,Data_type,Iterator,1>
     {
-        static bool do_parse(std::tuple<Args...>& t,Data_type& data,Iterator& first,Iterator last)
+        static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
         {
             if(!std::get<std::tuple_size<Tuple>::value-1>(t)(first,last))
                 return false;
@@ -60,7 +60,7 @@ public:
 
 
 public:
-    squence(Args&&... args):tuple_(args...) {}
+    squence(Args&&... args):tuple_(std::forward<Args>(args)...) {}
     ~squence() {}
 public:
     template <typename Iterator>
@@ -72,20 +72,7 @@ public:
        data_holder_type::call_back();
        return true;
     }
-    // /////////////////////////////////////////
-    // template <typename CallBack>
-    // squence& operator<= (const CallBack& cb)
-    // {
-    //     data_holder_type::call_back_function() = cb; 
-    //     return *this;
-    // }
-    // template <typename CallBack>
-    // squence& operator<= (CallBack&& cb)
-    // {
-    //     data_holder_type::call_back_function() = std::move(cb);
-    //     return *this;
-    // }
-    // ////////////////////////////////////////////
+
 private:
     tuple_type tuple_;
 };

@@ -5,4 +5,17 @@
 // Description  : 
 // ======================================================================================
 
+#include <type_traits>
+#include "data_holder.h"
 
+
+template <typename Parser>
+class not:
+    public data_holder<typename std::remove_reference<Parser>::type::data_type >
+{
+    public:
+        
+    public:
+    public:
+    private:
+};

@@ -32,20 +32,6 @@ class literal:public data_holder<std::string>
             call_back();
             return true;
         }
-        // /////////////////////////////////////////
-        // template <typename CallBack>
-        // literal& operator<= (const CallBack& cb)
-        // {
-        //     call_back_function() = cb; 
-        //     return *this;
-        // }
-        // template <typename CallBack>
-        // literal& operator<= (CallBack&& cb)
-        // {
-        //     call_back_function() = std::move(cb);
-        //     return *this;
-        // }
-        // ////////////////////////////////////////////
 };
 
 template <typename Arg>

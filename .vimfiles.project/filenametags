@@ -1,0 +1,20 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+alternative.h	../alternative.h	1
+data_holder.h	../data_holder.h	1
+difference.h	../difference.h	1
+list.h	../list.h	1
+literal.h	../literal.h	1
+meta_fuctions.h	../meta_fuctions.h	1
+mutiple.h	../mutiple.h	1
+not.h	../not.h	1
+optional.h	../optional.h	1
+parsers.h	../parsers.h	1
+quick_gen_project_project_autogen.bat	../quick_gen_project_project_autogen.bat	1
+repeat.h	../repeat.h	1
+sequential.h	../sequential.h	1
+test1.cc	../test1.cc	1
+test2.cc	../test2.cc	1
+test_ip.cc	../test_ip.cc	1
+test_list.cc	../test_list.cc	1
+test_mutiple.cc	../test_mutiple.cc	1
+tuple_serialization.h	../tuple_serialization.h	1

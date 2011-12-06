@@ -18,9 +18,7 @@ public:
     typedef std::vector<typename std::remove_reference<Parser>::type::data_type> data_type;
     typedef data_holder<data_type> data_holder_type;
 public:
-    repeat(Parser&& t):parser_(t) {}
-    //repeat(const repeat& r):parser_(r.parser_) {}
-    //repeat(repeat&& r):parser_(std::move(r.parser_)) {}
+    repeat(Parser&& t):parser_(std::forward<Parser>(t)) {}
     ~repeat() {}
 public:
     template <typename Iterator>
@@ -124,51 +122,3 @@ auto _N(Arg&& arg) ->repeat<N,Arg,N>
 }
 
 
-
-
-// template <typename Parser,std::size_t M>
-// class repeat<0,Parser,M>
-// {
-// public:
-//     typedef std::vector<typename Parser::data_type> data_type;
-//     typedef data_holder<data_type> data_holder_type;
-// public:
-//     repeat(Parser&& t):parser_(t) {}
-//     ~repeat() {}
-// public:
-//     template <typename Iterator>
-//     bool operator()(Iterator& first,Iterator last)
-//     {
-//         std::size_t counter=0;
-//         /////////////////////////////////////////////
-//         Iterator it = first;
-//         while(counter++ < M)
-//         {
-//             if(!parser_(first,last))
-//             {
-//                 first = it;
-//                 break;
-//             }
-//             data_holder_type::data().push_back(parser_.data());
-//         }
-//         data_holder_type::call_back();
-//         return true;
-//     }
-//     /////////////////////////////////////////
-//     template <typename CallBack>
-//     repeat& operator<= (const CallBack& cb)
-//     {
-//         call_back_function() = cb; 
-//         return *this;
-//     }
-//     template <typename CallBack>
-//     repeat& operator<= (CallBack&& cb)
-//     {
-//         call_back_function() = std::move(cb);
-//         return *this;
-//     }
-//    ////////////////////////////////////////////
-// private:
-//     Parser parser_;
-
-// };
