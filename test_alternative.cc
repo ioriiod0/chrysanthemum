@@ -22,13 +22,22 @@ int main()
     auto p1 = _literal("FTP");
     auto p2 = _literal("HTTP");
     auto p3 = _literal("TCP");
-    auto p = _alternative( _choice<1>(p1),
-                           _choice<2>(p2),
-                           _choice<3>(p3),
-                           _choice<4>(_literal("IP")) );
+    auto p = _alternative( p1,
+                           p2,
+                           p3,
+                           _literal("IP") );
     {
 
         std::string str = "HTTP";
+        std::string::iterator it = str.begin();
+        if(p(it,str.end()) )
+        {
+            std::cout<<p.data().which()<<":"<<p.data().get<1>()<<std::endl;
+        }
+
+    }
+    {
+        std::string str = "TCP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )
         {
@@ -36,20 +45,15 @@ int main()
         }
 
     }
-    // {
-    //     std::string str = "TCP";
-    //     std::string::iterator it = str.begin();
-    //     bool ret = p(it,str.end());
-    //     std::cout<<ret<<std::endl;
-    //     std::cout<<p.data().which()<<std::endl;
-    // }
-    // {
-    //     std::string str = "IP";
-    //     std::string::iterator it = str.begin();
-    //     bool ret = p(it,str.end());
-    //     std::cout<<ret<<std::endl;
-    //     std::cout<<p.data().which()<<" "<<p.data().get<4>()<<std::endl;
-    // }
+    {
+        std::string str = "IP";
+        std::string::iterator it = str.begin();
+        if(p(it,str.end()) )
+        {
+            std::cout<<p.data().which()<<":"<<p.data().get<3>()<<std::endl;
+        }
+
+    }
     ////////////////////////////////////////////////////////
 
 

@@ -12,13 +12,12 @@
 #include "mutiple.h"
 #include "data_holder.h"
 
-template <typename Parser>
-struct alternative_data_type_traits;
 
-template <std::size_t Idx,typename Parser>
-struct alternative_data_type_traits< choice<Idx,Parser> >
+
+template <typename Parser>
+struct alternative_data_type_traits
 {
-    typedef choice<Idx,typename std::remove_reference<Parser>::type::data_type> type;
+    typedef typename std::remove_reference<Parser>::type::data_type type;
 };
 
 
@@ -33,10 +32,10 @@ class alternative
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
             Iterator it = first;
-            if(std::get<Idx>(t).under_lying_(first,last))
+            if(std::get<Idx>(t)(first,last))
             {
-                typedef typename std::tuple_element<Idx,Tuple>::type ttype;
-                data.template set<ttype::value>(std::get<Idx>(t).under_lying_.data());
+                //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
+                data.template set<Idx>(std::get<Idx>(t).data());
                 return true;
             }
             first = it;
@@ -51,10 +50,10 @@ class alternative
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
             Iterator it = first;
-            if(std::get<Idx>(t).under_lying_(first,last))
+            if(std::get<Idx>(t)(first,last))
             {
-                typedef typename std::tuple_element<Idx,Tuple>::type ttype;
-                data.template set<ttype::value>(std::get<Idx>(t).under_lying_.data());
+                //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
+                data.template set<Idx>(std::get<Idx>(t).data());
                 return true;
             }
             first = it;

@@ -9,68 +9,96 @@
 #include <cstring>
 #include <type_traits>
 #include <stdexcept>
+#include <functional>
 
 #include "meta_fuctions.h"
-struct UNUSED;
 
-template<std::size_t Idx,typename T>
-struct choice
-{
-    const static std::size_t value = Idx;
-    typedef T type;
-    /////////////////////////
-    choice(T&& t):under_lying_(std::forward<T>(t)) {}
-    ~choice() {}
-    ////////////////////////
-    T under_lying_;
-};
+// struct UNUSED;
 
-template <std::size_t Idx,typename T>
-choice<Idx,T> _choice(T&& t)
-{
-    return choice<Idx,T>(std::forward<T>(t));
-}
+// template<std::size_t Idx,typename T>
+// struct choice
+// {
+//     const static std::size_t value = Idx;
+//     typedef T type;
+//     /////////////////////////
+//     choice(T&& t):under_lying_(std::forward<T>(t)) {}
+//     ~choice() {}
+//     ////////////////////////
+//     T under_lying_;
+// };
+
+// template <std::size_t Idx,typename T>
+// choice<Idx,T> _choice(T&& t)
+// {
+//     return choice<Idx,T>(std::forward<T>(t));
+// }
+/////////////////////////////helper..////////////////////////////////////////////
+// template <std::size_t Idx,typename... Args>
+// struct choices_selector;
+// template <std::size_t Idx,typename Head,typename... Tails>
+// struct choices_selector<Idx,Head,Tails...>
+// {
+//     typedef typename enable_if_else<Idx == Head::value,
+//                                     typename Head::type,
+//                                     typename choices_selector<Idx,Tails...>::type >::type type;
+// };
+// template <std::size_t Idx,typename T>
+// struct choices_selector<Idx,T>
+// {
+//     //static_assert(Idx == T::value,"the given Index is invalid!");
+//     typedef typename enable_if_else<Idx == T::value,
+//                                     typename T::type,
+//                                     UNUSED >::type type;
+// };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-   
-template <typename... Choices>
+
+
+
+template <typename T>
+struct default_deleter
+{
+    void operator()(void* p)
+    {
+        static_cast<T*>(p)->~T();
+    }
+};
+
+
+template <typename T>
+struct deleter_traits
+{
+    typedef default_deleter<T> type;
+};
+
+
+template <typename... Args>
 class mutiple
 {
 public:
-    const static std::size_t buffer_size = max_size_of<Choices...>::value;
-    /////////////////////////////helper..////////////////////////////////////////////
-    template <std::size_t Idx,typename... Args>
-    struct choices_selector;
-    template <std::size_t Idx,typename Head,typename... Tails>
-    struct choices_selector<Idx,Head,Tails...>
-    {
-        typedef typename enable_if_else<Idx == Head::value,
-                                        typename Head::type,
-                                        typename choices_selector<Idx,Tails...>::type >::type type;
-    };
-    template <std::size_t Idx,typename T>
-    struct choices_selector<Idx,T>
-    {
-        //static_assert(Idx == T::value,"the given Index is invalid!");
-        typedef typename enable_if_else<Idx == T::value,
-                                        typename T::type,
-                                        UNUSED >::type type;
-    };
+    const static std::size_t buffer_size = max_size_of<Args...>::value;
+    typedef std::function<void(void*)> delete_functor;
+
 
 public:
-    mutiple():which_(0) {}
-    ~mutiple() {}
+    mutiple():is_inited_(false) {}
+    ~mutiple() 
+    {
+        if(is_inited_ && deleter_)
+            deleter_(buffer_);
+    }
     //////////////copy-assignment//////
     mutiple& operator=(const mutiple& t)
     {
         if(this!=&t)
         {
+            is_inited_ = t.is_inited_;
             which_ = t.which_;
             memcpy(buffer_,t.buffer_,buffer_size);
         }
         return *this;
     }
-    ////////////////copy-constructor//////////////////////
+    ////////////////copy-constructor/////////////
     mutiple(const mutiple& t)
     {
         *this = t; 
@@ -78,6 +106,14 @@ public:
     //////////////////////////////////////////////
     
 public:
+    operator bool() const
+    {
+        return is_inited_;
+    }
+    bool has_value() const
+    {
+        return is_inited_;
+    }
     std::size_t which()
     {
         return which_;
@@ -85,41 +121,46 @@ public:
     //////////////////////////////////
     template <std::size_t Idx,typename T>
     void set(T&& t)
-    {
-        typedef typename choices_selector<Idx,Choices...>::type choice_type;
+    {        
+        typedef typename at<Idx,Args...>::type ith_type;
+        typedef typename deleter_traits<ith_type>::type deleter_type;
+        if(is_inited_ && deleter_)
+            deleter_(buffer_);
         which_ = Idx;
-        //*static_cast<choice_type*>((void*)buffer_) = std::forward<T>(t);
-        new(buffer_) choice_type(std::forward<T>(t));
+        new(buffer_) ith_type(std::forward<T>(t));
+        deleter_ =  deleter_type();
+        is_inited_ = true;
     }
     ////////////////////////////////////
     template <std::size_t Idx>
-    typename choices_selector<Idx,Choices...>::type get()
+    typename at<Idx,Args...>::type& get()
     {
-        typedef typename choices_selector<Idx,Choices...>::type choice_type;
-        if(which_!=Idx)
-            throw std::invalid_argument("the given idx is different from the value which()!");
-        choice_type* p = (choice_type*)buffer_;
-        /////////need to call descontructor here!!////
-        ///********there may be some bugs!*******///
-        choice_type tmp(std::move(*p));
-        p->~choice_type();
-        return tmp;
+        typedef typename at<Idx,Args...>::type ith_type;
+        if(which_!=Idx || is_inited_ == false)
+            throw std::invalid_argument("the given idx is different from the"
+                                        "value which() or the value has not been inited");
+        return *((ith_type*)buffer_);
     }
 
-    // template <std::size_t Idx>
-    // const typename choices_selector<Idx,Choices...>::type& get() const
-    // {
-    //     typedef typename choices_selector<Idx,Choices...>::type choice_type;
-    //     if(which_!=Idx)
-    //         throw std::invalid_argument("the given idx is different from the value which()!");
-    //     choice_type*p = new(buffer_) choice_type(std::forward<T>(t));
-    //     return *p;
-    // }
+    template <std::size_t Idx>
+    const typename at<Idx,Args...>::type& get() const
+    {
+        typedef typename at<Idx,Args...>::type ith_type;
+        if(which_!=Idx || is_inited_ = false)
+            throw std::invalid_argument("the given idx is different from the"
+                                        "value which() or the value has not been inited");
+        return *((ith_type*)buffer_);
+    }
+
+
     ///////////////////////////////////
 
 private:
     char buffer_[buffer_size];
     std::size_t which_;
+    bool is_inited_;
+    delete_functor deleter_;
+
 };
 
 
