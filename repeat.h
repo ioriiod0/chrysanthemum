@@ -88,20 +88,6 @@ public:
         data_holder_type::call_back();
         return true;
     }
-   //  /////////////////////////////////////////
-   //  template <typename CallBack>
-   //  repeat& operator<= (const CallBack& cb)
-   //  {
-   //      data_holder_type::call_back_function() = cb; 
-   //      return *this;
-   //  }
-   //  template <typename CallBack>
-   //  repeat& operator<= (CallBack&& cb)
-   //  {
-   //      data_holder_type::call_back_function() = std::move(cb);
-   //      return *this;
-   //  }
-   // ////////////////////////////////////////////
 private:
     Parser parser_;
 

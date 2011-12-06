@@ -64,6 +64,14 @@ struct default_deleter
     }
 };
 
+// template <typename T>
+// struct default_cloner
+// {
+//     void operator()(void* p_dst,void* d_src)
+//     {
+//         *(static_cast<T*>(p_dst)) = *(static_cast<T*>(p_src));
+//     }
+// };
 
 template <typename T>
 struct deleter_traits
@@ -71,6 +79,11 @@ struct deleter_traits
     typedef default_deleter<T> type;
 };
 
+// template <typename T>
+// struct cloner_traits
+// {
+//     typedef default_cloner<T> type;
+// };
 
 template <typename... Args>
 class mutiple
@@ -88,23 +101,25 @@ public:
             deleter_(buffer_);
     }
     //////////////copy-assignment//////
-    mutiple& operator=(const mutiple& t)
+    mutiple& operator=(const mutiple& t) = delete;
+    ////////////////copy-constructor/////////////
+    mutiple(const mutiple& t) = delete;
+    //////////////////////////////////////////////
+    mutiple& operator=(mutiple&& t)
     {
         if(this!=&t)
         {
             is_inited_ = t.is_inited_;
             which_ = t.which_;
             memcpy(buffer_,t.buffer_,buffer_size);
+            t.is_inited_ = false;
         }
         return *this;
     }
-    ////////////////copy-constructor/////////////
-    mutiple(const mutiple& t)
+    mutiple(mutiple&& t)
     {
-        *this = t; 
+        *this = std::move(t);
     }
-    //////////////////////////////////////////////
-    
 public:
     operator bool() const
     {
