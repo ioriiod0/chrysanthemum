@@ -27,6 +27,7 @@ public:
         std::size_t counter=0;
         while(counter++ < N)
         {
+            parser_.reset();
             if(!parser_(first,last))
                 return false;
             data_holder_type::data().push_back(parser_.data());
@@ -36,6 +37,7 @@ public:
         while(counter++ <= M)
         {
             it = first;
+            parser_.reset();
             if(!parser_(first,last))
             {
                 first = it;
@@ -45,6 +47,11 @@ public:
         }
         data_holder_type::call_back();
         return true;
+    }
+
+    void reset()
+    {
+        data_holder_type::data().clear();
     }
    private:
     Parser parser_;

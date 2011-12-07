@@ -24,6 +24,7 @@ public:
     template <typename Iterator>
     bool operator()(Iterator& first,Iterator last)
     {
+        parser1_.reset();
         if(!parser1_(first,last))
             return false;
         data_holder_type::data().push_back(parser1_.data());
@@ -31,7 +32,8 @@ public:
         for(;;)
         {
             it = first;
-            parser1_.data().clear(); //clear parser1_'s data before new parsing with it;
+            parser1_.reset(); //clear parser1_'s data before new parsing with it;
+            parser2_.reset();
             if(!parser2_(first,last) || !parser1_(first,last))
             {
                 first = it;
@@ -41,6 +43,10 @@ public:
         }
         data_holder_type::call_back();
         return true;
+    }
+    void reset()
+    {
+        data_holder_type::data().clear();
     }
    private:
     Parser1 parser1_;

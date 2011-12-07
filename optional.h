@@ -17,11 +17,22 @@ public:
 public:
     // con/de-structor
     optional():is_inited_(false) {}
-    optional(T&& t):is_inited_(true),sp_(new T(std::forward<T>(t))) {}
+    optional(T&& t):is_inited_(true),t_(std::forward<T>(t)) {}
     ~optional() {}
     
-    optional(const optional& rhs)=delete;
-    optional& operator=(const optional& rhs);
+    optional(const optional& rhs)
+    {
+       *this = rhs; 
+    }
+    optional& operator=(const optional& rhs)
+    {
+        if(this!=&rhs)
+        {
+            is_inited_ = rhs.is_inited_;
+            t_ = rhs.t_;
+        }
+        return *this;
+    }
 
     optional(optional&& rhs)
     {
@@ -32,7 +43,7 @@ public:
         if(this!=&rhs)
         {
             is_inited_ = rhs.is_inited_;
-            sp_ = std::move(rhs.sp_);
+            t_ = std::move(rhs.t_);
         }
         return *this;
     }
@@ -49,28 +60,23 @@ public:
     void reset()
     {
         is_inited_ = false;
-        sp_.reset();
     }
     template <typename U>
-    void set(U&& t)
+    void set(U&& u)
     {
-        sp_.reset(new T(std::forward<U>(t)));
+        t_ = std::forward<U>(u);
         is_inited_ = true;
     }
     T& get()
     {
-        if(!sp_)
-            sp_.reset(new T());
-        return *sp_;
+        return t_;
     }
     const T& get() const
     {
-        if(!sp_)
-            sp_.reset(new T());
-        return *sp_;
+        return t_;
     }
 private:
     bool is_inited_;
-    std::unique_ptr<T> sp_;
+    T t_;
 
 }; // end class optional

@@ -32,6 +32,10 @@ class literal:public data_holder<std::string>
             call_back();
             return true;
         }
+        void reset()
+        {
+
+        }
 };
 
 template <typename Arg>

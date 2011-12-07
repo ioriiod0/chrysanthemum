@@ -26,25 +26,16 @@ public:
         set_data_and_call_back(*first++);
         return true;
     }  
-    // /////////////////////////////////////////
-    // template <typename CallBack>
-    // alpha_parser& operator<= (const CallBack& cb)
-    // {
-    //     call_back_function() = cb; 
-    //     return *this;
-    // }
-    // template <typename CallBack>
-    // alpha_parser& operator<= (CallBack&& cb)
-    // {
-    //     call_back_function() = std::move(cb);
-    //     return *this;
-    // }
-    // ////////////////////////////////////////////
+    void reset()
+    {
+        ///////////////do noting here//////////////////
+    }
 
 };
 
 #define CHAR_TO_NUM(X) ((X)-'0')
-class digit_parser:public data_holder<std::size_t>
+
+class digit_parser:public data_holder<char>
 {
 public:
     digit_parser() {}
@@ -57,23 +48,14 @@ public:
             return false;
         if(!std::isdigit(*first))
             return false;
-        set_data_and_call_back(CHAR_TO_NUM(*first++));
+        set_data_and_call_back(*first++);
         return true;
     }
-    // /////////////////////////////////////////
-    // template <typename CallBack>
-    // digit_parser& operator<= (const CallBack& cb)
-    // {
-    //     call_back_function() = cb; 
-    //     return *this;
-    // }
-    // template <typename CallBack>
-    // digit_parser& operator<= (CallBack&& cb)
-    // {
-    //     call_back_function() = std::move(cb);
-    //     return *this;
-    // }
-    // ////////////////////////////////////////////
+    void reset()
+    {
+        ///////////////do noting here//////////////////
+    }
+
 
 };
 
@@ -94,20 +76,10 @@ public:
         set_data_and_call_back(*first++);
         return true;
     }
-    // /////////////////////////////////////////
-    // template <typename CallBack>
-    // cntrl_parser& operator<= (const CallBack& cb)
-    // {
-    //     call_back_function() = cb; 
-    //     return *this;
-    // }
-    // template <typename CallBack>
-    // cntrl_parser& operator<= (CallBack&& cb)
-    // {
-    //     call_back_function() = std::move(cb);
-    //     return *this;
-    // }
-    // ////////////////////////////////////////////
+    void reset()
+    {
+        ///////////////do noting here//////////////////
+    }
 
 };
 
@@ -127,20 +99,10 @@ public:
         set_data_and_call_back(*first++);
         return true;
     }
-    // /////////////////////////////////////////
-    // template <typename CallBack>
-    // space_parser& operator<= (const CallBack& cb)
-    // {
-    //     call_back_function() = cb; 
-    //     return *this;
-    // }
-    // template <typename CallBack>
-    // space_parser& operator<= (CallBack&& cb)
-    // {
-    //     call_back_function() = std::move(cb);
-    //     return *this;
-    // }
-    // ////////////////////////////////////////////
+    void reset()
+    {
+        ///////////////do noting here//////////////////
+    }
 
 };
 

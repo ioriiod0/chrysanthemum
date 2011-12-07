@@ -35,9 +35,11 @@ public:
     {
         static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
         {
-            if(!std::get<std::tuple_size<Tuple>::value-N>(t)(first,last))
+            const static std::size_t Idx = std::tuple_size<Tuple>::value-1;
+            std::get<Idx>(t).reset();
+            if(!std::get<Idx>(t)(first,last))
                 return false;
-            std::get<std::tuple_size<Tuple>::value-N>(data) = std::get<std::tuple_size<Tuple>::value-N>(t).data();
+            std::get<Idx>(data) = std::get<Idx>(t).data();
             return helper<Tuple,Data_type,Iterator,N-1>::do_parse(t,data,first,last);
         }
     };
@@ -47,12 +49,35 @@ public:
     {
         static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
         {
-            if(!std::get<std::tuple_size<Tuple>::value-1>(t)(first,last))
+            const static std::size_t Idx = std::tuple_size<Tuple>::value-1;  
+            std::get<Idx>(t).reset();
+            if(!std::get<Idx>(t)(first,last))
                 return false;
-            std::get<std::tuple_size<Tuple>::value-1>(data) = std::get<std::tuple_size<Tuple>::value-1>(t).data();
+            std::get<Idx>(data) = std::get<Idx>(t).data();
             return true;
         }
     };
+
+    // template <typename Tuple,std::size_t N>
+    // struct reset_helper
+    // {
+    //     static void do_reset(Tuple& t)
+    //     {
+    //         const static std::size_t Idx =  std::tuple_size<Tuple>::value-N;
+    //         std::get<Idx>(t).reset();
+    //         return helper<Tuple,N-1>::do_reset(t);
+    //     }
+    // };
+
+    // template <typename Tuple>
+    // struct reset_helper<Tuple,1>
+    // {
+    //     static void do_reset(Tuple& t)
+    //     {
+    //         const static std::size_t Idx = std::tuple_size<Tuple>::value-1;
+    //         std::get<Idx>(t).reset();
+    //     }
+    // };
 
     typedef std::tuple<Args...> tuple_type;
     typedef std::tuple<typename  std::remove_reference<Args>::type::data_type...> data_type;
@@ -72,7 +97,10 @@ public:
        data_holder_type::call_back();
        return true;
     }
-
+    void reset()
+    {
+        
+    }
 private:
     tuple_type tuple_;
 };
