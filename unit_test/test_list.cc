@@ -15,15 +15,16 @@
 #include "../all.h"
 
 
-#define ACCUMULATER [](std::vector<char>& vec) \
+#define PRINTER [](std::vector<char>& vec) \
                         {                                   \
                             std::for_each(vec.begin(),vec.end(),[](char ch){std::cout<<ch<<std::endl;}); \
+                            return true;                    \
                         }
 int main()
 {
 
     auto lit = _literal('.');
-    auto ip_parser = _list(_repeat<1,3>(_digit()) <= ACCUMULATER ,
+    auto ip_parser = _list(_repeat<1,3>(_digit()) <= PRINTER ,
                            lit);
     std::string str ="192.168.1.1"; // "192.168.1.1";
     auto it = str.begin();
@@ -41,6 +42,7 @@ int main()
                                         std::cout<<i;
                                       }); 
                         std::cout<<"|";
+                        return true;
                       });
         std::cout<<std::endl;
     }

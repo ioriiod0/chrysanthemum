@@ -32,8 +32,7 @@ class literal_str_p:public data_holder<std::string>
             }
             if(it != data_.end())
                 return false;
-            call_back();
-            return true;
+            return call_back();
         }
 };
 
@@ -49,8 +48,7 @@ class literal_ch_p:public data_holder<char>
         {
             if(first != last && *first++ == data_)
             {
-                call_back();
-                return true;
+                return call_back();
             }
             return false;
         }

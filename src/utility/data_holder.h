@@ -17,22 +17,23 @@ class data_holder
 {
 public:
     typedef T data_type;
-    typedef std::function<void(T&)> call_back_type;
+    typedef std::function<bool(T&)> call_back_type;
 public:
     data_holder() {}
     ~data_holder() {}
 public:  
     ////////////////////////////////////
-    void call_back()
+    bool call_back()
     {
         if(call_back_)
-            call_back_(data_);
+            return call_back_(data_);
+        return true;
     }
     /////////////////////////////////////////
-    void set_data_and_call_back(const data_type& t)
+    bool set_data_and_call_back(const data_type& t)
     {
         data_ = t;
-        call_back();
+        return call_back();
     }
     ////////////////////////////////////
     data_type& data()

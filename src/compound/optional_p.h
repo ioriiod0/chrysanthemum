@@ -32,16 +32,10 @@ public:
         if(parser_(first,last))
         {
             data_holder_type::data().set(parser_.data());
-            data_holder_type::call_back();
-            return true;
+            return data_holder_type::call_back();
         }
         first = it;
-        return true;
-    }
-
-    void reset()
-    {
-        data_holder_type::data().reset();
+        return data_holder_type::call_back();
     }
     
 private:

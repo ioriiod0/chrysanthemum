@@ -43,8 +43,7 @@ public:
             }
             data_holder_type::data().push_back(parser1_.data());
         }
-        data_holder_type::call_back();
-        return true;
+        return data_holder_type::call_back();
     }
 
    private:
@@ -60,6 +59,10 @@ auto _list(P1&& p1,P2&& p2) -> list<P1,P2>
     return list<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
 }
 
-
+template <typename P1,typename P2>
+auto operator% (P1&& p1,P2&& p2) -> list<P1,P2>
+{
+    return list<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
+}
 #endif
 

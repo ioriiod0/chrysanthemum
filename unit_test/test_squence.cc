@@ -21,7 +21,7 @@ int main()
     space_parser s1;
     space_parser s2;
     std::string header = "FTP://"; 
-    auto p2 = _literal("HTTP://") <= [&header](std::string& str){ str = header; };
+    auto p2 = _literal("HTTP://") <= [&header](std::string& str) -> bool { str = header; return true;};
     auto p = _sequence(p2,
                        a1,
                        d1,
@@ -29,7 +29,7 @@ int main()
                        a2,
                        d2,
                        s2,
-                       alpha_parser() <= [](char& ch){std::cout<<"char "<<ch<<" changed to i"<<std::endl;ch = 'i';} );
+                       alpha_parser() <= [](char& ch) -> bool {std::cout<<"char "<<ch<<" changed to i"<<std::endl;ch = 'i';return true;} );
     std::string str = "HTTP://a3 b4 c";
     std::string::iterator it = str.begin();
     bool ret = p(it,str.end());

@@ -35,7 +35,8 @@ test_optional: unit_test/test_optional.cc ${ALL_HEADER}
 test_alternative: unit_test/test_alternative.cc
 	g++ unit_test/test_alternative.cc -o bin/test_alternative -std=c++0x
 	echo "test_alternative done!"
-
-
+test_difference: unit_test/test_difference.cc
+	g++ unit_test/test_difference.cc -o bin/test_difference -std=c++0x
+	echo "test_difference done!"
 clean: 
 	rm -f bin/*.o

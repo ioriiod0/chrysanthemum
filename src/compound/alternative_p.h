@@ -80,8 +80,7 @@ public:
        if(!helper<tuple_type,data_type,Iterator,
                std::tuple_size<tuple_type>::value>::do_parse(tuple_,data_holder_type::data(),first,last))
            return false;
-       data_holder_type::call_back();
-       return true;
+       return data_holder_type::call_back();
     }
 
 private:

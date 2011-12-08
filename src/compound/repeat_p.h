@@ -49,8 +49,7 @@ public:
             }
             data_holder_type::data().push_back(parser_.data());
         }
-        data_holder_type::call_back();
-        return true;
+        return data_holder_type::call_back();
     }
 
    private:
@@ -92,8 +91,7 @@ public:
             }
             data_holder_type::data().push_back(parser_.data());
         }
-        data_holder_type::call_back();
-        return true;
+        return data_holder_type::call_back();
     }
 private:
     Parser parser_;

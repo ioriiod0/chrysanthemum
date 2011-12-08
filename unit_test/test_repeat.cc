@@ -16,10 +16,11 @@
 
 
 
-#define ACCUMULATER(SUM) [&SUM](std::vector<char>& vec) \
-                         {                                                 \
+#define ACCUMULATER(SUM) [&SUM](std::vector<char>& vec)                 \
+                         {                                               \
                             vec.push_back('\0');                            \
                             SUM = atol(&vec[0]);                            \
+                            return true;                                   \
                          }
 int main()
 {
