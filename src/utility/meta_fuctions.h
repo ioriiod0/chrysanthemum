@@ -87,7 +87,23 @@
     {
         typedef U type;
     };
-    
+    ////////////////////////////value_at////////////////////////////////////////////////
+    // template <std::size_t Idx,typename T,T... Vs>
+    // struct value_at;
+
+    // template <std::size_t Idx,typename T,T Head,T... Tails>
+    // struct value_at<Idx,T,Head,Tails...>
+    // {
+    //     const static T value =  value_at<Idx-1,T,Tails...>::value;    
+    // };
+
+    // template <typename T,T Head,T... Tails>
+    // struct at<0,Head,Tails...>
+    // {
+    //     const static T value = Head;
+    // };
+
+    // };
 #endif
 
 

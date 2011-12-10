@@ -32,7 +32,7 @@ class alternative_p
     template <typename Tuple,typename Data_type,typename Iterator,std::size_t N>
     struct helper
     {
-        static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
+        inline static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
             Iterator it = first;
@@ -50,7 +50,7 @@ class alternative_p
     template <typename Tuple,typename Data_type,typename Iterator>
     struct helper<Tuple,Data_type,Iterator,1>
     {
-        static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
+        inline static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
             Iterator it = first;
