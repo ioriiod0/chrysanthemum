@@ -7,8 +7,8 @@
 
 #include "../utility/data_holder.h"
 
-template <typename CharT,CharT Start,CharT End>
-class range:public data_holder<CharT>
+template <typename Iterator,typename CharT,CharT Start,CharT End>
+class range:public basic_parser<Iterator,range<Iterator,CharT,Start,End>>
 {
 public:
     static_assert(Start<End,"Start must less than End");
@@ -16,14 +16,14 @@ public:
     range() {}
     ~range() {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         if(first==last)
             return false;
         if(*first<Start || *first>End)
             return false;
-        set_data_and_call_back(*first++);
+        ++first;
+        return true;
     }
 
 };

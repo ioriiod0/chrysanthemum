@@ -25,9 +25,9 @@ struct alternative_p_data_type_traits
 };
 
 
-template <typename... Args>
+template <typename Iterator,typename... Args>
 class alternative_p
-    :public data_holder< alternative<typename alternative_p_data_type_traits<Args>::type...> > // alternative<typename alternative_p_data_type_traits<Args>::type...>
+    :public basic_parser<alternative_p,Iterator>
 {
     template <typename Tuple,typename Data_type,typename Iterator,std::size_t N>
     struct helper

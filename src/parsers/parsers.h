@@ -8,192 +8,168 @@
 #define __PARSERS_H__
 
 #include <cctype>
-#include "../utility/data_holder.h"
+#include "../utility/basic_parser.h"
 
-class alpha_parser:public data_holder<char>
+template <typename Iterator>
+class alpha_parser:public basic_parser<Iterator,alpha_parser<Iterator>>
 {
 public:
     alpha_parser() {}
     ~alpha_parser() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        if(first==last)
+        if(first == last || !std::isalpha(*first++))
             return false;
-        if(!std::isalpha(*first))
-            return false;
-        return set_data_and_call_back(*first++);
+        return true;
     }  
-
 };
 
-#define CHAR_TO_NUM(X) ((X)-'0')
 
-class digit_parser:public data_holder<char>
+template <typename Iterator>
+class digit_parser:public basic_parser<Iterator,digit_parser<Iterator>> 
 {
 public:
     digit_parser() {}
     ~digit_parser() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        if(first == last)
+        if(first == last || !std::isdigit(*first++))
             return false;
-        if(!std::isdigit(*first))
-            return false;
-        return set_data_and_call_back(*first++);
+        return true;
     }
  
 
 };
 
-
-class cntrl_parser:public data_holder<char>
+template <typename Iterator>
+class cntrl_parser:public basic_parser<Iterator,cntrl_parser<Iterator>>
 {
 public:
     cntrl_parser() {}
     ~cntrl_parser() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        if(first == last)
+        if(first == last || !std::iscntrl(*first++))
             return false;
-        if(!std::iscntrl(*first))
-            return false;
-        return set_data_and_call_back(*first++);
+        return true;
     }
     
 };
 
-class space_parser:public data_holder<char>
+template <typename Iterator>
+class space_parser:public basic_parser<Iterator,space_parser<Iterator>>
 {
 public:
     space_parser() {}
     ~space_parser() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        if(first == last)
+        if(first == last || !std::isspace(*first++))
             return false;
-        if(!std::isspace(*first))
-            return false;
-        return set_data_and_call_back(*first++);
+        return true;
     }
  };
 
-class oct_parser:public data_holder<char>
+template <typename Iterator>
+class oct_parser:public basic_parser<Iterator,oct_parser<Iterator>>
 {
 public:
     oct_parser() {}
     ~oct_parser() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         if(first == last)
             return false;
-        return set_data_and_call_back(*first++);
+        ++first;
+        return true;
     }
  };
 
-class char_parser:public data_holder<char>
+template <typename Iterator>
+class char_parser:public basic_parser<Iterator,char_parser<Iterator>>
 {
 public:
     char_parser() {}
     ~char_parser() {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         if(first == last)
             return false;
         if((int)*first <0 || (int)*first > 127)
             return false;
-        return set_data_and_call_back(*first++);
+        ++first;
+        return true;
     }
 };
 
-class char_parser:public data_holder<char>
-{
-public:
-    char_parser() {}
-    ~char_parser() {}
-public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
-    {
-        if(first == last)
-            return false;
-        if((int)*first <0 || (int)*first > 127)
-            return false;
-        return set_data_and_call_back(*first++);
-    }
-};
 
-class upalpha_parser:public data_holder<char>
+template <typename Iterator>
+class upalpha_parser:public basic_parser<Iterator,upalpha_parser<Iterator>>
 {
 public:
     upalpha_parser() {}
     ~upalpha_parser() {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        if(first == last)
+
+        if(first == last || !std::isupper(*first++))
             return false;
-        if(!std::isupper(*first))
-            return false;
-        return set_data_and_call_back(*first++);
+        return true;
     }
 };
 
-class loalpha_parser:public data_holder<char>
+template <typename Iterator>
+class loalpha_parser:public basic_parser<Iterator,loalpha_parser<Iterator>>
 {
 public:
     loalpha_parser() {}
     ~loalpha_parser() {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        if(first == last)
+
+        if(first == last || !std::islower(*first++))
             return false;
-        if(!std::islower(*first))
-            return false;
-        return set_data_and_call_back(*first++);
+        return true; 
     }
 };
 
-class hex_parser:public data_holder<char>
+template <typename Iterator>
+class hex_parser:public basic_parser<Iterator,hex_parser<Iterator>>
 {
 public:
     hex_parser() {}
     ~hex_parser() {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         if(first == last)
             return false;
         char ch = *first;
         if(std::isdigit(ch) || ( ch>='A' && ch<='F') || (ch >='a' && ch<='f') )
-            return set_data_and_call_back(*first++);
+        {
+            ++first;
+            return true;
+        }
         return false;
     }
 };
 
-typedef alpha_parser _alpha;
-typedef digit_parser _digit;
-typedef space_parser _space;
-typedef cntrl_parser _cntrl;
-typedef oct_parser _oct;
-typedef char_parser _char;
-typedef loalpha_parser _loalpha;
-typedef upalpha_parser _upalpha;
+#define _alpha alpha_parser
+#define _digit digit_parser
+#define _space space_parser
+#define _cntrl cntrl_parser
+#define _oct oct_parser
+#define _char char_parser
+#define _loalpha loalpha_parser
+#define _upalpha upalpha_parser
 
 #endif
 

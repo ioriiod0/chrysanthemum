@@ -8,35 +8,49 @@
 #include <string>
 #include <iostream>
 
-#include "../all.h"
+//#include "../all.h"
+#include "../src/compound/sequence_p.h"
+#include "../src/compound/literal_p.h"
+#include "../src/parsers/parsers.h"
 
 
+#define PRINTER [](Iterator first,Iterator last)    \
+                  {                                 \
+                      std::cout<<*first<<std::endl;      \
+                      return true;                  \
+                  }
+
+#define PRINTER [](Iterator first,Iterator last)    \
+                  {                                 \
+                      std::cout<<*first<<std::endl;      \
+                      return true;                  \
+                  }
 
 int main()
 {
-    alpha_parser a1;
-    alpha_parser a2;
-    digit_parser d1;
-    digit_parser d2;
-    space_parser s1;
-    space_parser s2;
-    std::string header = "FTP://"; 
-    auto p2 = _literal("HTTP://") <= [&header](std::string& str) -> bool { str = header; return true;};
-    auto p = _sequence(p2,
-                       a1,
-                       d1,
-                       s1,
-                       a2,
-                       d2,
-                       s2,
-                       alpha_parser() <= [](char& ch) -> bool {std::cout<<"char "<<ch<<" changed to i"<<std::endl;ch = 'i';return true;} );
+    typedef std::string::iterator Iterator;
+    _alpha<Iterator> a1;
+    _alpha<Iterator> a2;
+    _digit<Iterator> d1;
+    _digit<Iterator> d2;
+    _space<Iterator> s1;
+    _space<Iterator> s2;
+    //std::string header = "FTP://"; 
+    auto p2 = _literal<Iterator>("HTTP://");
+    auto p = _sequence<Iterator>(p2, 
+                               a1 <= PRINTER,
+                               d1 <= PRINTER,
+                               s1 <= PRINTER,
+                               a2 <= PRINTER,
+                               d2 <= PRINTER,
+                               s2 <= PRINTER,
+                               _alpha<Iterator>() <= PRINTER);
     std::string str = "HTTP://a3 b4 c";
-    std::string::iterator it = str.begin();
-    bool ret = p(it,str.end());
+    Iterator first = str.begin();
+    Iterator last = str.end();
+    
+    bool ret = p(first,last);
     std::cout<<ret<<std::endl;
-    std::cout<<p.data()<<std::endl;
-    std::cout<<d1.data()<<std::endl;
-;
 
 }
 
