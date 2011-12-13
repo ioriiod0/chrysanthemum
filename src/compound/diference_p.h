@@ -10,23 +10,19 @@
 #define __DIFFERENCE_P_H__
 
 #include <type_traits>
-#include "../utility/data_holder.h"
+#include "../utility/basic_parser.h"
 
 
-template <typename Parser1,typename Parser2>
-class difference_p:public data_holder<typename std::remove_reference<Parser1>::type::data_type>
+template <typename Iterator,typename Parser1,typename Parser2>
+class difference_p:public basic_parser<Iterator,difference_p<Iterator,Parser1,Parser2>>
 {
-public:
-    typedef typename std::remove_reference<Parser1>::type::data_type data_type;
-    typedef data_holder<data_type> data_holder_type; 
 public:
     difference_p(Parser1&& p1,Parser2&& p2):
                 parser1(std::forward<Parser1>(p1)),
                 parser2(std::forward<Parser2>(p2)) {}
     ~difference_p() {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         Iterator it=first;
         if(!parser2(first,last))
@@ -34,8 +30,7 @@ public:
             first = it;
             if(parser1(first,last))
             {
-                data_holder_type::data() = parser1.data();
-                return data_holder_type::call_back();
+                return true;
             }
         }
         return false;
@@ -45,16 +40,16 @@ private:
     Parser2 parser2;
 };
 
-template <typename Parser1,typename Parser2>
-auto _difference(Parser1&& p1,Parser2&& p2) -> difference_p<Parser1,Parser2>
+template <typename Iterator,typename Parser1,typename Parser2>
+auto _difference(Parser1&& p1,Parser2&& p2) -> difference_p<Iterator,Parser1,Parser2>
 {
-    return difference_p<Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
+    return difference_p<Iterator,Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
 }
 
 template <typename Parser1,typename Parser2>
-auto operator- (Parser1&& p1,Parser2&& p2) -> difference_p<Parser1,Parser2>
+auto operator- (Parser1&& p1,Parser2&& p2) -> difference_p<typename Parser1::iterator,Parser1,Parser2>
 {
-    return difference_p<Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
+    return difference_p<typename Parser1::iterator,Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
 }
 
 

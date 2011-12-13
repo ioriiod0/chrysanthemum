@@ -14,50 +14,40 @@
 #include <tuple>
 #include <type_traits>
 #include <string>
-#include "../utility/alternative.h"
-#include "../utility/data_holder.h"
-
-
-template <typename Parser>
-struct alternative_p_data_type_traits
-{
-    typedef typename std::remove_reference<Parser>::type::data_type type;
-};
+#include "../utility/basic_parser.h"
 
 
 template <typename Iterator,typename... Args>
 class alternative_p
-    :public basic_parser<alternative_p,Iterator>
+    :public basic_parser<Iterator,alternative_p<Iterator,Args...>>
 {
-    template <typename Tuple,typename Data_type,typename Iterator,std::size_t N>
+    template <typename Tuple,typename It,std::size_t N>
     struct helper
     {
-        inline static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
+        inline static bool do_parse(Tuple& t,It& first,Iterator last)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
             Iterator it = first;
             if(std::get<Idx>(t)(first,last))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
-                data.template set<Idx>(std::get<Idx>(t).data());
                 return true;
             }
             first = it;
-            return helper<Tuple,Data_type,Iterator,N-1>::do_parse(t,data,first,last);
+            return helper<Tuple,It,N-1>::do_parse(t,first,last);
         }
     };
 
-    template <typename Tuple,typename Data_type,typename Iterator>
-    struct helper<Tuple,Data_type,Iterator,1>
+    template <typename Tuple,typename It>
+    struct helper<Tuple,It,1>
     {
-        inline static bool do_parse(Tuple& t,Data_type& data,Iterator& first,Iterator last)
+        inline static bool do_parse(Tuple& t,It& first,Iterator last)
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
             Iterator it = first;
             if(std::get<Idx>(t)(first,last))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
-                data.template set<Idx>(std::get<Idx>(t).data());
                 return true;
             }
             first = it;
@@ -66,21 +56,18 @@ class alternative_p
     };
 
     typedef std::tuple<Args...> tuple_type;
-    typedef alternative<typename alternative_p_data_type_traits<Args>::type...> data_type;
-    typedef data_holder<data_type> data_holder_type;
 
 
 public:
     alternative_p(Args&&... args):tuple_(std::forward<Args>(args)...) {}
     ~alternative_p() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last) 
+    bool do_parse(Iterator& first,Iterator last) 
     {
-       if(!helper<tuple_type,data_type,Iterator,
-               std::tuple_size<tuple_type>::value>::do_parse(tuple_,data_holder_type::data(),first,last))
+       if(!helper<tuple_type,Iterator,
+               std::tuple_size<tuple_type>::value>::do_parse(tuple_,first,last))
            return false;
-       return data_holder_type::call_back();
+       return true; 
     }
 
 private:
@@ -90,10 +77,10 @@ private:
 
 
 
-template <typename... Args>
-auto _alternative(Args&&... args) -> alternative_p<Args...> 
+template <typename Iterator,typename... Args>
+auto _alternative(Args&&... args) -> alternative_p<Iterator,Args...> 
 {
-    return alternative_p<Args...>(std::forward<Args>(args)...);
+    return alternative_p<Iterator,Args...>(std::forward<Args>(args)...);
 }
 
 #endif

@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "../all.h"
+#include "../src/action/action.h"
 
 struct tester
 {

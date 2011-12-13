@@ -12,45 +12,59 @@
 #include "../src/compound/sequence_p.h"
 #include "../src/compound/literal_p.h"
 #include "../src/parsers/parsers.h"
-
-
-#define PRINTER [](Iterator first,Iterator last)    \
-                  {                                 \
-                      std::cout<<*first<<std::endl;      \
-                      return true;                  \
-                  }
+#include "../src/action/action.h"
 
 #define PRINTER [](Iterator first,Iterator last)    \
                   {                                 \
                       std::cout<<*first<<std::endl;      \
                       return true;                  \
                   }
+
 
 int main()
 {
     typedef std::string::iterator Iterator;
-    _alpha<Iterator> a1;
-    _alpha<Iterator> a2;
-    _digit<Iterator> d1;
-    _digit<Iterator> d2;
-    _space<Iterator> s1;
-    _space<Iterator> s2;
-    //std::string header = "FTP://"; 
-    auto p2 = _literal<Iterator>("HTTP://");
-    auto p = _sequence<Iterator>(p2, 
-                               a1 <= PRINTER,
-                               d1 <= PRINTER,
-                               s1 <= PRINTER,
-                               a2 <= PRINTER,
-                               d2 <= PRINTER,
-                               s2 <= PRINTER,
-                               _alpha<Iterator>() <= PRINTER);
-    std::string str = "HTTP://a3 b4 c";
-    Iterator first = str.begin();
-    Iterator last = str.end();
-    
-    bool ret = p(first,last);
-    std::cout<<ret<<std::endl;
+    _alpha<Iterator> a1; a1 <= PRINTER;
+    _alpha<Iterator> a2; a2 <= PRINTER;
+    _digit<Iterator> d1; d1 <= PRINTER;
+    _digit<Iterator> d2; d2 <= PRINTER;
+    _space<Iterator> s1; s1 <= PRINTER;
+    _space<Iterator> s2; s2 <= PRINTER;
+    std::string ret;
+
+    // {
+    //            //std::string header = "FTP://"; 
+    //     auto p2 = _literal<Iterator>("HTTP://");
+    //     auto p = _sequence<Iterator>(p2, 
+    //                                  a1,
+    //                                  d1,
+    //                                  s1,
+    //                                  a2,
+    //                                  d2,
+    //                                  s2,
+    //                                  _alpha<Iterator>() <= PRINTER);
+    //     std::string str = "HTTP://a3 b4 c";
+    //     Iterator first = str.begin();
+    //     Iterator last = str.end();
+    //     
+    //     bool ret = p(first,last);
+    //     std::cout<<ret<<std::endl;
+    // }
+
+
+    {
+        auto p = "HTTP://" & a1 & d1 & ' ' & a2 & d2 & ' ' & (_alpha<Iterator>() <= PRINTER);
+        p <= to_string<Iterator>(ret);
+        std::string str = "HTTP://a3 b4 c";
+        Iterator first = str.begin();
+        Iterator last = str.end();
+        if(p(first,last))
+        {
+            std::cout<<ret<<std::endl;
+        }
+
+    }
+
 
 }
 

@@ -17,9 +17,8 @@ template <typename Iterator,typename Str_type>
 class literal_str_p:public basic_parser<Iterator,literal_str_p<Iterator,Str_type>>
 {
     public:
-        literal_str_p(const Str_type& str) {data_ = str;}
-        literal_str_p(Str_type&& str) {data_ = std::move(str);}
-        literal_str_p(const typename Str_type::value_type* str) { data_ = str; }
+        template <typename T>
+        literal_str_p(T&& t):data_(std::forward<T>(t)) {}
         ~literal_str_p() {}
 
     public:
@@ -65,6 +64,7 @@ auto _literal(Arg&& arg) -> literal_str_p<Iterator,std::string>
 {
     return literal_str_p<Iterator,std::string>(std::forward<Arg>(arg));
 }
+
 
 template <typename Iterator>
 auto _literal(char ch) -> literal_ch_p<Iterator,char>

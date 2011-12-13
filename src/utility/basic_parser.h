@@ -17,6 +17,7 @@ class basic_parser
 {
 public:
     typedef std::function<bool(Iterator,Iterator)> call_back_type;
+    typedef Iterator iterator;
 public:
     basic_parser() {}
     ~basic_parser() {}
@@ -39,6 +40,13 @@ public:
     {
         return cb_;
     }
+    ////////////////////////////////////////////
+    template <typename F>
+    basic_parser& operator[](F&& f)
+    {
+        cb_ = std::forward<F>(f);
+        return *this;
+    }
 protected:
     call_back_type cb_;
 };
@@ -49,7 +57,7 @@ protected:
     inline typename std::remove_reference<Parser>::type&& 
         operator<= (Parser&& p,CallBack&& cb)
     {
-        p.get_cb() = std::forward<CallBack>(cb); 
+        p[std::forward<CallBack>(cb)]; 
         return static_cast<typename std::remove_reference<Parser>::type&&>(p);
     }
    ////////////////////////////////////////////

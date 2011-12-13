@@ -60,15 +60,15 @@ protected:
 
 };
 
- /////////////////////////////////////////
-    template <typename Parser,typename CallBack>
-    inline typename std::remove_reference<Parser>::type&& 
-        operator<= (Parser&& p,CallBack&& cb)
-    {
-        p.call_back_function() = std::forward<CallBack>(cb); 
-        return static_cast<typename std::remove_reference<Parser>::type&&>(p);
-    }
-   ////////////////////////////////////////////
+ // /////////////////////////////////////////
+ //    template <typename Parser,typename CallBack>
+ //    inline typename std::remove_reference<Parser>::type&& 
+ //        operator<= (Parser&& p,CallBack&& cb)
+ //    {
+ //        p.call_back_function() = std::forward<CallBack>(cb); 
+ //        return static_cast<typename std::remove_reference<Parser>::type&&>(p);
+ //    }
+ //   ////////////////////////////////////////////
 
 #endif
 
