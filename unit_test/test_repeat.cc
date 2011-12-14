@@ -11,17 +11,16 @@
 #include <iostream>
 #include <algorithm>
 
-#include "../all.h"
+//#include "../all.h"
+#include "literal_p.h"
+#include "and_p.h"
+#include "or_p.h"
+#include "../action/action.h"
+#include "../parsers/parsers.h"
 
 
 
 
-#define ACCUMULATER(SUM) [&SUM](std::vector<char>& vec)                 \
-                         {                                               \
-                            vec.push_back('\0');                            \
-                            SUM = atol(&vec[0]);                            \
-                            return true;                                   \
-                         }
 int main()
 {
 
@@ -29,7 +28,7 @@ int main()
         std::size_t sum=0;
         std::string str ="192"; // "192.168.1.1";
         auto it = str.begin();
-        auto p = _repeat<1,4>(_digit())<= ACCUMULATER(sum);
+        auto p = _repeat<1,4>(_digit()) <= ACCUMULATER(sum);
         if(p(it,str.end()))
         {
             std::cout<<sum<<std::endl;

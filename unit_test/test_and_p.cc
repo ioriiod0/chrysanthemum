@@ -9,7 +9,7 @@
 #include <iostream>
 
 //#include "../all.h"
-#include "../src/compound/sequence_p.h"
+#include "../src/compound/and_p.h"
 #include "../src/compound/literal_p.h"
 #include "../src/parsers/parsers.h"
 #include "../src/action/action.h"
@@ -31,26 +31,6 @@ int main()
     _space<Iterator> s1; s1 <= PRINTER;
     _space<Iterator> s2; s2 <= PRINTER;
     std::string ret;
-
-    // {
-    //            //std::string header = "FTP://"; 
-    //     auto p2 = _literal<Iterator>("HTTP://");
-    //     auto p = _sequence<Iterator>(p2, 
-    //                                  a1,
-    //                                  d1,
-    //                                  s1,
-    //                                  a2,
-    //                                  d2,
-    //                                  s2,
-    //                                  _alpha<Iterator>() <= PRINTER);
-    //     std::string str = "HTTP://a3 b4 c";
-    //     Iterator first = str.begin();
-    //     Iterator last = str.end();
-    //     
-    //     bool ret = p(first,last);
-    //     std::cout<<ret<<std::endl;
-    // }
-
 
     {
         auto p = "HTTP://" & a1 & d1 & ' ' & a2 & d2 & ' ' & (_alpha<Iterator>() <= PRINTER);
