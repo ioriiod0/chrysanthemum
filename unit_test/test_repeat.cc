@@ -12,11 +12,12 @@
 #include <algorithm>
 
 //#include "../all.h"
-#include "literal_p.h"
-#include "and_p.h"
-#include "or_p.h"
-#include "../action/action.h"
-#include "../parsers/parsers.h"
+#include "../src/compound/repeat_p.h"
+#include "../src/compound/literal_p.h"
+#include "../src/compound/and_p.h"
+#include "../src/compound/or_p.h"
+#include "../src/action/converters.h"
+#include "../src/parsers/parsers.h"
 
 
 
@@ -24,11 +25,15 @@
 int main()
 {
 
+    typedef std::string::iterator IT;
+
     {
+        
         std::size_t sum=0;
         std::string str ="192"; // "192.168.1.1";
         auto it = str.begin();
-        auto p = _repeat<1,4>(_digit()) <= ACCUMULATER(sum);
+        auto p = _repeat<1,4>(_digit<IT>()) <= str_to_numeric<IT,std::size_t>(sum);
+
         if(p(it,str.end()))
         {
             std::cout<<sum<<std::endl;
@@ -39,37 +44,21 @@ int main()
         }
     }
 
-    {
-        auto lit = _literal('.');
-        std::string str ="."; // "192.168.1.1";
-        auto it = str.begin();
-        if(lit(it,str.end()))
-        {
-            std::cout<<lit.data()<<std::endl;
-        }
-        else
-        {
-            std::cout<<"fuck"<<std::endl;
-        }
-
-    }
-
+  
     {
         std::size_t adress1=0;
         std::size_t adress2=0;
         std::size_t adress3=0;
-        std::size_t adress4=0;
+        std::size_t adress4=0; 
 
-        auto lit = _literal('.');
-
-        auto ip_parser = _sequence( _repeat<1,3>(_digit()) <= ACCUMULATER(adress1),
-                                    lit,
-                                     _repeat<1,3>(_digit()) <= ACCUMULATER(adress2),
-                                    lit,
-                                    _repeat<1,3>(_digit()) <= ACCUMULATER(adress3),
-                                    lit,
-                                    _repeat<1,3>(_digit()) <= ACCUMULATER(adress4)
-                                  );
+        auto ip_parser =  (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress1)
+                        & '.'
+                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress2)
+                        & '.'
+                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress3)
+                        & '.'
+                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress4);
+                                 
 
         std::string str ="192.168.1.1"; // "192.168.1.1";
         auto it = str.begin();

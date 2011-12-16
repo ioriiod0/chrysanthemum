@@ -12,39 +12,32 @@
 #include <iostream>
 #include <algorithm>
 
-#include "../all.h"
+
+//#include "../all.h"
+#include "../src/compound/repeat_p.h"
+#include "../src/compound/list_p.h"
+#include "../src/compound/and_p.h"
+#include "../src/compound/or_p.h"
+#include "../src/action/back_inserter.h"
+#include "../src/action/converters.h"
+#include "../src/parsers/parsers.h"
 
 
-#define PRINTER [](std::vector<char>& vec) \
-                        {                                   \
-                            std::for_each(vec.begin(),vec.end(),[](char ch){std::cout<<ch<<std::endl;}); \
-                            return true;                    \
-                        }
 int main()
 {
 
-    auto lit = _literal('.');
-    auto ip_parser = _list(_repeat<1,3>(_digit()) <= PRINTER ,
-                           lit);
-    std::string str ="192.168.1.1"; // "192.168.1.1";
+    typedef std::string::iterator IT;
+    std::vector<std::size_t> vec;
+    auto ip_parser = (_repeat<1,3>(_digit<IT>()) 
+                        <= make_back_inserter<IT,str_to_numeric<IT,std::size_t>>(vec)) % '.';
+    std::string str = "192.168.1.1"; // "192.168.1.1";
     auto it = str.begin();
     if(ip_parser(it,str.end()))
     {
-        typedef decltype(ip_parser) ip_parser_type;
-        ip_parser_type::data_type& data = ip_parser.data();
-        std::for_each(data.begin(),
-                      data.end(),
-                      [](std::vector<char>& vec)
-                      {
-                        std::for_each(vec.begin(),vec.end(),
-                                      [](char i)
-                                      {
-                                        std::cout<<i;
-                                      }); 
-                        std::cout<<"|";
-                        return true;
+        std::for_each(vec.begin(),vec.end(),[](std::size_t i){
+                      std::cout<<i<<std::endl;
                       });
-        std::cout<<std::endl;
+        std::cout<<"................."<<std::endl;
     }
     else
     {

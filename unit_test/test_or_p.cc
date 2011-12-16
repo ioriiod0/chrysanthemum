@@ -8,7 +8,7 @@
 #include <string>
 #include <iostream>
 //#include "../all.h"
-#include "../src/action/action.h"
+#include "../src/action/converters.h"
 #include "../src/compound/or_p.h"
 #include "../src/compound/and_p.h"
 #include "../src/parsers/parsers.h"
@@ -26,11 +26,11 @@ int main()
 
 
     {
-        auto p = _or<Iterator>( p1,
-                                p2,
-                                p3,
-                                _literal<Iterator>("IP") <= to_string<Iterator>(str)
-                              );
+        auto p = _or( p1,
+                      p2,
+                      p3,
+                      _literal<Iterator>("IP") <= to_string<Iterator>(str)
+                    );
         std::string str = "HTTP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )
@@ -43,11 +43,11 @@ int main()
 
 
     {
-        auto p = _or<Iterator>( p1,
-                                p2,
-                                p3,
-                                _literal<Iterator>("IP") <= to_string<Iterator>(str)
-                              );
+        auto p = _or( p1,
+                      p2,
+                      p3,
+                      _literal<Iterator>("IP") <= to_string<Iterator>(str)
+                    );
         std::string str = "TCP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )
@@ -60,11 +60,11 @@ int main()
 
 
     {
-        auto p = _or<Iterator>( p1,
-                                p2,
-                                p3,
-                                "IP" <= to_string<Iterator>(str)
-                              );
+        auto p = _or( p1,
+                      p2,
+                      p3,
+                      "IP" <= to_string<Iterator>(str)
+                    );
         std::string str = "IP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )

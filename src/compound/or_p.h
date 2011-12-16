@@ -15,17 +15,22 @@
 #include <type_traits>
 #include <string>
 #include "literal_p.h"
+#include "../utility/meta_fuctions.h"
 #include "../utility/basic_parser.h"
 
 
-template <typename Iterator,typename... Args>
+template <typename... Args>
 class or_p
-    :public basic_parser<Iterator,or_p<Iterator,Args...>>
+    :public basic_parser<typename std::remove_reference<typename at<0,Args...>::type>::type::iterator,
+                        or_p<Args...>>
 {
+public:
+    typedef typename std::remove_reference<typename at<0,Args...>::type>::type::iterator Iterator;
+
     template <typename Tuple,typename It,std::size_t N>
     struct helper
     {
-        inline static bool do_parse(Tuple& t,It& first,Iterator last)
+        inline static bool do_parse(Tuple& t,It& first,It last)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
             Iterator it = first;
@@ -42,7 +47,7 @@ class or_p
     template <typename Tuple,typename It>
     struct helper<Tuple,It,1>
     {
-        inline static bool do_parse(Tuple& t,It& first,Iterator last)
+        inline static bool do_parse(Tuple& t,It& first,It last)
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
             Iterator it = first;
@@ -78,30 +83,18 @@ private:
 
 
 
-template <typename Iterator,typename... Args>
-auto _or(Args&&... args) -> or_p<Iterator,Args...> 
+template <typename... Args>
+auto _or(Args&&... args) -> or_p<Args...> 
 {
-    return or_p<Iterator,Args...>(std::forward<Args>(args)...);
+    return or_p<Args...>(std::forward<Args>(args)...);
 }
 
-template <typename Iterator,typename T1,typename T2>
-auto _or(T1&& t1,T2&& t2) -> or_p<Iterator,T1,T2>
-{
-    return or_p<Iterator,T1,T2>(std::forward<T1>(t1),std::forward<T2>(t2));
-}
-
-template <typename T1,typename T2>
-auto _or(T1&& t1,T2&& t2) 
-    -> or_p<typename std::remove_reference<T1>::type::iterator,T1,T2>
-{
-    return or_p<typename std::remove_reference<T1>::type::iterator,T1,T2>(std::forward<T1>(t1),std::forward<T2>(t2));
-}
 
 template <typename T1,typename T2>
 auto operator| (T1&& t1,T2&& t2)
-    -> or_p<typename std::remove_reference<T1>::type::iterator,T1,T2>
+    -> or_p<T1,T2>
 {
-    return or_p<typename std::remove_reference<T1>::type::iterator,T1,T2>(std::forward<T1>(t1),std::forward<T2>(t2));
+    return or_p<T1,T2>(std::forward<T1>(t1),std::forward<T2>(t2));
 }
 
 template <typename T1>

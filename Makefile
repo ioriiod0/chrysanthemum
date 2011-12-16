@@ -10,10 +10,14 @@ ALL_HEADER = all.h config.h \
 			 src/compound/and_p.h \
 			 src/parsers/parsers.h \
 			 src/utility/alternative.h \
-			 src/utility/data_holder.h \
 			 src/utility/meta_fuctions.h \
 			 src/utility/optional.h \
-			 src/utility/tuple_serialization.h
+			 src/utility/tuple_serialization.h \
+			 src/action/basic_action.h \
+			 src/action/converters.h \
+			 src/action/data_holder.h \
+			 src/action/accumulater.h \
+			 src/action/back_inserter.h 
 
 all_test: test_and_p test_or_p test_repeat test_list test_optional test_alternative
 

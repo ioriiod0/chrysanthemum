@@ -16,17 +16,6 @@
 #include "../compound/literal_p.h" 
 
 
-template <typename Iterator>
-class basic_action
-{
-public:
-    typedef Iterator iterator;
-public:
-    basic_action() {}
-    ~basic_action() {}
-};
-
-
 /////////////////////////////////////////
 template <typename Parser,typename CallBack>
 inline typename std::remove_reference<Parser>::type&& 
@@ -35,32 +24,33 @@ inline typename std::remove_reference<Parser>::type&&
     p[std::forward<CallBack>(cb)]; 
     return static_cast<typename std::remove_reference<Parser>::type&&>(p);
 }
-////////////////////////////////////////////
-template <typename CallBack>
-inline auto operator<= (const char* str,CallBack&& cb)
-    ->decltype(_literal<typename std::remove_reference<CallBack>::type::iterator>(str))
-{
-    auto p = _literal<typename std::remove_reference<CallBack>::type::iterator>(str);
-    p[std::forward<CallBack>(cb)]; 
-    return p;
-}
-//////////////////////////////////////////////////////////////
-template <typename CallBack>
-inline auto operator<= (const std::string& str,CallBack&& cb) 
-    -> decltype(_literal<typename std::remove_reference<CallBack>::type::iterator>(str))
-{
-    auto p = _literal<typename std::remove_reference<CallBack>::type::iterator>(str);
-    p[std::forward<CallBack>(cb)]; 
-    return p;
-}
-/////////////////////////to_string////////////////////////////////
-template <typename CallBack>
-inline auto operator<= (char ch,CallBack&& cb) 
-    -> decltype(_literal<typename std::remove_reference<CallBack>::type::iterator>(ch))
-{
-    auto p = _literal<typename std::remove_reference<CallBack>::type::iterator>(ch);
-    p[std::forward<CallBack>(cb)]; 
-    return p;
-}
+
+// ////////////////////////////////////////////
+// template <typename CallBack>
+// inline auto operator<= (const char* str,CallBack&& cb)
+//     ->decltype(_literal<typename std::remove_reference<CallBack>::type::iterator>(str))
+// {
+//     auto p = _literal<typename std::remove_reference<CallBack>::type::iterator>(str);
+//     p[std::forward<CallBack>(cb)]; 
+//     return p;
+// }
+// //////////////////////////////////////////////////////////////
+// template <typename CallBack>
+// inline auto operator<= (const std::string& str,CallBack&& cb) 
+//     -> decltype(_literal<typename std::remove_reference<CallBack>::type::iterator>(str))
+// {
+//     auto p = _literal<typename std::remove_reference<CallBack>::type::iterator>(str);
+//     p[std::forward<CallBack>(cb)]; 
+//     return p;
+// }
+// /////////////////////////to_string////////////////////////////////
+// template <typename CallBack>
+// inline auto operator<= (char ch,CallBack&& cb) 
+//     -> decltype(_literal<typename std::remove_reference<CallBack>::type::iterator>(ch))
+// {
+//     auto p = _literal<typename std::remove_reference<CallBack>::type::iterator>(ch);
+//     p[std::forward<CallBack>(cb)]; 
+//     return p;
+// }
 #endif
 

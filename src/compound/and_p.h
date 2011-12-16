@@ -17,10 +17,14 @@
 
 
 
-template <typename Iterator,typename... Args>
-class and_p:public basic_parser<Iterator,and_p<Iterator,Args...>> 
+template <typename... Args>
+class and_p:
+    public basic_parser<typename std::remove_reference<typename at<0,Args...>::type>::type::iterator,
+                       and_p<Args...> > 
 {
 public:
+    typedef typename std::remove_reference<typename at<0,Args...>::type>::type::iterator Iterator;
+
     template <typename Tuple,typename It,std::size_t N>
     struct helper
     {
@@ -64,23 +68,17 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////
-template <typename Iterator,typename... Args>
-auto _and(Args&&... args) -> and_p<Iterator,Args...> 
-{
-    return and_p<Iterator,Args...>(std::forward<Args>(args)...);
-}
-////////////////////////////////////////////////////////////////////////////
 template <typename... Args>
-auto _and(Args&&... args) -> and_p<typename std::remove_reference<typename at<0,Args...>::type>::type::iterator,Args...> 
+auto _and(Args&&... args) -> and_p<Args...> 
 {
-    return and_p<typename std::remove_reference<typename at<0,Args...>::type>::type::iterator,Args...>(std::forward<Args>(args)...);
+    return and_p<Args...>(std::forward<Args>(args)...);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename T1,typename T2>
-auto  operator& (T1&& t1,T2&& t2) -> and_p<typename std::remove_reference<T1>::type::iterator,T1,T2> 
+auto  operator& (T1&& t1,T2&& t2) -> and_p<T1,T2> 
 {
-    return and_p<typename std::remove_reference<T1>::type::iterator,T1,T2>(std::forward<T1>(t1),std::forward<T2>(t2));
+    return and_p<T1,T2>(std::forward<T1>(t1),std::forward<T2>(t2));
 }
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T1>

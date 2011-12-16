@@ -7,31 +7,32 @@
 #ifndef __LIST_P_H__
 #define __LIST_P_H__
 
-#include <vector>
-#include "../utility/data_holder.h"
+#include <type_traits>
+#include <string>
+#include "../utility/meta_fuctions.h"
+#include "../utility/basic_parser.h"
+#include "literal_p.h"
+
 
 template <typename Parser1,typename Parser2>
-class list:
-    public data_holder< std::vector<typename std::remove_reference<Parser1>::type::data_type> >
+class list_p:
+    public basic_parser<typename std::remove_reference<Parser1>::type::iterator,
+                        list_p<Parser1,Parser2>>
 {
+
 public:
-    typedef std::vector<typename std::remove_reference<Parser1>::type::data_type> data_type;
-    typedef data_holder<data_type> data_holder_type;
-public:
-    list(Parser1&& p1,Parser2&& p2):
+    typedef typename std::remove_reference<Parser1>::type::iterator Iterator;
+
+    list_p(Parser1&& p1,Parser2&& p2):
             parser1_(std::forward<Parser1>(p1)),
             parser2_(std::forward<Parser2>(p2)) {}
-    ~list() {}
+    ~list_p() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+
+    bool do_parse(Iterator& first,Iterator last)
     {
-        /////////////////clear the data() befor parsing//////////////
-        data_holder_type::data().clear();
-        ///////////////////////////////////////////////////////
         if(!parser1_(first,last))
             return false;
-        data_holder_type::data().push_back(parser1_.data());
         Iterator it;
         for(;;)
         {
@@ -40,10 +41,9 @@ public:
             {
                 first = it;
                 break;
-            }
-            data_holder_type::data().push_back(parser1_.data());
+            } 
         }
-        return data_holder_type::call_back();
+        return true;
     }
 
    private:
@@ -54,15 +54,37 @@ public:
 
 
 template <typename P1,typename P2>
-auto _list(P1&& p1,P2&& p2) -> list<P1,P2>
+auto _list(P1&& p1,P2&& p2) -> list_p<P1,P2>
 {
-    return list<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
+    return list_p<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
 }
 
 template <typename P1,typename P2>
-auto operator% (P1&& p1,P2&& p2) -> list<P1,P2>
+auto operator% (P1&& p1,P2&& p2) -> list_p<P1,P2>
 {
-    return list<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
+    return list_p<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
 }
+
+template <typename T>
+auto operator% (T&& t,char ch)
+    -> decltype(_list(std::forward<T>(t),_literal<typename std::remove_reference<T>::type::iterator>(ch)))
+{
+    return _list(std::forward<T>(t),_literal<typename std::remove_reference<T>::type::iterator>(ch));
+}
+
+template <typename T>
+auto operator% (T&& t,const char* str)
+    -> decltype(_list(std::forward<T>(t),_literal<typename std::remove_reference<T>::type::iterator>(str)))
+{
+    return _list(std::forward<T>(t),_literal<typename std::remove_reference<T>::type::iterator>(str));
+}
+
+template <typename T>
+auto operator% (T&& t,const std::string& str)
+    -> decltype(_list(std::forward<T>(t),_literal<typename std::remove_reference<T>::type::iterator>(str)))
+{
+    return _list(std::forward<T>(t),_literal<typename std::remove_reference<T>::type::iterator>(str));
+}
+
 #endif
 

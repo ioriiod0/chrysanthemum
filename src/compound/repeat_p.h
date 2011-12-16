@@ -19,11 +19,12 @@ class repeat_p:
     public basic_parser<typename std::remove_reference<Parser>::type::iterator,repeat_p<N,Parser,M>>
 {
 public:
+    typedef typename std::remove_reference<Parser>::type::iterator Iterator; 
+
     repeat_p(Parser&& t):parser_(std::forward<Parser>(t)) {}
-    ~repeat_P() {}
+    ~repeat_p() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         ///////////////////////////////////////
         std::size_t counter=0;
@@ -57,11 +58,11 @@ class repeat_p<N,Parser,INFINITE>:
     public basic_parser<typename std::remove_reference<Parser>::type::iterator,repeat_p<N,Parser,INFINITE>>
 {
 public:
+    typedef typename std::remove_reference<Parser>::type::iterator Iterator;
     repeat_p(Parser&& t):parser_(std::forward<Parser>(t)) {}
     ~repeat_p() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
         std::size_t counter=0;
         while(counter++ < N)
@@ -94,27 +95,6 @@ auto _repeat(Arg&& arg) -> repeat_p<N,Arg,M>
     return repeat_p<N,Arg,M>(std::forward<Arg>(arg));
 }
 
-template <typename Iterator,std::size_t N,std::size_t M>
-auto _repeat(const char* str)
-    -> _repeat<N,decltype(_literal<Iterator>(str)),M>
-{
-    return _repeat<N,decltype(_literal<Iterator>(str)),M>(_literal<Iterator>(str));
-}
-
-
-template <typename Iterator,std::size_t N,std::size_t M>
-auto _repeat(const std::string& str)
-    -> _repeat<N,decltype(_literal<Iterator>(str)),M>
-{
-    return _repeat<N,decltype(_literal<Iterator>(str)),M>(_literal<Iterator>(str));
-}
-
-template <typename Iterator,std::size_t N,std::size_t M>
-auto _repeat(char ch)
-    -> _repeat<N,decltype(_literal<Iterator>(ch)),M>
-{
-    return _repeat<N,decltype(_literal<Iterator>(ch)),M>(_literal<Iterator>(ch));
-}
 
 template <std::size_t N,typename Arg>
 auto _N(Arg&& arg) ->repeat_p<N,Arg,N> 
@@ -122,25 +102,4 @@ auto _N(Arg&& arg) ->repeat_p<N,Arg,N>
     return repeat_p<N,Arg,N>(std::forward<Arg>(arg));
 }
 
-template <typename Iterator,std::size_t N>
-auto _N(const char* str)
-    -> repeat_p<N,decltype(_literal<Iterator>(str)),N>
-{
-    return _repeat<N,decltype(_literal<Iterator>(str)),N>(_literal<Iterator>(str));
-}
-
-
-template <typename Iterator,std::size_t N>
-auto _N(const std::string& str)
-    -> _repeat<N,decltype(_literal<Iterator>(str)),N>
-{
-    return _repeat<N,decltype(_literal<Iterator>(str)),N>(_literal<Iterator>(str));
-}
-
-template <typename Iterator,std::size_t N>
-auto _N(char ch)
-    -> _repeat<N,decltype(_literal<Iterator>(ch)),N>
-{
-    return _repeat<N,decltype(_literal<Iterator>(ch)),N>(_literal<Iterator>(ch));
-}
 #endif
