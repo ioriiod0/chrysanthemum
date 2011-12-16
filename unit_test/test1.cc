@@ -5,7 +5,8 @@
 // Description  : 
 // ======================================================================================
 
-
+#include <cstdlib>
+#include <string>
 #include <tuple>
 #include <iostream>
 #include <functional>
@@ -49,7 +50,9 @@ int main()
    // t2 = std::make_tuple('c','8');
 
    // std::cout<<std::get<0>(t2)<<" "<<std::get<1>(t2)<<std::endl;
-    std::function<bool(char*,char*)> f = [](char* p,char* q){ return true;};
-    f = tester();
+    std::function<void(char*,char*)> f = [](char* p,char* q){ std::cout<<std::string(p,q)<<std::endl; };
+    std::string str = "12345";
+    f(str.begin(),str.end());
+    
 }
 

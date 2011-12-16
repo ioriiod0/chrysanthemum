@@ -9,14 +9,19 @@
 #ifndef __DIFFERENCE_P_H__
 #define __DIFFERENCE_P_H__
 
+#include <string>
 #include <type_traits>
 #include "../utility/basic_parser.h"
+#include "literal_p.h"
 
-
-template <typename Iterator,typename Parser1,typename Parser2>
-class difference_p:public basic_parser<Iterator,difference_p<Iterator,Parser1,Parser2>>
+template <typename Parser1,typename Parser2>
+class difference_p:
+    public basic_parser<typename std::remove_reference<Parser1>::type::iterator,
+                        difference_p<Parser1,Parser2>>
 {
 public:
+    typedef typename std::remove_reference<Parser1>::type::iterator Iterator;
+
     difference_p(Parser1&& p1,Parser2&& p2):
                 parser1(std::forward<Parser1>(p1)),
                 parser2(std::forward<Parser2>(p2)) {}
@@ -40,18 +45,42 @@ private:
     Parser2 parser2;
 };
 
-template <typename Iterator,typename Parser1,typename Parser2>
-auto _difference(Parser1&& p1,Parser2&& p2) -> difference_p<Iterator,Parser1,Parser2>
+template <typename Parser1,typename Parser2>
+auto _difference(Parser1&& p1,Parser2&& p2) 
+    -> difference_p<Parser1,Parser2>
 {
-    return difference_p<Iterator,Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
+    return difference_p<Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
 }
 
 template <typename Parser1,typename Parser2>
-auto operator- (Parser1&& p1,Parser2&& p2) -> difference_p<typename Parser1::iterator,Parser1,Parser2>
+auto operator- (Parser1&& p1,Parser2&& p2) 
+    -> difference_p<Parser1,Parser2>
 {
-    return difference_p<typename Parser1::iterator,Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
+    return difference_p<Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
 }
 
+template <typename Parser1>
+auto operator- (Parser1&& p1,char ch) 
+    -> decltype(_difference(std::forward<Parser1>(p1),_literal<typename std::remove_reference<Parser1>::type::iterator>(ch)))
+{
+    return _difference(std::forward<Parser1>(p1),
+                       _literal<typename std::remove_reference<Parser1>::type::iterator>(ch));
+}
 
+template <typename Parser1>
+auto operator- (Parser1&& p1,const char* str) 
+    -> decltype(_difference(std::forward<Parser1>(p1),_literal<typename std::remove_reference<Parser1>::type::iterator>(str)))
+{
+    return _difference(std::forward<Parser1>(p1),
+                       _literal<typename std::remove_reference<Parser1>::type::iterator>(str));
+}
+
+template <typename Parser1>
+auto operator- (Parser1&& p1,const std::string& str) 
+    -> decltype(_difference(std::forward<Parser1>(p1),_literal<typename std::remove_reference<Parser1>::type::iterator>(str)))
+{
+    return _difference(std::forward<Parser1>(p1),
+                       _literal<typename std::remove_reference<Parser1>::type::iterator>(str));
+}
 #endif
 

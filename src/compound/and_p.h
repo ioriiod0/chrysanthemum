@@ -120,7 +120,7 @@ template <typename T1>
 auto  operator& (char ch,T1&& t1) 
       -> decltype(_and(_literal<typename std::remove_reference<T1>::type::iterator>(ch),std::forward<T1>(t1))) 
 {
-    return _and<typename T1::iterator>(_literal<typename std::remove_reference<T1>::type::iterator>(ch),std::forward<T1>(t1));
+    return _and(_literal<typename std::remove_reference<T1>::type::iterator>(ch),std::forward<T1>(t1));
 }
 
 #endif

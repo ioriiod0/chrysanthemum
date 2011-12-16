@@ -27,7 +27,7 @@ public:
         Iterator it = first;
         if(!static_cast<Derived*>(this)->do_parse(first,last))
             return false;
-        if(cb_)
+        if(cb_ && it != first)
             return cb_(it,first);
         return true;
     }

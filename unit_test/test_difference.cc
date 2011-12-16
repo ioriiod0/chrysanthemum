@@ -10,27 +10,28 @@
 #include <algorithm>
 #include <vector>
 
-#include "../all.h"
-
+//#include "../all.h"
+#include "../src/compound/repeat_p.h"
+#include "../src/compound/list_p.h"
+#include "../src/compound/and_p.h"
+#include "../src/compound/or_p.h"
+#include "../src/action/back_inserter.h"
+#include "../src/action/converters.h"
+#include "../src/parsers/parsers.h"
+#include "../src/compound/diference_p.h"
 int main()
 {
-    auto p_start = _literal('{');
-    auto p_end = _literal('}');
-    auto p1 = _repeat<0,INFINITE>(_oct()-p_end) <= [](std::vector<char>& vec){
-        std::for_each(vec.begin(),vec.end(),[](char c){
-                      std::cout<<c;
-                      });
-        return true;
-    };
+
   
 
-
-    auto p = _sequence(p_start,p1,p_end);
-    std::string str = "{sdfs123214fdsfsdf}";
+    typedef std::string::iterator IT;
+    std::string ret;
+    auto p = '{' & _repeat<0,INFINITE>(_oct<IT>()-'{'-'}') <= _converter(ret); //& '}';
+    std::string str = "{sdfs123214}fdsfsdf}";
     auto it = str.begin();
     if(p(it,str.end()))
     { 
-        std::cout<<"YEAH!"<<std::endl;
+        std::cout<<ret<<std::endl;
     }
     else
     {

@@ -9,9 +9,8 @@
 
 
 #include <string>
-#include "../utility/basic_parser.h"
 #include <type_traits>
-
+#include "../utility/basic_parser.h"
 
 template <typename Iterator,typename Str_type>
 class literal_str_p:public basic_parser<Iterator,literal_str_p<Iterator,Str_type>>

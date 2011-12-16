@@ -79,8 +79,6 @@ class alternative
 public:
     const static std::size_t buffer_size = max_size_of<Args...>::value;
     typedef std::function<void(void*)> delete_functor;
-
-
 public:
     alternative():is_inited_(false) {}
     ~alternative() 

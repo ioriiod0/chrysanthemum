@@ -7,8 +7,59 @@
 #ifndef __CONVERTER_H__
 #define __CONVERTER_H__
 
+#include <cstdlib>
 #include <string>
 #include <tuple>
+#include <type_traits>
+#include "../utility/meta_fuctions.h"
+
+
+#define DECLARE_CONVERT_FUNCTION_1_1(FUNC) \
+    template <typename Iterator,typename T1> \
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T1>& t) \
+    { \
+        std::string str(first,last); \
+        std::get<0>(t) = FUNC(str.c_str()); \
+    }
+////////////////////////////////////////////////////////////
+#define DECLARE_CONVERT_FUNCTION_1_2(FUNC,DEFAUT_VAL) \
+    template <typename Iterator,typename T1> \
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T1>& t) \
+    { \
+        std::string str(first,last); \
+        std::get<0>(t) = FUNC(str.c_str(),DEFAUT_VAL); \
+    }
+
+#define DECLARE_CONVERT_FUNCTION_2_2(FUNC) \
+    template <typename Iterator,typename T1,typename T2> \
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T1,T2>& t) \
+    { \
+        std::string str(first,last); \
+        std::get<0>(t) = FUNC(str.c_str(),std::get<1>(t)); \
+    }
+//////////////////////////////////////////////////////////////////
+#define DECLARE_CONVERT_FUNCTION_2_3(FUNC,DEFAUT_VAL) \
+    template <typename Iterator,typename T1,typename T2> \
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T1,T2>& t) \
+    { \
+        std::string str(first,last); \
+        std::get<0>(t) = FUNC(str.c_str(),DEFAUT_VAL,std::get<1>(t)); \
+    }
+
+#define DECLARE_CONVERT_FUNCTION_1_3(FUNC,DEFAUT_VAL1,DEFAUT_VAL2) \
+    template <typename Iterator,typename T1> \
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T1>& t) \
+    { \
+        std::string str(first,last); \
+        std::get<0>(t) = FUNC(str.c_str(),DEFAUT_VAL1,DEFAUT_VAL2); \
+    } 
+#define DECLARE_CONVERT_FUNCTION_3_3(FUNC) \
+    template <typename Iterator,typename T1,typename T2,typename T3> \
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T1,T2,T3>& t) \
+    { \
+        std::string str(first,last); \
+        std::get<0>(t) = FUNC(str.c_str(),std::get<2>(t),std::get<1>(t)); \
+    }
 
 template <typename T>
 struct converter_traits;
@@ -16,198 +67,183 @@ struct converter_traits;
 template <>
 struct converter_traits<int>
 {
-    template <typename Iterator,typename Tuple>
-    inline static int do_convert(Iterator first,Iterator last,const Tuple& t)
-    {
-        std::string str(first,last);
-        return stoi(str,std::get<0>(t),std::get<1>(t));
-    }
+    /////////////////////////////////////
+    DECLARE_CONVERT_FUNCTION_1_3(strtol,NULL,10)
+    DECLARE_CONVERT_FUNCTION_2_3(strtol,NULL)
+    DECLARE_CONVERT_FUNCTION_3_3(strtol)
 };
 
 template <>
 struct converter_traits<long>
 {     
-    template <typename Iterator,typename Tuple>
-    inline static long do_convert(Iterator first,Iterator last,const Tuple& t)   
-    {
-        std::string str(first,last);
-        return stol(str,std::get<0>(t),std::get<1>(t));
-    }
-
+    DECLARE_CONVERT_FUNCTION_1_3(strtol,NULL,10)
+    DECLARE_CONVERT_FUNCTION_2_3(strtol,NULL)
+    DECLARE_CONVERT_FUNCTION_3_3(strtol)
 };
 
 template <>
 struct converter_traits<unsigned int>
 {   
-    template <typename Iterator,typename Tuple>
-    inline static unsigned int do_convert(Iterator first,Iterator last,const Tuple& t)    
-    {
-        std::string str(first,last);
-        return stoul(str,std::get<0>(t),std::get<1>(t));
-    }
-
+    DECLARE_CONVERT_FUNCTION_1_3(strtoul,NULL,10)
+    DECLARE_CONVERT_FUNCTION_2_3(strtoul,NULL)
+    DECLARE_CONVERT_FUNCTION_3_3(strtoul)
 };
 
 template <>
 struct converter_traits<unsigned long>
 {    
-    template <typename Iterator,typename Tuple>
-    inline static unsigned long do_convert(Iterator first,Iterator last,const Tuple& t)    
-    {
-        std::string str(first,last);
-        return stoul(str,std::get<0>(t),std::get<1>(t));
-    }
-
+    DECLARE_CONVERT_FUNCTION_1_3(strtoul,NULL,10)
+    DECLARE_CONVERT_FUNCTION_2_3(strtoul,NULL)
+    DECLARE_CONVERT_FUNCTION_3_3(strtoul)
 };
 
 template <>
 struct converter_traits<long long>
 {    
-    template <typename Iterator,typename Tuple>
-    inline static long long do_convert(Iterator first,Iterator last,const Tuple& t)    
-    {
-        std::string str(first,last);
-        return stoll(str,std::get<0>(t),std::get<1>(t));
-    }
+    DECLARE_CONVERT_FUNCTION_1_3(strtoll,NULL,10)
+    DECLARE_CONVERT_FUNCTION_2_3(strtoll,NULL)
+    DECLARE_CONVERT_FUNCTION_3_3(strtoll)
 
 };
 
 template <>
 struct converter_traits<unsigned long long>
 {   
-    template <typename Iterator,typename Tuple>
-    inline static unsigned long long do_convert(Iterator first,Iterator last,const Tuple& t)    
-    {
-        std::string str(first,last);
-        return stoull(str,std::get<0>(t),std::get<1>(t));
-    }
-
+    DECLARE_CONVERT_FUNCTION_1_3(strtoull,NULL,10)
+    DECLARE_CONVERT_FUNCTION_2_3(strtoull,NULL)
+    DECLARE_CONVERT_FUNCTION_3_3(strtoull)
 };
 
 template <>
 struct converter_traits<double>
 {    
-    template <typename Iterator,typename Tuple>
-    inline static double do_convert(Iterator first,Iterator last,const Tuple& t)    
-    {
-        std::string str(first,last);
-        return stod(str);
-    }
-
+    DECLARE_CONVERT_FUNCTION_1_2(strtod,NULL)
+    DECLARE_CONVERT_FUNCTION_2_2(strtod)
 };
 
 template <>
 struct converter_traits<float>
 {   
-    template <typename Iterator,typename Tuple>
-    inline static float do_convert(Iterator first,Iterator last,const Tuple& t)    
-    {
-        std::string str(first,last);
-        return stof(str);
-    }
-
+    DECLARE_CONVERT_FUNCTION_1_2(strtof,NULL)
+    DECLARE_CONVERT_FUNCTION_2_2(strtof)
 };
 
 template <>
 struct converter_traits<long double>
 {    
-    template <typename Iterator,typename Tuple>
-    inline static long double do_convert(Iterator first,Iterator last,const Tuple& t)
-    {
-        std::string str(first,last);
-        return stold(str);
-    }
+    DECLARE_CONVERT_FUNCTION_1_2(strtold,NULL)
+    DECLARE_CONVERT_FUNCTION_2_2(strtold)
 
 };
 
 template <>
 struct converter_traits<std::string>
 {    
-    template <typename Iterator,typename Tuple>
-    inline static std::string do_convert(Iterator first,Iterator last,const Tuple& t)
+    template <typename Iterator,typename T>
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T>& t)
     {
-        return std::string(first,last);
+        std::get<0>(t).assign(first,last);
     }
 };
 
 
 
-template <typename Numeric,typename... Args,template <class> class Traits = converter_traits>
+template <template <class> class Traits,typename... Args>
 struct converter
 {
-    converter(Numeric& i,Args... args):data_(i),tuple_(args) {}
+    ////////////////////////
+    typedef typename std::remove_reference<typename at<0,Args...>::type>::type data_type;
+    ////////////////////////
+    converter(Args&&... args):tuple_(std::forward<Args>(args)...) {}
     /////////////////////////////////////
     template <typename Iterator>
     bool operator()(Iterator first,Iterator last)
     {
-        Traits<Numeric>::do_convert(first,last,NULL,base_);
+        Traits<data_type>::do_convert(first,last,tuple_);
         return true;
     }
-    ////////////////////////
-    
+
+    ///////////////////////
+    data_type& data()
+    {
+        return std::get<0>(tuple_);
+    }
+    const data_type& data() const
+    {
+        return std::get<0>(tuple_);
+    }
     std::tuple<Args...> tuple_;
 };
 
 
-template <template <class> class Traits>
-struct converter<std::string,Traits>
+template <typename... Args>
+auto _converter(Args&&... args)
+    -> converter<converter_traits,Args...>
 {
-    to_string(std::string& s):str_(s) {}
-    ////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
-    {
-        str_.assign(first,last);
-        return true;
-    }
-    ///////////////////////
-    std::string& str_;
-};
+    return converter<converter_traits,Args...>(std::forward<Args>(args)...);
+}
 
-template <template <class> class Traits>
-struct converter<float,Traits>
-{
-    converter(float& i):data_(i) {}
-    /////////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
-    {
-        data_ = Traits<float>::do_convert(first,last);
-        return true;
-    }
-    ////////////////////////
-    float& data_;
-};
 
-template <template <class> class Traits>
-struct converter<double,Traits>
-{
-    converter(double& i):data_(i) {}
-    /////////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
-    {
-        data_ = Traits<float>::do_convert(first,last);
-        return true;
-    }
-    ////////////////////////
-    double& data_;
-};
 
-template <template <class> class Traits>
-struct converter<long double,Traits>
-{
-    converter(long double& i):data_(i) {}
-    /////////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
-    {
-        data_ = Traits<long double>::do_convert(first,last);
-        return true;
-    }
-    ////////////////////////
-    long double& data_;
-};
+// template <template <class> class Traits>
+// struct converter<std::string,Traits>
+// {
+//     to_string(std::string& s):str_(s) {}
+//     ////////////////////////
+//     template <typename Iterator>
+//     bool operator()(Iterator first,Iterator last)
+//     {
+//         str_.assign(first,last);
+//         return true;
+//     }
+//     ///////////////////////
+//     std::string& str_;
+// };
+
+// template <template <class> class Traits>
+// struct converter<float,Traits>
+// {
+//     converter(float& i):data_(i) {}
+//     /////////////////////////////////////
+//     template <typename Iterator>
+//     bool operator()(Iterator first,Iterator last)
+//     {
+//         data_ = Traits<float>::do_convert(first,last);
+//         return true;
+//     }
+//     ////////////////////////
+//     float& data_;
+// };
+
+// template <template <class> class Traits>
+// struct converter<double,Traits>
+// {
+//     converter(double& i):data_(i) {}
+//     /////////////////////////////////////
+//     template <typename Iterator>
+//     bool operator()(Iterator first,Iterator last)
+//     {
+//         data_ = Traits<float>::do_convert(first,last);
+//         return true;
+//     }
+//     ////////////////////////
+//     double& data_;
+// };
+
+// template <template <class> class Traits>
+// struct converter<long double,Traits>
+// {
+//     converter(long double& i):data_(i) {}
+//     /////////////////////////////////////
+//     template <typename Iterator>
+//     bool operator()(Iterator first,Iterator last)
+//     {
+//         data_ = Traits<long double>::do_convert(first,last);
+//         return true;
+//     }
+//     ////////////////////////
+//     long double& data_;
+// };
 
 
 

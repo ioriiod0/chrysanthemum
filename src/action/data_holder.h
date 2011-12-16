@@ -11,7 +11,7 @@
 #include "basic_action.h"
 #include "converters.h"
 
-template <typename Iterator,typename T,typename Converter>
+template <typename T,typename Converter>
 class data_holder:public basic_action<Iterator>
 {
 public:
