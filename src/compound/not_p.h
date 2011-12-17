@@ -7,18 +7,39 @@
 #ifndef __NOT_P_H__
 #define __NOT_P_H__
 #include <type_traits>
-#include "../utility/data_holder.h"
+#include <string>
+#include "literal_p.h"
+#include "../utility/basic_parser.h"
 
 
 template <typename Parser>
-class not_p:public data_holder<typename std::remove_reference<Parser>::type::data_type >
+class not_p:
+    public basic_parser<typename std::remove_reference<Parser>::type::iterator,
+                        not_p<Parser> >
 {
     public:
-        
+        typedef typename std::remove_reference<Parser>::type::iterator Iterator;
     public:
+        not_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
+        ~not_p() {}
     public:
+        bool do_parse(Iterator& first,Iterator last)
+        {
+            if(!parser_(first,last))
+                return true;
+            return false;
+        }
     private:
+        Parser parser_;
 };
+
+
+template <typename Arg>
+auto _not(Arg&& arg) -> not_p<Arg> 
+{
+    return not_p<Arg>(std::forward<Arg>(arg));
+}
+
 
 
 #endif

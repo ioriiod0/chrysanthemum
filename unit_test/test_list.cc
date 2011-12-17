@@ -20,8 +20,10 @@
 #include "../src/compound/or_p.h"
 #include "../src/compound/diference_p.h"
 #include "../src/action/back_inserter.h"
+#include "../src/action/accumulater.h"
 #include "../src/action/converters.h"
 #include "../src/parsers/parsers.h"
+#include "../src/action/comparer.h"
 
 
 int main()
@@ -30,7 +32,7 @@ int main()
     typedef std::string::iterator IT;
     std::vector<std::size_t> vec;
     auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _back_inserter(vec)) % '.';
-    
+
     {
         std::string str = "192.168.1.1"; // "192.168.1.1";
         auto it = str.begin();
@@ -63,6 +65,51 @@ int main()
         }
     }
 
+
+
+
+    {
+        std::string ret;
+        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _accumulater(ret)) % '.';
+        std::string str = "192.168.1.1"; // "192.168.1.1";
+        auto it = str.begin();
+        if(ip_parser(it,str.end()))
+        {
+            std::cout<<ret<<std::endl;
+        }
+        else
+        {
+            std::cout<<"err..."<<std::endl;
+        }
+    }
+
+
+    {
+        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _less_equal(255)) % '.';
+        std::string str = "192.168.1.1"; // "192.168.1.1";
+        auto it = str.begin();
+        if(ip_parser(it,str.end()))
+        {
+            std::cout<<"yes.."<<std::endl;
+        }
+        else
+        {
+            std::cout<<"err..."<<std::endl;
+        }
+    }
+    {
+        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _less_equal(255)) % '.';
+        std::string str = "256.168.1.1"; // "192.168.1.1";
+        auto it = str.begin();
+        if(ip_parser(it,str.end()))
+        {
+            std::cout<<"yes.."<<std::endl;
+        }
+        else
+        {
+            std::cout<<"err..."<<std::endl;
+        }
+    }
 }
 
 

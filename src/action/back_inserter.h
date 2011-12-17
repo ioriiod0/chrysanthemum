@@ -24,12 +24,13 @@ struct back_inserter
     back_inserter(Container&& c,Args&&... args):
                                     c_(std::forward<Container>(c)),
                                     tuple_(value_type(),std::forward<Args>(args)...) {}
+    ~back_inserter() {}
     ////////////////////////////////
     template <typename Iterator>
     bool operator()(Iterator first,Iterator last)
     {
         Traits<value_type>::do_convert(first,last,tuple_);
-        c_.push_back(std::get<0>(tuple_));
+        c_.push_back(std::move(std::get<0>(tuple_)));
         return true;
     }
    

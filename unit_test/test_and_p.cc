@@ -14,7 +14,7 @@
 #include "../src/parsers/parsers.h"
 #include "../src/action/converters.h"
 
-#define PRINTER [](Iterator first,Iterator last)    \
+#define PRINTER [](IT first,IT last)    \
                   {                                 \
                       std::cout<<*first<<std::endl;      \
                       return true;                  \
@@ -23,21 +23,21 @@
 
 int main()
 {
-    typedef std::string::iterator Iterator;
-    _alpha<Iterator> a1; a1 <= PRINTER;
-    _alpha<Iterator> a2; a2 <= PRINTER;
-    _digit<Iterator> d1; d1 <= PRINTER;
-    _digit<Iterator> d2; d2 <= PRINTER;
-    _space<Iterator> s1; s1 <= PRINTER;
-    _space<Iterator> s2; s2 <= PRINTER;
+    typedef std::string::iterator IT;
+    _alpha<IT> a1; a1 <= PRINTER;
+    _alpha<IT> a2; a2 <= PRINTER;
+    _digit<IT> d1; d1 <= PRINTER;
+    _digit<IT> d2; d2 <= PRINTER;
+    _space<IT> s1; s1 <= PRINTER;
+    _space<IT> s2; s2 <= PRINTER;
     std::string ret;
 
     {
-        auto p = "HTTP://" & a1 & d1 & ' ' & a2 & d2 & ' ' & (_alpha<Iterator>() <= PRINTER);
-        p <= to_string<Iterator>(ret);
+        auto p = "HTTP://" & a1 & d1 & ' ' & a2 & d2 & ' ' & (_alpha<IT>() <= PRINTER);
+        p <= _converter(ret);
         std::string str = "HTTP://a3 b4 c";
-        Iterator first = str.begin();
-        Iterator last = str.end();
+        IT first = str.begin();
+        IT last = str.end();
         if(p(first,last))
         {
             std::cout<<ret<<std::endl;

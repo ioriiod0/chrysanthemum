@@ -18,24 +18,25 @@
 int main()
 {
 
-    std::string str;
-    typedef std::string::iterator Iterator;
-    auto p1 = _literal<Iterator>("FTP") <= to_string<Iterator>(str);
-    auto p2 = _literal<Iterator>("HTTP") <= to_string<Iterator>(str);
-    auto p3 = _literal<Iterator>("TCP") <= to_string<Iterator>(str);
+
+    std::string ret;
+    typedef std::string::iterator IT;
+    auto p1 = _literal<IT>("FTP") <= _converter(ret);
+    auto p2 = _literal<IT>("HTTP") <= _converter(ret);
+    auto p3 = _literal<IT>("TCP") <= _converter(ret);
 
 
     {
         auto p = _or( p1,
                       p2,
                       p3,
-                      _literal<Iterator>("IP") <= to_string<Iterator>(str)
+                      _literal<IT>("IP") <= _converter(ret)
                     );
         std::string str = "HTTP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )
         {
-            std::cout<<str<<std::endl;
+            std::cout<<ret<<std::endl;
         }
 
     }
@@ -43,80 +44,19 @@ int main()
 
 
     {
-        auto p = _or( p1,
-                      p2,
-                      p3,
-                      _literal<Iterator>("IP") <= to_string<Iterator>(str)
-                    );
+        auto p =  p1
+                | p2
+                | p3
+                | (_literal<IT>("IP") <= _converter(ret));
         std::string str = "TCP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )
         {
-            std::cout<<str<<std::endl;
+            std::cout<<ret<<std::endl;
         }
 
     }
 
-
-
-    {
-        auto p = _or( p1,
-                      p2,
-                      p3,
-                      "IP" <= to_string<Iterator>(str)
-                    );
-        std::string str = "IP";
-        std::string::iterator it = str.begin();
-        if(p(it,str.end()) )
-        {
-            std::cout<<str<<std::endl;
-        }
-
-    }
-
-
-    {
-        auto p =   "UDP"  <= to_string<Iterator>(str)
-                 | "TCP" <= to_string<Iterator>(str)
-                 | "HTTP" <= to_string<Iterator>(str) 
-                 | "IP" <= to_string<Iterator>(str);
-        std::string str = "IP";
-        std::string::iterator it = str.begin();
-        if(p(it,str.end()) )
-        {
-            std::cout<<str<<std::endl;
-        }
-
-    }
-
-    {
-        auto p =   "UDP"  <= to_string<Iterator>(str)
-                 | "TCP" <= to_string<Iterator>(str)
-                 | 'b' <= to_string<Iterator>(str) 
-                 | 'c' <= to_string<Iterator>(str);
-        std::string str = "b";
-        std::string::iterator it = str.begin();
-        if(p(it,str.end()) )
-        {
-            std::cout<<str<<std::endl;
-        }
-
-    }
-
-
-    {
-        auto p =   "UDP"  <= to_string<Iterator>(str)
-                 | "TCP" <= to_string<Iterator>(str)
-                 | 'b' <= to_string<Iterator>(str) 
-                 | 'c' <= to_string<Iterator>(str);
-        std::string str = "UDP";
-        std::string::iterator it = str.begin();
-        if(p(it,str.end()) )
-        {
-            std::cout<<str<<std::endl;
-        }
-
-    }
 
     ////////////////////////////////////////////////////////
 

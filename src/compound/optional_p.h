@@ -7,35 +7,33 @@
 #ifndef __OPTIONAL_P_H__
 #define __OPTIONAL_P_H__
 
-
-#include "../utility/data_holder.h"
-#include "../utility/optional.h"
+#include <string>
+#include <type_traits>
+#include "../utility/basic_parser.h"
+#include "literal_p.h"
 
 
 template <typename Parser>
-class optional_p:public data_holder< optional<typename Parser::data_type> >
+class optional_p:
+    public basic_parser<typename std::remove_reference<Parser>::type::iterator,
+                        optional_p<Parser>>
 {
 public:
-    typedef optional<typename Parser::data_type> data_type;
-    typedef data_holder<data_type> data_holder_type;
+    typedef typename std::remove_reference<Parser>::type::iterator Iterator;
 public:
     optional_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
     ~optional_p() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    bool do_parse(Iterator& first,Iterator last)
     {
-        ////////////clear data() before parsing//////
-        data_holder_type::data().reset();
         //////////////////////////////////////////
         Iterator it = first;
         if(parser_(first,last))
         {
-            data_holder_type::data().set(parser_.data());
-            return data_holder_type::call_back();
+            return true;
         }
         first = it;
-        return data_holder_type::call_back();
+        return true;
     }
     
 private:

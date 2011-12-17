@@ -7,11 +7,13 @@
 #ifndef __CONVERTER_H__
 #define __CONVERTER_H__
 
+
 #include <cstdlib>
 #include <string>
 #include <tuple>
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
+#include "basic_action.h"
 
 
 #define DECLARE_CONVERT_FUNCTION_1_1(FUNC) \
@@ -143,6 +145,16 @@ struct converter_traits<std::string>
     inline static void do_convert(Iterator first,Iterator last,std::tuple<T>& t)
     {
         std::get<0>(t).assign(first,last);
+    }
+};
+
+template <>
+struct converter_traits<char>
+{    
+    template <typename Iterator,typename T>
+    inline static void do_convert(Iterator first,Iterator last,std::tuple<T>& t)
+    {
+        std::get<0>(t) = *first;
     }
 };
 

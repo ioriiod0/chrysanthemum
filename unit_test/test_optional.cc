@@ -10,25 +10,33 @@
 #include <iostream>
 #include <algorithm>
 
-#include "../all.h"
-
+#include "../src/compound/repeat_p.h"
+#include "../src/compound/list_p.h"
+#include "../src/compound/and_p.h"
+#include "../src/compound/or_p.h"
+#include "../src/compound/diference_p.h"
+#include "../src/action/back_inserter.h"
+#include "../src/action/converters.h"
+#include "../src/parsers/parsers.h"
+#include "../src/compound/optional_p.h"
 
 int main()
 {
     
 
-
+    typedef std::string::iterator IT;
     {
-        auto p = _sequence(_optional(_literal("abc")),
-                       _literal("defg"));
+        std::string ret1;
+        std::string ret2;
+        auto p = _optional(_literal<IT>("abc")) <= _converter(ret1)
+               & _literal<IT>("defg") <= _converter(ret2);
 
         std::string str = "abcdefg";
         auto it = str.begin();
         if(p(it,str.end()))
         {
-            if(std::get<0>(p.data()))
-                std::cout<<std::get<0>(p.data()).get()<<" ";
-            std::cout<<std::get<1>(p.data())<<std::endl;
+            std::cout<<"1:"<<ret1<<std::endl;
+            std::cout<<"2:"<<ret2<<std::endl;
         }
         else
         {
@@ -38,15 +46,16 @@ int main()
     }
 
     {
-        auto p = _sequence(_optional(_literal("abc")),
-                       _literal("defg"));
+        std::string ret1;
+        std::string ret2;
+        auto p = _optional(_literal<IT>("abc")) <= _converter(ret1) 
+               & _literal<IT>("defg") <= _converter(ret2);
         std::string str = "defg";
         auto it = str.begin();
         if(p(it,str.end()))
         {
-            if(std::get<0>(p.data()))
-                std::cout<<std::get<0>(p.data()).get()<<" "<<std::endl;
-            std::cout<<std::get<1>(p.data())<<std::endl;
+            std::cout<<"1:"<<ret1<<std::endl;
+            std::cout<<"2:"<<ret2<<std::endl;
         }
         else
         {
