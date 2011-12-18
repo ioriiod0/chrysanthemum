@@ -8,13 +8,11 @@
 #include "../utility/data_holder.h"
 
 template <typename Iterator,typename CharT,CharT Start,CharT End>
-class range:public basic_parser<Iterator,range<Iterator,CharT,Start,End>>
+struct range:public basic_parser<Iterator,range<Iterator,CharT,Start,End>>
 {
 public:
     static_assert(Start<End,"Start must less than End");
-public:
-    range() {}
-    ~range() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {

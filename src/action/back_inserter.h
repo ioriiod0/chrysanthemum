@@ -24,7 +24,6 @@ struct back_inserter
     back_inserter(Container&& c,Args&&... args):
                                     c_(std::forward<Container>(c)),
                                     tuple_(value_type(),std::forward<Args>(args)...) {}
-    ~back_inserter() {}
     ////////////////////////////////
     template <typename Iterator>
     bool operator()(Iterator first,Iterator last)

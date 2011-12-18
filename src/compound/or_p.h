@@ -66,7 +66,6 @@ public:
 
 public:
     or_p(Args&&... args):tuple_(std::forward<Args>(args)...) {}
-    ~or_p() {}
 public:
     bool do_parse(Iterator& first,Iterator last) 
     {

@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : sequence_p.h
-// Author       : Lei Gao 
-// Last Change  : 12/07/2011 | 15:46:30 PM | Wednesday,December
+// File         : and_p.h
+// Author       : Gao Lei 
+// Last Change  : 12/17/2011 | 21:30:22 PM | Saturday,December
 // Description  : 
 // ======================================================================================
 
@@ -53,7 +53,6 @@ public:
 
 public:
     and_p(Args&&... args):tuple_(std::forward<Args>(args)...) {}
-    ~and_p() {}
 public:
     bool do_parse(Iterator& first,Iterator last) 
     {
@@ -92,7 +91,8 @@ template <typename T1>
 auto  operator& (const char* str,T1&& t1) 
      -> decltype(_and(_literal<typename std::remove_reference<T1>::type::iterator>(str),std::forward<T1>(t1)))
 {
-    return _and(_literal<typename std::remove_reference<T1>::type::iterator>(str),std::forward<T1>(t1));
+    return _and(_literal<typename std::remove_reference<T1>::type::iterator>(str),
+                std::forward<T1>(t1));
 }
 // ////////////////////////////////////////////////////////////////////////////////
 template <typename T1>

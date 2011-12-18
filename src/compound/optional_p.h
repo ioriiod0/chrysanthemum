@@ -22,7 +22,6 @@ public:
     typedef typename std::remove_reference<Parser>::type::iterator Iterator;
 public:
     optional_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
-    ~optional_p() {}
 public:
     bool do_parse(Iterator& first,Iterator last)
     {

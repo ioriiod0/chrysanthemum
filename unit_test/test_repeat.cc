@@ -19,9 +19,6 @@
 #include "../src/action/converters.h"
 #include "../src/parsers/parsers.h"
 
-
-
-
 int main()
 {
 
@@ -32,7 +29,7 @@ int main()
         std::size_t sum=0;
         std::string str ="192"; // "192.168.1.1";
         auto it = str.begin();
-        auto p = _repeat<1,4>(_digit<IT>()) <= str_to_numeric<IT,std::size_t>(sum);
+        auto p = _repeat<1,4>(_digit<IT>()) <= _converter(sum);
 
         if(p(it,str.end()))
         {
@@ -51,13 +48,13 @@ int main()
         std::size_t adress3=0;
         std::size_t adress4=0; 
 
-        auto ip_parser =  (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress1)
+        auto ip_parser =  (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress1)
                         & '.'
-                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress2)
+                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress2)
                         & '.'
-                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress3)
+                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress3)
                         & '.'
-                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= str_to_numeric<IT,std::size_t>(adress4);
+                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress4);
                                  
 
         std::string str ="192.168.1.1"; // "192.168.1.1";

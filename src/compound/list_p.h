@@ -26,7 +26,6 @@ public:
     list_p(Parser1&& p1,Parser2&& p2):
             parser1_(std::forward<Parser1>(p1)),
             parser2_(std::forward<Parser2>(p2)) {}
-    ~list_p() {}
 public:
 
     bool do_parse(Iterator& first,Iterator last)

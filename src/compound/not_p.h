@@ -21,7 +21,6 @@ class not_p:
         typedef typename std::remove_reference<Parser>::type::iterator Iterator;
     public:
         not_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
-        ~not_p() {}
     public:
         bool do_parse(Iterator& first,Iterator last)
         {

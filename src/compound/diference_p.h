@@ -25,7 +25,6 @@ public:
     difference_p(Parser1&& p1,Parser2&& p2):
                 parser1(std::forward<Parser1>(p1)),
                 parser2(std::forward<Parser2>(p2)) {}
-    ~difference_p() {}
 public:
     bool do_parse(Iterator& first,Iterator last)
     {

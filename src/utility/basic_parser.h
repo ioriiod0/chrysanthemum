@@ -13,14 +13,13 @@
 #include <functional>
 
 template <typename Iterator,typename Derived>
-class basic_parser
+struct basic_parser
 {
 public:
     typedef std::function<bool(Iterator,Iterator)> call_back_type;
     typedef Iterator iterator;
 public:
-    basic_parser() {}
-    ~basic_parser() {}
+
     /////////////////////////////
     bool operator() (Iterator& first,Iterator last)
     {

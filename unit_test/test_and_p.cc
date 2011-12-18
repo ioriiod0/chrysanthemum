@@ -14,16 +14,26 @@
 #include "../src/parsers/parsers.h"
 #include "../src/action/converters.h"
 
-#define PRINTER [](IT first,IT last)    \
-                  {                                 \
-                      std::cout<<*first<<std::endl;      \
-                      return true;                  \
-                  }
+// #define PRINTER [](IT first,IT last)    \
+//                   {                                 \
+//                       std::cout<<*first<<std::endl;      \
+//                       return true;                  \
+//                   }
 
+
+typedef std::string::iterator IT;
+
+bool printer(IT first,IT last)
+{
+    std::cout<<*first<<std::endl;
+    return true;
+}
+
+#define PRINTER printer
 
 int main()
 {
-    typedef std::string::iterator IT;
+
     _alpha<IT> a1; a1 <= PRINTER;
     _alpha<IT> a2; a2 <= PRINTER;
     _digit<IT> d1; d1 <= PRINTER;

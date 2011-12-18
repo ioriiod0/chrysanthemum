@@ -22,7 +22,6 @@ struct accumulater
     accumulater(Sum&& sum,Args&&... args):
                                     sum_(std::forward<Sum>(sum)),
                                     tuple_(data_type(),std::forward<Args>(args)...) {}
-    ~accumulater() {}
     ////////////////////////////////
     template <typename Iterator>
     bool operator()(Iterator first,Iterator last)

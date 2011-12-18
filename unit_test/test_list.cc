@@ -24,6 +24,7 @@
 #include "../src/action/converters.h"
 #include "../src/parsers/parsers.h"
 #include "../src/action/comparer.h"
+#include "../src/action/condition.h"
 
 
 int main()
@@ -69,13 +70,13 @@ int main()
 
 
     {
-        std::string ret;
-        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _accumulater(ret)) % '.';
+        std::size_t sum = 0;
+        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _accumulater(sum)) % '.';
         std::string str = "192.168.1.1"; // "192.168.1.1";
         auto it = str.begin();
         if(ip_parser(it,str.end()))
         {
-            std::cout<<ret<<std::endl;
+            std::cout<<sum<<std::endl;
         }
         else
         {
@@ -85,7 +86,11 @@ int main()
 
 
     {
-        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _less_equal(255)) % '.';
+        auto condition = _less_equal(255);
+        auto ip_parser = ( 
+                            ((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>()))
+                                <= _if_then(condition,[&condition](){ std::cout<<condition.data()<<std::endl;})
+                         ) % '.';
         std::string str = "192.168.1.1"; // "192.168.1.1";
         auto it = str.begin();
         if(ip_parser(it,str.end()))
@@ -98,7 +103,14 @@ int main()
         }
     }
     {
-        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _less_equal(255)) % '.';
+        auto condition = _less_equal(255);
+        auto ip_parser = ( 
+                            ((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>()))
+                                <= _if_else(condition,
+                                            [&condition](){ std::cout<<condition.data()<<std::endl;},
+                                            [&condition](){ std::cout<<"wrong num:"<<condition.data()<<std::endl;}
+                                           )
+                         ) % '.';
         std::string str = "256.168.1.1"; // "192.168.1.1";
         auto it = str.begin();
         if(ip_parser(it,str.end()))

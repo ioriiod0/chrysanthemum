@@ -22,7 +22,6 @@ public:
     typedef typename std::remove_reference<Parser>::type::iterator Iterator; 
 
     repeat_p(Parser&& t):parser_(std::forward<Parser>(t)) {}
-    ~repeat_p() {}
 public:
     bool do_parse(Iterator& first,Iterator last)
     {

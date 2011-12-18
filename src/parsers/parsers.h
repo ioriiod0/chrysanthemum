@@ -11,11 +11,9 @@
 #include "../utility/basic_parser.h"
 
 template <typename Iterator>
-class alpha_parser:public basic_parser<Iterator,alpha_parser<Iterator>>
+struct alpha_parser:public basic_parser<Iterator,alpha_parser<Iterator>>
 {
-public:
-    alpha_parser() {}
-    ~alpha_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -27,11 +25,9 @@ public:
 
 
 template <typename Iterator>
-class digit_parser:public basic_parser<Iterator,digit_parser<Iterator>> 
+struct digit_parser:public basic_parser<Iterator,digit_parser<Iterator>> 
 {
-public:
-    digit_parser() {}
-    ~digit_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -44,11 +40,9 @@ public:
 };
 
 template <typename Iterator>
-class cntrl_parser:public basic_parser<Iterator,cntrl_parser<Iterator>>
+struct cntrl_parser:public basic_parser<Iterator,cntrl_parser<Iterator>>
 {
-public:
-    cntrl_parser() {}
-    ~cntrl_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -60,11 +54,9 @@ public:
 };
 
 template <typename Iterator>
-class space_parser:public basic_parser<Iterator,space_parser<Iterator>>
+struct space_parser:public basic_parser<Iterator,space_parser<Iterator>>
 {
-public:
-    space_parser() {}
-    ~space_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -75,11 +67,8 @@ public:
  };
 
 template <typename Iterator>
-class oct_parser:public basic_parser<Iterator,oct_parser<Iterator>>
+struct oct_parser:public basic_parser<Iterator,oct_parser<Iterator>>
 {
-public:
-    oct_parser() {}
-    ~oct_parser() {}
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -91,11 +80,9 @@ public:
  };
 
 template <typename Iterator>
-class char_parser:public basic_parser<Iterator,char_parser<Iterator>>
+struct char_parser:public basic_parser<Iterator,char_parser<Iterator>>
 {
-public:
-    char_parser() {}
-    ~char_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -110,11 +97,9 @@ public:
 
 
 template <typename Iterator>
-class upalpha_parser:public basic_parser<Iterator,upalpha_parser<Iterator>>
+struct upalpha_parser:public basic_parser<Iterator,upalpha_parser<Iterator>>
 {
-public:
-    upalpha_parser() {}
-    ~upalpha_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -126,11 +111,9 @@ public:
 };
 
 template <typename Iterator>
-class loalpha_parser:public basic_parser<Iterator,loalpha_parser<Iterator>>
+struct loalpha_parser:public basic_parser<Iterator,loalpha_parser<Iterator>>
 {
-public:
-    loalpha_parser() {}
-    ~loalpha_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {
@@ -142,11 +125,9 @@ public:
 };
 
 template <typename Iterator>
-class hex_parser:public basic_parser<Iterator,hex_parser<Iterator>>
+struct hex_parser:public basic_parser<Iterator,hex_parser<Iterator>>
 {
-public:
-    hex_parser() {}
-    ~hex_parser() {}
+
 public:
     bool do_parse(Iterator& first,Iterator last)
     {

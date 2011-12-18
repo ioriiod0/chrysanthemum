@@ -18,8 +18,10 @@ class literal_str_p:public basic_parser<Iterator,literal_str_p<Iterator,Str_type
     public:
         template <typename T>
         literal_str_p(T&& t):data_(std::forward<T>(t)) {}
-        ~literal_str_p() {}
-
+        ////////////////////////////////////////
+        literal_str_p(const literal_str_p& rhs) = default;
+        literal_str_p(literal_str_p&& rhs) = default;
+        /////////////////////////////////////////
     public:
         bool do_parse(Iterator& first,Iterator last)
         {
@@ -42,7 +44,6 @@ class literal_ch_p:public basic_parser<Iterator,literal_ch_p<Iterator,CharT>>
 {
     public:
         literal_ch_p(char ch) {data_ = ch;}
-        ~literal_ch_p() {}
     public:
         bool do_parse(Iterator& first,Iterator last)
         {
