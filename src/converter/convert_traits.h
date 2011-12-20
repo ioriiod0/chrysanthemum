@@ -1,19 +1,17 @@
 // ======================================================================================
-// File         : action.h
+// File         : convert_traits.h
 // Author       : Lei Gao 
-// Last Change  : 12/13/2011 | 13:32:14 PM | Tuesday,December
+// Last Change  : 12/20/2011 | 16:28:19 PM | Tuesday,December
 // Description  : 
 // ======================================================================================
-#ifndef __CONVERTER_H__
-#define __CONVERTER_H__
-
-
+#ifndef __CONVERT_TRAITS_H__
+#define __CONVERT_TRAITS_H__
 #include <cstdlib>
 #include <string>
 #include <tuple>
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
-#include "basic_action.h"
+
 
 
 #define DECLARE_CONVERT_FUNCTION_1_1(FUNC) \
@@ -160,107 +158,6 @@ struct converter_traits<char>
 
 
 
-template <template <class> class Traits,typename... Args>
-struct converter
-{
-    ////////////////////////
-    typedef typename std::remove_reference<typename at<0,Args...>::type>::type data_type;
-    ////////////////////////
-    converter(Args&&... args):tuple_(std::forward<Args>(args)...) {}
-    /////////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
-    {
-        Traits<data_type>::do_convert(first,last,tuple_);
-        return true;
-    }
-
-    ///////////////////////
-    data_type& data()
-    {
-        return std::get<0>(tuple_);
-    }
-    const data_type& data() const
-    {
-        return std::get<0>(tuple_);
-    }
-    std::tuple<Args...> tuple_;
-};
-
-
-template <typename... Args>
-auto _converter(Args&&... args)
-    -> converter<converter_traits,Args...>
-{
-    return converter<converter_traits,Args...>(std::forward<Args>(args)...);
-}
-
-
-
-// template <template <class> class Traits>
-// struct converter<std::string,Traits>
-// {
-//     to_string(std::string& s):str_(s) {}
-//     ////////////////////////
-//     template <typename Iterator>
-//     bool operator()(Iterator first,Iterator last)
-//     {
-//         str_.assign(first,last);
-//         return true;
-//     }
-//     ///////////////////////
-//     std::string& str_;
-// };
-
-// template <template <class> class Traits>
-// struct converter<float,Traits>
-// {
-//     converter(float& i):data_(i) {}
-//     /////////////////////////////////////
-//     template <typename Iterator>
-//     bool operator()(Iterator first,Iterator last)
-//     {
-//         data_ = Traits<float>::do_convert(first,last);
-//         return true;
-//     }
-//     ////////////////////////
-//     float& data_;
-// };
-
-// template <template <class> class Traits>
-// struct converter<double,Traits>
-// {
-//     converter(double& i):data_(i) {}
-//     /////////////////////////////////////
-//     template <typename Iterator>
-//     bool operator()(Iterator first,Iterator last)
-//     {
-//         data_ = Traits<float>::do_convert(first,last);
-//         return true;
-//     }
-//     ////////////////////////
-//     double& data_;
-// };
-
-// template <template <class> class Traits>
-// struct converter<long double,Traits>
-// {
-//     converter(long double& i):data_(i) {}
-//     /////////////////////////////////////
-//     template <typename Iterator>
-//     bool operator()(Iterator first,Iterator last)
-//     {
-//         data_ = Traits<long double>::do_convert(first,last);
-//         return true;
-//     }
-//     ////////////////////////
-//     long double& data_;
-// };
-
-
-
-
 
 
 #endif
-

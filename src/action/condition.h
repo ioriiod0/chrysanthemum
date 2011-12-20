@@ -11,8 +11,7 @@
 #include <functional>
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
-#include "basic_action.h"
-#include "converters.h"
+
 
 
 
@@ -23,12 +22,12 @@ struct if_then
     if_then(Condition&& c,Handler&& h):c_(std::forward<Condition>(c)),
                         h_(std::forward<Handler>(h)) {}
     ///////////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
+    template <typename T>
+    bool operator()(const T& t)
     {
-        bool ret = c_(first,last);
+        bool ret = c_(t);
         if(ret)
-            h_();
+            h_(t);
         return ret;
     }
     //////////////////////////////////////
@@ -55,14 +54,14 @@ struct if_else
                             h1_(std::forward<Handler1>(h1)),
                             h2_(std::forward<Handler2>(h2)) {}
     ///////////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
+    template <typename T>
+    bool operator()(const T& t)
     {
-        bool ret = c_(first,last);
+        bool ret = c_(t);
         if(ret)
-            h1_();
+            h1_(t);
         else
-            h2_();
+            h2_(t);
         return ret;
     }
     //////////////////////////////////////

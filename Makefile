@@ -1,6 +1,8 @@
 
 ALL_HEADER = all.h config.h \
 		     src/compound/or_p.h \
+			 src/compound/composer_p_a.h \
+			 src/compound/composer_p_c.h \
 			 src/compound/diference_p.h \
 			 src/compound/list_p.h \
 			 src/compound/literal_p.h \
@@ -8,16 +10,17 @@ ALL_HEADER = all.h config.h \
 			 src/compound/optional_p.h \
 			 src/compound/repeat_p.h \
 			 src/compound/and_p.h \
-			 src/parsers/parsers.h \
-			 src/utility/alternative.h \
+			 src/parsers/basic_parsers.h \
+			 src/parsers/rule.h \
 			 src/utility/meta_fuctions.h \
-			 src/utility/optional.h \
 			 src/utility/tuple_serialization.h \
-			 src/action/basic_action.h \
-			 src/action/converters.h \
-			 src/action/data_holder.h \
+			 src/converter/converters.h \
+			 src/converter/convert_traits.h \
 			 src/action/accumulater.h \
-			 src/action/back_inserter.h 
+			 src/action/back_inserter.h \
+			 src/action/printer.h \
+			 src/action/condition.h \
+			 src/action/comparer.h
 
 all_test: test_and_p test_or_p test_repeat test_list test_optional test_alternative
 

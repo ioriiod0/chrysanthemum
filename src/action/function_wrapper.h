@@ -11,45 +11,15 @@
 #include <functional>
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
-#include "basic_action.h"
-#include "converters.h"
 
 
-template <template<class> class Traits,typename Handler>
+
+template <typename Handler>
 struct function_wrapper;
 
 
-// template <typename Farg,template<class> class Traits,typename... Args>
-// struct function_wrapper<bool(Farg),Traits,Args...>
-// {
-//     ///////////////////////////
-//     typedef typename std::function<R(Farg)>::argument_type T1;
-//     typedef typename std::remove_const<T1>::type data_type;
-//     ////////////////////////////
-//     template <typename U>
-//     function_wrapper(U&& u,Args&&... args):
-//                             f_(std::forward<U>(u)),
-//                             tuple_(data_type(),std::forward<Args>(args)...){}
-//     /////////////////////////////
-//     function_wrapper(const function_wrapper& rhs) = default;
-//     function_wrapper(function_wrapper&& rhs) = default;
-//     ///////////////////////////
-//     template <typename Iterator>
-//     bool operator() (Iterator first,Iterator last)
-//     {
-//         Traits<data_type>::do_convert(first,last,tuple_);
-//         return f_(std::get<0>(tuple_));
-//     }
-//     //////////////////////
-//     std::function<bool(Farg)> f_;
-//     std::tuple<data_type,Args...> tuple_;
-
-// };
-
-/////////////////////////////////////////////////////////////////
-
-template <template<class> class Traits,typename R,typename Farg>
-struct function_wrapper<Traits,R(Farg)>
+template <typename R,typename Farg>
+struct function_wrapper<R(Farg)>
 {
     ///////////////////////////
     typedef std::function<R(Farg)> F_type;

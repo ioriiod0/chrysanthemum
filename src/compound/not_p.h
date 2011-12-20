@@ -9,20 +9,17 @@
 #include <type_traits>
 #include <string>
 #include "literal_p.h"
-#include "../utility/basic_parser.h"
 
 
 template <typename Parser>
-class not_p:
-    public basic_parser<typename std::remove_reference<Parser>::type::iterator,
-                        not_p<Parser> >
+class not_p
 {
-    public:
-        typedef typename std::remove_reference<Parser>::type::iterator Iterator;
+
     public:
         not_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
     public:
-        bool do_parse(Iterator& first,Iterator last)
+        template <typename Iterator>
+        bool operator()(Iterator& first,Iterator last)
         {
             if(!parser_(first,last))
                 return true;
@@ -34,7 +31,7 @@ class not_p:
 
 
 template <typename Arg>
-auto _not(Arg&& arg) -> not_p<Arg> 
+inline auto _not(Arg&& arg) -> not_p<Arg> 
 {
     return not_p<Arg>(std::forward<Arg>(arg));
 }

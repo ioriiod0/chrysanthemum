@@ -9,48 +9,35 @@
 
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
-#include "basic_action.h"
-#include "converters.h"
 
 
-template <template<class> class Traits,typename Sum,typename... Args>
+
+template <typename Sum>
 struct accumulater
 {
     ////////////////////////////////
     typedef typename std::remove_reference<Sum>::type data_type;
     /////////////////////////////////
-    accumulater(Sum&& sum,Args&&... args):
-                                    sum_(std::forward<Sum>(sum)),
-                                    tuple_(data_type(),std::forward<Args>(args)...) {}
+    accumulater(Sum&& sum):sum_(std::forward<Sum>(sum)) {}
     ////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
+    template <typename T>
+    bool operator()(const T& t)
     {
-        Traits<data_type>::do_convert(first,last,tuple_);
-        sum_ += std::move(std::get<0>(tuple_));
+        sum_ += t;
         return true;
     }
    
-    ///////////////////////
-    data_type& data()
-    {
-        return sum_;
-    }
-    const data_type& data() const
-    {
-        return sum_;
-    }
     /////////////////////////////////////
     Sum sum_; 
-    std::tuple<data_type,Args...> tuple_;    
+  
 
 };
 
-template <typename Sum,typename... Args>
-auto _accumulater(Sum&& sum,Args&&... args)
-    -> accumulater<converter_traits,Sum,Args...>
+template <typename Sum>
+auto _accumulater(Sum&& sum)
+    -> accumulater<Sum>
 {
-    return accumulater<converter_traits,Sum,Args...>(std::forward<Sum>(sum),std::forward<Args>(args)...);
+    return accumulater<Sum>(std::forward<Sum>(sum));
 }
 
 #endif

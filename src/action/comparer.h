@@ -11,81 +11,64 @@
 #include <functional>
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
-#include "basic_action.h"
-#include "converters.h"
 
 
-
-template <template<class> class Traits,typename Comp,typename T,typename... Args>
+template <typename T,typename Comp>
 struct comparer
 {
-    typedef typename std::remove_reference<T>::type data_type;
     ////////////////////////////////////////
-    comparer(T&& t,Args&&... args):t_(std::forward<T>(t)),
-                        tuple_(data_type(),std::forward<Args>(args)...) {}
+    comparer(T&& t):t_(std::forward<T>(t)) {}
     ///////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
+    bool operator()(const T& t)
     {
-        Traits<data_type>::do_convert(first,last,tuple_);
-        return comp_(std::get<0>(tuple_),t_);
-    }
-    ///////////////////////////////
-    data_type& data()
-    {
-        return std::get<0>(tuple_);
-    }
-    const data_type& data() const
-    {
-        return std::get<0>(tuple_);
+        return comp_(t,t_);
     }
     //////////////////////////////////////
     Comp comp_;
     T t_;
-    std::tuple<data_type,Args...> tuple_;
-
-    
 };
 
-template <typename T,typename... Args>
-auto _equal_to(T&& t,Args&&... args)
-    -> comparer<converter_traits,std::equal_to<T>,T,Args...>
+template <typename T>
+auto _equal_to(T&& t)
+    -> comparer<T,std::equal_to<T>>
 {
-    return comparer<converter_traits,std::equal_to<T>,T,Args...>(std::forward<T>(t),std::forward<Args>(args)...);
+    return comparer<T,std::equal_to<T>>(std::forward<T>(t));
 }
 
-template <typename T,typename... Args>
-auto _not_equal_to(T&& t,Args&&... args)
-    -> comparer<converter_traits,std::not_equal_to<T>,T,Args...>
+template <typename T>
+auto _not_equal_to(T&& t)
+    -> comparer<T,std::not_equal_to<T>>
 {
-    return comparer<converter_traits,std::not_equal_to<T>,T,Args...>(std::forward<T>(t),std::forward<Args>(args)...);
+    return comparer<T,std::not_equal_to<T>>(std::forward<T>(t));
 }   
 
-template <typename T,typename... Args>
-auto _less_than(T&& t,Args&&... args)
-    -> comparer<converter_traits,std::less<T>,T,Args...>
+template <typename T>
+auto _less_than(T&& t)
+    -> comparer<T,std::less<T>>
 {
-    return comparer<converter_traits,std::less<T>,T,Args...>(std::forward<T>(t),std::forward<Args>(args)...);
+    return comparer<T,std::less<T>>(std::forward<T>(t));
 }
 
-template <typename T,typename... Args>
-auto _less_equal(T&& t,Args&&... args)
+template <typename T>
+auto _less_equal(T&& t)
     -> comparer<converter_traits,std::less_equal<T>,T,Args...>
 {
-    return comparer<converter_traits,std::less_equal<T>,T,Args...>(std::forward<T>(t),std::forward<Args>(args)...);
+    return comparer<T,std::less_equal<T>>(std::forward<T>(t));
 }
 
-template <typename T,typename... Args>
-auto _greater_than(T&& t,Args&&... args)
-    -> comparer<converter_traits,std::greater<T>,T,Args...>
+
+template <typename T>
+auto _greater_than(T&& t)
+    -> comparer<T,std::greater<T>>
 {
-    return comparer<converter_traits,std::greater<T>,T,Args...>(std::forward<T>(t),std::forward<Args>(args)...);
+    return comparer<T,std::greater<T>>(std::forward<T>(t));
 }
-template <typename T,typename... Args>
-auto _greater_equal(T&& t,Args&&... args)
-    -> comparer<converter_traits,std::greater_equal<T>,T,Args...>
+
+template <typename T>
+auto _greater_equal(T&& t)
+    -> comparer<T,std::greater_equal<T>>
 {
-    return comparer<converter_traits,std::greater_equal<T>,T,Args...>(std::forward<T>(t),std::forward<Args>(args)...);
+    return comparer<T,std::greater_equal<T>>(std::forward<T>(t));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif

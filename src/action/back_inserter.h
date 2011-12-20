@@ -9,50 +9,33 @@
 
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
-#include "basic_action.h"
-#include "converters.h"
+
 //#include "data_holder.h"
 
 
-template <template<class> class Traits,typename Container,typename... Args>
+template <typename Container>
 struct back_inserter
 {
-    ////////////////////////////////
-    typedef typename std::remove_reference<Container>::type data_type;
-    typedef typename data_type::value_type value_type;
     /////////////////////////////////
-    back_inserter(Container&& c,Args&&... args):
-                                    c_(std::forward<Container>(c)),
-                                    tuple_(value_type(),std::forward<Args>(args)...) {}
+    back_inserter(Container&& c):c_(std::forward<Container>(c)) {}
     ////////////////////////////////
-    template <typename Iterator>
-    bool operator()(Iterator first,Iterator last)
+    template <typename T>
+    bool operator()(const T& t)
     {
-        Traits<value_type>::do_convert(first,last,tuple_);
-        c_.push_back(std::move(std::get<0>(tuple_)));
+        c_.push_back(t);
         return true;
     }
    
-    ///////////////////////
-    data_type& data()
-    {
-        return c_;
-    }
-    const data_type& data() const
-    {
-        return c_;
-    }
-    /////////////////////////////////////
     Container c_;
-    std::tuple<value_type,Args...> tuple_;    
+
 
 };
 
-template <typename Container,typename... Args>
-auto _back_inserter(Container&& c,Args&&... args)
-    -> back_inserter<converter_traits,Container,Args...>
+template <typename Container>
+auto _back_inserter(Container&& c)
+    -> back_inserter<Container>
 {
-    return back_inserter<converter_traits,Container,Args...>(std::forward<Container>(c),std::forward<Args>(args)...);
+    return back_inserter<Container>(std::forward<Container>(c));
 }
 
 #endif

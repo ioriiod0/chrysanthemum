@@ -5,52 +5,63 @@
 // Description  : 
 // ======================================================================================
 
-#include <string>
-#include <iostream>
+
 
 //#include "../all.h"
 #include "../src/compound/and_p.h"
 #include "../src/compound/literal_p.h"
-#include "../src/parsers/parsers.h"
-#include "../src/action/converters.h"
+#include "../src/parsers/basic_parsers.h"
+#include "../src/parsers/rule.h"
+#include "../src/converter/converters.h"
+#include "../src/action/printer.h"
+#include "../src/action/back_inserter.h"
+#include "../src/action/accumulater.h"
+#include "../src/compound/composer_p_c.h"
+#include "../src/compound/composer_p_a.h"
 
-// #define PRINTER [](IT first,IT last)    \
-//                   {                                 \
-//                       std::cout<<*first<<std::endl;      \
-//                       return true;                  \
-//                   }
+#include <string>
+#include <iostream>
 
 
-typedef std::string::iterator IT;
 
-bool printer(IT first,IT last)
-{
-    std::cout<<*first<<std::endl;
-    return true;
-}
-
-#define PRINTER printer
 
 int main()
 {
 
-    _alpha<IT> a1; a1 <= PRINTER;
-    _alpha<IT> a2; a2 <= PRINTER;
-    _digit<IT> d1; d1 <= PRINTER;
-    _digit<IT> d2; d2 <= PRINTER;
-    _space<IT> s1; s1 <= PRINTER;
-    _space<IT> s2; s2 <= PRINTER;
-    std::string ret;
+    typedef std::string::iterator IT;
+    _alpha a1; char ch1;
+    _alpha a2; char ch2;
+    _digit d1; char ch3;
+    _digit d2; char ch4;
+    _space s1; char ch5;
+    _space s2; char ch6;
 
     {
-        auto p = "HTTP://" & a1 & d1 & ' ' & a2 & d2 & ' ' & (_alpha<IT>() <= PRINTER);
-        p <= _converter(ret);
+        std::string ret;
+        char ch;
+        rule<IT,std::string,no_skip> p;
+        p %= ( "HTTP://" << _converter(ret) <= _line_printer(std::cout)
+            & a1 << _converter(ch1) <= _line_printer(std::cout)
+            & d1 << _converter(ch2) <= _line_printer(std::cout)
+            & ' ' 
+            & a2 
+            & d2 
+            & ' ' 
+            & _alpha()
+            ) << _converter(p.ctx()) <= _line_printer(std::cout);
+        // p %= "HTTP://" <= _converter(p.ctx())
+        //     & a1<= _converter(ch1);
         std::string str = "HTTP://a3 b4 c";
         IT first = str.begin();
-        IT last = str.end();
-        if(p(first,last))
+        if(p(first,str.end()))
         {
-            std::cout<<ret<<std::endl;
+            printf("%s\r\n",p.ctx().c_str());
+            std::cout<<p.ctx().c_str()<<std::endl;
+
+        }
+        else
+        {
+            printf("err\r\n");
         }
 
     }

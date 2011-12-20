@@ -10,22 +10,21 @@
 
 #include <string>
 #include <type_traits>
-#include "../utility/basic_parser.h"
 
-template <typename Iterator,typename Str_type>
-class literal_str_p:public basic_parser<Iterator,literal_str_p<Iterator,Str_type>>
+
+class literal_str_p
 {
-    public:
-        template <typename T>
-        literal_str_p(T&& t):data_(std::forward<T>(t)) {}
-        ////////////////////////////////////////
-        literal_str_p(const literal_str_p& rhs) = default;
-        literal_str_p(literal_str_p&& rhs) = default;
+    public: 
+        literal_str_p(const char* str):data_(str) {}
+        literal_str_p(const std::string& str):data_(str) {}
+        literal_str_p(std::string&& str):data_(std::move(str)) {}
+
         /////////////////////////////////////////
     public:
-        bool do_parse(Iterator& first,Iterator last)
+        template <typename Iterator>
+        bool operator()(Iterator& first,Iterator last)
         {
-            typename Str_type::iterator it = data_.begin();
+            typename std::string::iterator it = data_.begin();
             while(first!=last && it!=data_.end())
             {
                 if(*first++ != *it++)
@@ -36,16 +35,17 @@ class literal_str_p:public basic_parser<Iterator,literal_str_p<Iterator,Str_type
             return true;
         }
     private:
-        Str_type data_;
+        std::string data_;
 };
 
-template <typename Iterator,typename CharT>
-class literal_ch_p:public basic_parser<Iterator,literal_ch_p<Iterator,CharT>>
+template <typename CharT>
+class literal_ch_p
 {
     public:
-        literal_ch_p(char ch) {data_ = ch;}
+        literal_ch_p(CharT ch) {data_ = ch;}
     public:
-        bool do_parse(Iterator& first,Iterator last)
+        template <typename Iterator>
+        bool operator()(Iterator& first,Iterator last)
         {
             if(first != last && *first++ == data_)
             {
@@ -59,17 +59,27 @@ class literal_ch_p:public basic_parser<Iterator,literal_ch_p<Iterator,CharT>>
 };
 
 
-template <typename Iterator,typename Arg>
-auto _literal(Arg&& arg) -> literal_str_p<Iterator,std::string>
+inline auto _literal(const char* str) -> literal_str_p
 {
-    return literal_str_p<Iterator,std::string>(std::forward<Arg>(arg));
+    return literal_str_p(str);
 }
 
 
-template <typename Iterator>
-auto _literal(char ch) -> literal_ch_p<Iterator,char>
+inline auto _literal(const std::string& str) -> literal_str_p
 {
-    return literal_ch_p<Iterator,char>(ch);
+    return literal_str_p(str);
+}
+
+
+inline auto _literal(std::string&& str) -> literal_str_p
+{
+    return literal_str_p(std::move(str));
+}
+
+
+inline auto _literal(char ch) -> literal_ch_p<char>
+{
+    return literal_ch_p<char>(ch);
 }
 
 
