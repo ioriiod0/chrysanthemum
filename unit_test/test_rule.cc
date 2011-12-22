@@ -32,7 +32,7 @@ int main()
         auto f = [](const std::string& str) {std::cout<<str<<std::endl;};
         auto wrapper = _wrapper<void(const std::string& str)>(f);
         //decltype(fw) fw2(fw);
-
+        //{a{b{c{d}}}}
         rule<IT> rule_;
         rule_ %= (   '{' 
                    & _repeat<0,INFINITE>(_char<IT>()-'{'-'}') 

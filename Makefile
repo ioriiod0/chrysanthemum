@@ -1,8 +1,6 @@
 
 ALL_HEADER = all.h config.h \
 		     src/compound/or_p.h \
-			 src/compound/composer_p_a.h \
-			 src/compound/composer_p_c.h \
 			 src/compound/diference_p.h \
 			 src/compound/list_p.h \
 			 src/compound/literal_p.h \
@@ -12,6 +10,10 @@ ALL_HEADER = all.h config.h \
 			 src/compound/and_p.h \
 			 src/parsers/basic_parsers.h \
 			 src/parsers/rule.h \
+			 src/parsers/type_tags.h \
+			 src/parsers/compposer.h \
+			 src/parsers/context_parser.h \
+			 src/parsers/action_parser.h \
 			 src/utility/meta_fuctions.h \
 			 src/utility/tuple_serialization.h \
 			 src/converter/converters.h \

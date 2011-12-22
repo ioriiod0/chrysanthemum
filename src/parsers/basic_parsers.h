@@ -1,16 +1,19 @@
 // ======================================================================================
-// File         : ps.h
-// Author       : Gao Lei 
-// Last Change  : 12/01/2011 | 01:43:39 AM | Thursday,December
+// File         : basic_parsers.h
+// Author       : Lei Gao 
+// Last Change  : 12/22/2011 | 16:40:21 PM | Thursday,December
 // Description  : 
 // ======================================================================================
 #ifndef __pS_H__
 #define __pS_H__
 
+
 #include <cctype>
+#include "type_tags.h"
 
 
-struct alpha_p
+
+struct alpha_p:public basic_parser_base
 {
 
 public:
@@ -25,7 +28,7 @@ public:
 
 
 
-struct digit_p 
+struct digit_p :public basic_parser_base
 {
 
 public:
@@ -40,7 +43,7 @@ public:
 
 };
 
-struct cntrl_p
+struct cntrl_p:public basic_parser_base
 {
 public:
     template <typename Iterator>
@@ -54,7 +57,7 @@ public:
 };
 
 
-struct space_p
+struct space_p:public basic_parser_base
 {
 
 public:
@@ -68,8 +71,8 @@ public:
  };
 
 
-struct oct_p
-{
+struct oct_p:public basic_parser_base
+{   
 public:
     template <typename Iterator>
     bool operator()(Iterator& first,Iterator last)
@@ -82,7 +85,7 @@ public:
  };
 
 
-struct char_p
+struct char_p:public basic_parser_base
 {
 
 public:
@@ -100,7 +103,7 @@ public:
 
 
 
-struct upalpha_p
+struct upalpha_p:public basic_parser_base
 {
 
 public:
@@ -115,7 +118,7 @@ public:
 };
 
 
-struct loalpha_p
+struct loalpha_p:public basic_parser_base
 {
 
 public:
@@ -130,7 +133,7 @@ public:
 };
 
 
-struct hex_p
+struct hex_p:public basic_parser_base
 {
 
 public:
@@ -151,7 +154,7 @@ public:
 
 
 template <typename CharT,CharT Start,CharT End>
-struct range_p
+struct range_p:public basic_parser_base
 {
 public:
     static_assert(Start<End,"Start must less than End");
@@ -169,6 +172,7 @@ public:
     }
 
 };
+
 #define _alpha alpha_p
 #define _digit digit_p
 #define _space space_p

@@ -16,8 +16,8 @@
 #include "../src/action/printer.h"
 #include "../src/action/back_inserter.h"
 #include "../src/action/accumulater.h"
-#include "../src/compound/composer_p_c.h"
-#include "../src/compound/composer_p_a.h"
+#include "../src/parsers/compposer.h"
+
 
 #include <string>
 #include <iostream>
@@ -37,33 +37,33 @@ int main()
     _space s2; char ch6;
 
     {
+        //////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////
         std::string ret;
         char ch;
         rule<IT,std::string,no_skip> p;
-        p %= ( "HTTP://" << _converter(ret) <= _line_printer(std::cout)
-            & a1 << _converter(ch1) <= _line_printer(std::cout)
-            & d1 << _converter(ch2) <= _line_printer(std::cout)
+        p %= ( "HTTP://" <= _converter(ret) <= _line_printer(std::cout)
+            & a1 <= _converter(ch1) <= _line_printer(std::cout)
+            & d1 <= _converter(ch2) <= _line_printer(std::cout)
             & ' ' 
             & a2 
             & d2 
             & ' ' 
             & _alpha()
-            ) << _converter(p.ctx()) <= _line_printer(std::cout);
-        // p %= "HTTP://" <= _converter(p.ctx())
-        //     & a1<= _converter(ch1);
+            ) <= _converter(p.ctx()) <= _line_printer(std::cout);
+        // p %= "HTTP://" <= _converter(p.ctx()) <= _line_printer(std::cout)
+        //     & a1 <= _converter(ch1) <= _line_printer(std::cout);
         std::string str = "HTTP://a3 b4 c";
         IT first = str.begin();
         if(p(first,str.end()))
         {
-            printf("%s\r\n",p.ctx().c_str());
-            std::cout<<p.ctx().c_str()<<std::endl;
-
+            std::cout<<p.ctx()<<"   lala"<<std::endl;
         }
         else
         {
             printf("err\r\n");
         }
-
+        /////////////////////////////////////////////////////////////////
     }
 
 

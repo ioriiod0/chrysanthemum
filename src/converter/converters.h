@@ -25,7 +25,7 @@ struct converter
         return true;
     }
 
-    ///////////////////////
+    /////////////////////
     ctx_type& ctx()
     {
         return std::get<0>(tuple_);
