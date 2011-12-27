@@ -62,7 +62,7 @@ inline auto operator% (P1&& p1,P2&& p2) -> list_p<P1,P2>
 
 template <typename T>
 inline auto operator% (T&& t,char ch)
-    -> decltype(_list(std::forward<T>(t),_literal(ch)))
+    -> list_p<T,literal_ch_p<char>>
 {
     return _list(std::forward<T>(t),_literal(ch));
 }

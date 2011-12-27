@@ -14,44 +14,35 @@
 
 
 
-template <typename Handler>
-struct function_wrapper;
-
-
-template <typename R,typename Farg>
-struct function_wrapper<R(Farg)>
+template <typename Converter,typename Handler>
+struct function_wrapper
 {
     ///////////////////////////
-    typedef std::function<R(Farg)> F_type;
-    typedef typename std::remove_reference<Farg>::type T1;
-    typedef typename std::remove_const<T1>::type data_type;
+    typedef typename Converter::ctx_type Arg;
+    typedef std::function<bool(Arg)> Func;
     ////////////////////////////
-    function_wrapper(const F_type& f):tuple_(data_type()),f_(f) {}
-    function_wrapper(F_type&& f):tuple_(data_type()),f_(std::move(f)) {}
+    function_wrapper(Converter&& c,Handler&& h):c_(std::forward<Converter>(c)),
+                                                  f_(std::forward<Handler>(h)) {}
     /////////////////////////////
-    function_wrapper(const function_wrapper& rhs):f_(rhs.f_),tuple_(rhs.tuple_) {}
-    function_wrapper(function_wrapper&& rhs):f_(std::move(rhs.f_)),
-                                            tuple_(std::move(rhs.tuple_)) {}
-    ///////////////////////////
     template <typename Iterator>
     bool operator() (Iterator first,Iterator last)
     {
-        Traits<data_type>::do_convert(first,last,tuple_);
-        f_(std::get<0>(tuple_));
-        return true;
+        if(c_(first,last))
+            return f_(c_.ctx());
+        return false;
     }
     //////////////////////
-    F_type f_;
-    std::tuple<data_type> tuple_;
+    Func f_;
+    Converter c_; 
 
 };
 
 
-template <typename Sig,typename U>
-auto _wrapper(U&& u)
-    -> function_wrapper<converter_traits,Sig>
+template <typename C,typename H>
+auto _wrapper(C&& c,H&& h)
+    -> function_wrapper<C,H>
 {
-    return function_wrapper<converter_traits,Sig>(std::forward<U>(u));
+    return function_wrapper<C,H>(std::forward<C>(c),std::forward<H>(h));
 }
 
 #endif

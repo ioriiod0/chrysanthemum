@@ -10,9 +10,7 @@ ALL_HEADER = all.h config.h \
 			 src/compound/and_p.h \
 			 src/parsers/basic_parsers.h \
 			 src/parsers/rule.h \
-			 src/parsers/type_tags.h \
 			 src/parsers/compposer.h \
-			 src/parsers/context_parser.h \
 			 src/parsers/action_parser.h \
 			 src/utility/meta_fuctions.h \
 			 src/utility/tuple_serialization.h \
@@ -22,7 +20,8 @@ ALL_HEADER = all.h config.h \
 			 src/action/back_inserter.h \
 			 src/action/printer.h \
 			 src/action/condition.h \
-			 src/action/comparer.h
+			 src/action/comparer.h \
+			 src/action/function_wrapper.h 
 
 all_test: test_and_p test_or_p test_repeat test_list test_optional test_alternative
 

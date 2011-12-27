@@ -30,7 +30,7 @@ public:
         inline static bool do_parse(Tuple& t,It& first,It last)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
-            Iterator it = first;
+            It it = first;
             if(std::get<Idx>(t)(first,last))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
@@ -47,7 +47,7 @@ public:
         inline static bool do_parse(Tuple& t,It& first,It last)
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
-            Iterator it = first;
+            It it = first;
             if(std::get<Idx>(t)(first,last))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;

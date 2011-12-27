@@ -10,7 +10,7 @@
 
 #include <type_traits>
 #include <string> 
-#include "type_tags.h"
+
 
 
 
@@ -27,7 +27,7 @@ public:
     {
         Iterator it = first;
         if(p_(first,last))
-            return a_(p_.ctx());
+            return a_(it,first);
         return false;
     }
 private:
@@ -42,35 +42,6 @@ inline auto _action_parser (Parser&& p,Action&& c)
 {
     return action_parser<Parser,Action>(std::forward<Parser>(p),std::forward<Action>(c));
 }
-
-template <typename Parser,typename Action>
-inline auto do_compose (Parser&& p,Action&& c,const context_parser_tag&)
-    -> action_parser<Parser,Action>
-{
-    return action_parser<Parser,Action>(std::forward<Parser>(p),std::forward<Action>(c));
-}
-
-// template <typename Action>
-// inline auto do_compose (const char* str,Action&& c,const context_parser_tag&)
-//     -> action_parser<literal_str_p,Action>
-// {
-//     return _action_parser(_literal(str),std::forward<Action>(c));
-// }
-
-
-// template <typename Action>
-// inline auto do_compose (const std::string& str,Action&& c,const context_parser_tag&)
-//     -> action_parser<literal_str_p,Action>
-// {
-//     return _action_parser(_literal(str),std::forward<Action>(c));
-// }
-
-// template <typename Action>
-// inline auto do_compose (char ch,Action&& c)
-//     -> decltype(_action_parser(_literal(ch),std::forward<Action>(c)),const )
-// {
-//     return _action_parser(_literal(ch),std::forward<Action>(c));
-// }
 
 
 #endif

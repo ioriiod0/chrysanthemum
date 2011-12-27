@@ -9,11 +9,10 @@
 
 
 #include <cctype>
-#include "type_tags.h"
 
 
 
-struct alpha_p:public basic_parser_base
+struct alpha_p
 {
 
 public:
@@ -28,7 +27,7 @@ public:
 
 
 
-struct digit_p :public basic_parser_base
+struct digit_p 
 {
 
 public:
@@ -43,7 +42,7 @@ public:
 
 };
 
-struct cntrl_p:public basic_parser_base
+struct cntrl_p
 {
 public:
     template <typename Iterator>
@@ -57,7 +56,7 @@ public:
 };
 
 
-struct space_p:public basic_parser_base
+struct space_p
 {
 
 public:
@@ -71,7 +70,7 @@ public:
  };
 
 
-struct oct_p:public basic_parser_base
+struct oct_p
 {   
 public:
     template <typename Iterator>
@@ -85,7 +84,7 @@ public:
  };
 
 
-struct char_p:public basic_parser_base
+struct char_p
 {
 
 public:
@@ -103,7 +102,7 @@ public:
 
 
 
-struct upalpha_p:public basic_parser_base
+struct upalpha_p
 {
 
 public:
@@ -118,7 +117,7 @@ public:
 };
 
 
-struct loalpha_p:public basic_parser_base
+struct loalpha_p
 {
 
 public:
@@ -133,7 +132,7 @@ public:
 };
 
 
-struct hex_p:public basic_parser_base
+struct hex_p
 {
 
 public:
@@ -154,7 +153,7 @@ public:
 
 
 template <typename CharT,CharT Start,CharT End>
-struct range_p:public basic_parser_base
+struct range_p
 {
 public:
     static_assert(Start<End,"Start must less than End");
@@ -173,6 +172,16 @@ public:
 
 };
 
+struct void_p
+{
+public:
+    template <typename Iterator>
+    bool operator()(Iterator& first,Iterator last)
+    {
+        return true;
+    }
+};
+
 #define _alpha alpha_p
 #define _digit digit_p
 #define _space space_p
@@ -182,6 +191,7 @@ public:
 #define _loalpha loalpha_p
 #define _upalpha upalpha_p
 #define _range range_p
+#define _void void_p
 
 #endif
 

@@ -17,6 +17,7 @@
 #include "../src/action/back_inserter.h"
 #include "../src/action/accumulater.h"
 #include "../src/parsers/compposer.h"
+#include "../src/action/function_wrapper.h"
 
 
 #include <string>
@@ -41,27 +42,27 @@ int main()
         /////////////////////////////////////////////////////////////
         std::string ret;
         char ch;
-        rule<IT,std::string,no_skip> p;
-        p %= ( "HTTP://" <= _converter(ret) <= _line_printer(std::cout)
-            & a1 <= _converter(ch1) <= _line_printer(std::cout)
-            & d1 <= _converter(ch2) <= _line_printer(std::cout)
+        rule<IT,no_skip> p;
+        p %= ( "HTTP://" <= _wrapper(_converter(ret),_line_printer(std::cout))
+            & a1 <= _wrapper(_converter(ch1),_line_printer(std::cout))
+            & d1 <= _wrapper(_converter(char()),_line_printer(std::cout))
             & ' ' 
             & a2 
             & d2 
             & ' ' 
             & _alpha()
-            ) <= _converter(p.ctx()) <= _line_printer(std::cout);
+            ) <= _wrapper(_converter(std::string()),_line_printer(std::cout));
         // p %= "HTTP://" <= _converter(p.ctx()) <= _line_printer(std::cout)
         //     & a1 <= _converter(ch1) <= _line_printer(std::cout);
         std::string str = "HTTP://a3 b4 c";
         IT first = str.begin();
         if(p(first,str.end()))
         {
-            std::cout<<p.ctx()<<"   lala"<<std::endl;
+            std::cout<<"lala"<<std::endl;
         }
         else
         {
-            printf("err\r\n");
+            std::cout<<"err"<<std::endl;
         }
         /////////////////////////////////////////////////////////////////
     }

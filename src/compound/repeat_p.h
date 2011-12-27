@@ -50,7 +50,7 @@ public:
 
 
 template <std::size_t N,typename Parser>
-class repeat_p<N,Parser,INFINITE>:
+class repeat_p<N,Parser,INFINITE>
 {
 public:
     repeat_p(Parser&& t):parser_(std::forward<Parser>(t)) {}

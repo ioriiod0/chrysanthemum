@@ -14,7 +14,7 @@
 #include "literal_p.h"
 
 template <typename Parser1,typename Parser2>
-class difference_p:
+class difference_p
 {
 public: 
     difference_p(Parser1&& p1,Parser2&& p2):
