@@ -116,7 +116,7 @@ inline auto  operator& (T1&& t1,char ch)
 // ////////////////////////////////////////////////////////////////////////////////
 template <typename T1>
 inline auto  operator& (char ch,T1&& t1) 
-      -> decltype(_and(_literal(ch),std::forward<T1>(t1))) 
+      -> and_p<literal_ch_p<char>,T1>
 {
     return _and(_literal(ch),std::forward<T1>(t1));
 }

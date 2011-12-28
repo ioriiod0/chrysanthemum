@@ -64,6 +64,36 @@ struct member_node:public node
 };
 
 
+void print_list(list_node* p);
+void print_member(member_node* p);
+void print_str(string_node* p);
+
+void print_member(member_node* p)
+{
+    if(p->type == STRING_NODE)
+    {
+        print_str((string_node*)p->p_node);
+        std::cout<<",";
+    }
+    else
+    {
+        print_list((list_node*) p->p_node);
+        std::cout<<",";
+    }
+}
+
+void print_list(list_node* p)
+{
+    std::cout<<"{";
+    for_each(p->nodes_.begin(),p->nodes_.end(),print_member);
+    std::cout<<"}";
+}
+
+void print_str(string_node* p)
+{
+    std::cout<<p->str;
+}
+
 
 int main()
 {
@@ -74,101 +104,61 @@ int main()
 
         struct grammer
         {
-            rule<IT,no_skip> list,str,member;
-            std::stack<node*> stack_;
+            rule<IT,list_node> list;
+            rule<IT,string_node> str;
+            rule<IT,member_node> member;
 
             grammer()
             {
-                list %= _void() <= std::bind(&grammer::push_list,this,_1,_2)
-                       & '{' 
-                       & (member <= std::bind(&grammer::on_member,this,_1,_2)) % ','
+                list %=  '{'
+                       &  (member <= [=](IT first,IT last) 
+                                    {
+                                        member_node* p = new member_node(member.cur_ctx());
+                                        list.cur_ctx().nodes_.push_back(p);
+                                        member.clear_ctx();
+                                        return true;
+                                    })  % ','
                        & '}';
-                member %= _void() <= std::bind(&grammer::push_member,this,_1,_2) &
-                         (str <= std::bind(&grammer::on_string,this,_1,_2)
-                         | list <= std::bind(&grammer::on_list,this,_1,_2));
-                str %= _void() <= std::bind(&grammer::push_string,this,_1,_2)
-                         & _repeat<0,INFINITE>(_loalpha()) <= std::bind(&grammer::on_string2,this,_1,_2); 
+
+                member %=  str <= [=](IT first,IT last)
+                                 {
+                                    string_node* p = new string_node(str.cur_ctx());
+                                    member.cur_ctx().type = STRING_NODE;
+                                    member.cur_ctx().p_node = p;
+                                    str.clear_ctx();
+                                    return true;
+                                 }
+                          |list <= [=](IT first,IT last)
+                                  {
+                                      list_node* p = new list_node(list.cur_ctx());
+                                      member.cur_ctx().type = LIST_NODE;
+                                      member.cur_ctx().p_node = p;
+                                      list.clear_ctx();
+                                      return true;
+                                  }; 
+
+                str %= _repeat<1,INFINITE>(_loalpha())
+                            <= [=](IT first,IT last)
+                                {
+                                    str.cur_ctx().str.assign(first,last);
+                                    return true;
+                                }; 
+                     
             }
             
-            bool push_list(IT first,IT last)
-            {
-                std::cout<<"push list"<<std::endl;
-                list_node* p = new list_node;
-                stack_.push(p);
-                return true;
-            }
-
-            bool push_string(IT first,IT last)
-            {
-                std::cout<<"push string"<<std::endl;
-                string_node* p = new string_node;
-                stack_.push(p);
-                return true;
-            }
-
-            bool push_member(IT first,IT last)
-            {
-                std::cout<<"push member"<<std::endl;
-                member_node* p = new member_node;
-                stack_.push(p);
-                return true;
-            }
-
-            bool on_member(IT first,IT last)
-            {
-                std::cout<<"on member"<<std::endl;
-                member_node* p = (member_node*)stack_.top();
-                stack_.pop();
-                list_node* q = (list_node*)stack_.top();
-                q->nodes_.push_back(p);
-                return true;
-            }
-
-            bool on_list(IT first,IT last)
-            {
-                std::cout<<"on list"<<std::endl;
-                list_node* p = (list_node*)stack_.top();
-                stack_.pop();
-                member_node* q = (member_node*)stack_.top();
-                q->type = LIST_NODE;
-                q->p_node = p;
-                return true;
-            }
-
-            bool on_string(IT first,IT last)
-            {
-                std::cout<<"on string"<<std::endl;
-                string_node* p = (string_node*)stack_.top();
-                stack_.pop();
-                member_node* q = (member_node*)stack_.top();
-                q->type = STRING_NODE;
-                q->p_node = p;
-                return true;
-            }
-
-            bool on_string2(IT first,IT last)
-            {
-                std::cout<<"on string2"<<std::endl;
-                string_node* p =(string_node*) stack_.top();
-                p->str.assign(first,last);
-                return true;
-            }
-
-            list_node* ctx()
-            {
-                return (list_node*)stack_.top();
-            }
 
         };
 
         
         grammer g; 
-        //std::string str = "{aaa,bbb,{ccc,ddd},{eee,{fff}}}";
-        std::string str = "{aaa,{bbb}}";
+        std::string str = "{ aaa \r\n , bbb \t\n, { ccc , ddd } \r\n,{ eee , { fff } } } ";
+        std::cout<<str<<std::endl;
         IT it = str.begin();
         if(g.list(it,str.end()))
         {
             std::cout<<"OK"<<std::endl;
+            print_list(&g.list.cur_ctx());
+            std::cout<<std::endl;
         }
         else
         {
@@ -177,3 +167,5 @@ int main()
 
     }
 }
+
+

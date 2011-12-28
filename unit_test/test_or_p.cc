@@ -8,35 +8,41 @@
 #include <string>
 #include <iostream>
 //#include "../all.h"
-#include "../src/action/converters.h"
-#include "../src/compound/or_p.h"
 #include "../src/compound/and_p.h"
-#include "../src/parsers/parsers.h"
+#include "../src/compound/or_p.h"
+#include "../src/compound/literal_p.h"
+#include "../src/parsers/basic_parsers.h"
+#include "../src/parsers/rule.h"
+#include "../src/converter/converters.h"
+#include "../src/action/printer.h"
+#include "../src/action/back_inserter.h"
+#include "../src/action/accumulater.h"
+#include "../src/parsers/compposer.h"
+#include "../src/action/function_wrapper.h"
 
 
 
 int main()
 {
 
-
-    std::string ret;
     typedef std::string::iterator IT;
-    auto p1 = _literal<IT>("FTP") <= _converter(ret);
-    auto p2 = _literal<IT>("HTTP") <= _converter(ret);
-    auto p3 = _literal<IT>("TCP") <= _converter(ret);
+    auto p1 = _literal("FTP") <= _wrapper(_converter(std::string()),_line_printer(std::cout));
+    auto p2 = _literal("HTTP") <= _wrapper(_converter(std::string()),_line_printer(std::cout));
+    auto p3 = _literal("TCP") <= _wrapper(_converter(std::string()),_line_printer(std::cout));
 
 
     {
         auto p = _or( p1,
                       p2,
                       p3,
-                      _literal<IT>("IP") <= _converter(ret)
+                      _literal("IP") 
+                        <= _wrapper(_converter(std::string()),_line_printer(std::cout))
                     );
         std::string str = "HTTP";
-        std::string::iterator it = str.begin();
+        IT it = str.begin();
         if(p(it,str.end()) )
         {
-            std::cout<<ret<<std::endl;
+            std::cout<<"OK"<<std::endl;
         }
 
     }
@@ -47,12 +53,13 @@ int main()
         auto p =  p1
                 | p2
                 | p3
-                | (_literal<IT>("IP") <= _converter(ret));
+                | "IP"
+                   <= _wrapper(_converter(std::string()),_line_printer(std::cout));
         std::string str = "TCP";
         std::string::iterator it = str.begin();
         if(p(it,str.end()) )
         {
-            std::cout<<ret<<std::endl;
+            std::cout<<"OK"<<std::endl;
         }
 
     }

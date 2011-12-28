@@ -96,42 +96,56 @@ inline auto operator| (T1&& t1,T2&& t2)
 
 template <typename T1>
 inline auto operator| (T1&& t1,const char* str)
-    -> decltype(_or(std::forward<T1>(t1),_literal(str)))
+    -> or_p<T1,literal_str_p>
 {
     return _or(std::forward<T1>(t1),_literal(str));
 }
 
 template <typename T1>
 inline auto operator| (const char* str,T1&& t1)
-    -> decltype(_or(_literal(str),std::forward<T1>(t1)))
+    -> or_p<literal_str_p,T1>
 {
     return _or(_literal(str),std::forward<T1>(t1));
 }
 
 template <typename T1>
 inline auto operator| (T1&& t1,const std::string& str)
-    -> decltype(_or(std::forward<T1>(t1),_literal(str)))
+    -> or_p<T1,literal_str_p>
 {
     return _or(std::forward<T1>(t1),_literal(str));
 }
     
 template <typename T1>
 inline auto operator| (const std::string& str,T1&& t1)
-    -> decltype(_or(_literal(str),std::forward<T1>(t1)))
+    -> or_p<literal_str_p,T1>
 {
     return _or(_literal(str),std::forward<T1>(t1));
+}
+
+template <typename T1>
+inline auto operator| (T1&& t1,std::string&& str)
+    -> or_p<T1,literal_str_p>
+{
+    return _or(std::forward<T1>(t1),_literal(std::move(str)));
+}
+    
+template <typename T1>
+inline auto operator| (std::string&& str,T1&& t1)
+    -> or_p<literal_str_p,T1>
+{
+    return _or(_literal(std::move(str)),std::forward<T1>(t1));
 }
     
 template <typename T1>
 inline auto operator| (T1&& t1,char ch)
-    -> decltype(_or(std::forward<T1>(t1),_literal(ch)))
+    -> or_p<T1,literal_ch_p<char>>
 {
     return _or(std::forward<T1>(t1),_literal(ch));
 }
     
 template <typename T1>
 inline auto operator| (char ch,T1&& t1)
-    -> decltype(_or(_literal(ch),std::forward<T1>(t1)))
+    -> or_p<literal_ch_p<char>,T1>
 {
     return _or(_literal(ch),std::forward<T1>(t1));
 }

@@ -22,7 +22,7 @@ public:
                 parser2(std::forward<Parser2>(p2)) {}
 public:
     template <typename Iterator>
-    bool do_parse(Iterator& first,Iterator last)
+    bool operator()(Iterator& first,Iterator last)
     {
         Iterator it=first;
         if(!parser2(first,last))
@@ -56,7 +56,8 @@ inline auto operator- (Parser1&& p1,Parser2&& p2)
 
 template <typename Parser1>
 inline auto operator- (Parser1&& p1,char ch) 
-    -> decltype(_difference(std::forward<Parser1>(p1),_literal(ch)))
+    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(ch)))
+    -> difference_p<Parser1,literal_ch_p<char>>
 {
     return _difference(std::forward<Parser1>(p1),
                        _literal(ch));
@@ -64,7 +65,8 @@ inline auto operator- (Parser1&& p1,char ch)
 
 template <typename Parser1>
 inline auto operator- (Parser1&& p1,const char* str) 
-    -> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
+    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
+    -> difference_p<Parser1,literal_str_p>
 {
     return _difference(std::forward<Parser1>(p1),
                        _literal(str));
@@ -72,10 +74,20 @@ inline auto operator- (Parser1&& p1,const char* str)
 
 template <typename Parser1>
 inline auto operator- (Parser1&& p1,const std::string& str) 
-    -> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
+    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
+    -> difference_p<Parser1,literal_str_p>
 {
     return _difference(std::forward<Parser1>(p1),
                        _literal(str));
+}
+
+template <typename Parser1>
+inline auto operator- (Parser1&& p1,std::string&& str) 
+    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
+    -> difference_p<Parser1,literal_str_p>
+{
+    return _difference(std::forward<Parser1>(p1),
+                       _literal(std::move(str)));
 }
 #endif
 

@@ -14,17 +14,20 @@
 
 
 //#include "../all.h"
-#include "../src/compound/repeat_p.h"
-#include "../src/compound/list_p.h"
 #include "../src/compound/and_p.h"
+#include "../src/compound/list_p.h"
 #include "../src/compound/or_p.h"
 #include "../src/compound/diference_p.h"
+#include "../src/compound/repeat_p.h"
+#include "../src/compound/literal_p.h"
+#include "../src/parsers/basic_parsers.h"
+#include "../src/parsers/rule.h"
+#include "../src/converter/converters.h"
+#include "../src/action/printer.h"
 #include "../src/action/back_inserter.h"
 #include "../src/action/accumulater.h"
-#include "../src/action/converters.h"
-#include "../src/parsers/parsers.h"
-#include "../src/action/comparer.h"
-#include "../src/action/condition.h"
+#include "../src/parsers/compposer.h"
+#include "../src/action/function_wrapper.h"
 
 
 int main()
@@ -32,7 +35,9 @@ int main()
 
     typedef std::string::iterator IT;
     std::vector<std::size_t> vec;
-    auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _back_inserter(vec)) % '.';
+    auto ip_parser = (((_digit()-'0') & _repeat<0,2>(_digit())) 
+                      <= _wrapper(_converter(std::size_t()),_back_inserter(vec)))
+                     % '.';
 
     {
         std::string str = "192.168.1.1"; // "192.168.1.1";
@@ -69,59 +74,59 @@ int main()
 
 
 
-    {
-        std::size_t sum = 0;
-        auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _accumulater(sum)) % '.';
-        std::string str = "192.168.1.1"; // "192.168.1.1";
-        auto it = str.begin();
-        if(ip_parser(it,str.end()))
-        {
-            std::cout<<sum<<std::endl;
-        }
-        else
-        {
-            std::cout<<"err..."<<std::endl;
-        }
-    }
+    // {
+    //     std::size_t sum = 0;
+    //     auto ip_parser = (((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>())) <= _accumulater(sum)) % '.';
+    //     std::string str = "192.168.1.1"; // "192.168.1.1";
+    //     auto it = str.begin();
+    //     if(ip_parser(it,str.end()))
+    //     {
+    //         std::cout<<sum<<std::endl;
+    //     }
+    //     else
+    //     {
+    //         std::cout<<"err..."<<std::endl;
+    //     }
+    // }
 
 
-    {
-        auto condition = _less_equal(255);
-        auto ip_parser = ( 
-                            ((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>()))
-                                <= _if_then(condition,[&condition](){ std::cout<<condition.data()<<std::endl;})
-                         ) % '.';
-        std::string str = "192.168.1.1"; // "192.168.1.1";
-        auto it = str.begin();
-        if(ip_parser(it,str.end()))
-        {
-            std::cout<<"yes.."<<std::endl;
-        }
-        else
-        {
-            std::cout<<"err..."<<std::endl;
-        }
-    }
-    {
-        auto condition = _less_equal(255);
-        auto ip_parser = ( 
-                            ((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>()))
-                                <= _if_else(condition,
-                                            [&condition](){ std::cout<<condition.data()<<std::endl;},
-                                            [&condition](){ std::cout<<"wrong num:"<<condition.data()<<std::endl;}
-                                           )
-                         ) % '.';
-        std::string str = "256.168.1.1"; // "192.168.1.1";
-        auto it = str.begin();
-        if(ip_parser(it,str.end()))
-        {
-            std::cout<<"yes.."<<std::endl;
-        }
-        else
-        {
-            std::cout<<"err..."<<std::endl;
-        }
-    }
+    // {
+    //     auto condition = _less_equal(255);
+    //     auto ip_parser = ( 
+    //                         ((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>()))
+    //                             <= _if_then(condition,[&condition](){ std::cout<<condition.data()<<std::endl;})
+    //                      ) % '.';
+    //     std::string str = "192.168.1.1"; // "192.168.1.1";
+    //     auto it = str.begin();
+    //     if(ip_parser(it,str.end()))
+    //     {
+    //         std::cout<<"yes.."<<std::endl;
+    //     }
+    //     else
+    //     {
+    //         std::cout<<"err..."<<std::endl;
+    //     }
+    // }
+    // {
+    //     auto condition = _less_equal(255);
+    //     auto ip_parser = ( 
+    //                         ((_digit<IT>()-'0') & _repeat<0,2>(_digit<IT>()))
+    //                             <= _if_else(condition,
+    //                                         [&condition](){ std::cout<<condition.data()<<std::endl;},
+    //                                         [&condition](){ std::cout<<"wrong num:"<<condition.data()<<std::endl;}
+    //                                        )
+    //                      ) % '.';
+    //     std::string str = "256.168.1.1"; // "192.168.1.1";
+    //     auto it = str.begin();
+    //     if(ip_parser(it,str.end()))
+    //     {
+    //         std::cout<<"yes.."<<std::endl;
+    //     }
+    //     else
+    //     {
+    //         std::cout<<"err..."<<std::endl;
+    //     }
+    // }
 }
 
 

@@ -69,17 +69,28 @@ inline auto operator% (T&& t,char ch)
 
 template <typename T>
 inline auto operator% (T&& t,const char* str)
-    -> decltype(_list(std::forward<T>(t),_literal(str)))
+    //-> decltype(_list(std::forward<T>(t),_literal(str)))
+    -> list_p<T,literal_str_p>
 {
     return _list(std::forward<T>(t),_literal(str));
 }
 
 template <typename T>
 inline auto operator% (T&& t,const std::string& str)
-    -> decltype(_list(std::forward<T>(t),_literal(str)))
+    //-> decltype(_list(std::forward<T>(t),_literal(str)))
+    -> list_p<T,literal_str_p>
 {
     return _list(std::forward<T>(t),_literal(str));
 }
+
+template <typename T>
+inline auto operator% (T&& t,std::string&& str)
+    //-> decltype(_list(std::forward<T>(t),_literal(str)))
+    -> list_p<T,literal_str_p>
+{
+    return _list(std::forward<T>(t),_literal(std::move(str)));
+}
+
 
 #endif
 
