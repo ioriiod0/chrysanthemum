@@ -53,7 +53,7 @@ auto _less_than(T&& t)
 
 template <typename T>
 auto _less_equal(T&& t)
-    -> comparer<converter_traits,std::less_equal<T>,T,Args...>
+    -> comparer<T,std::less_equal<T>>
 {
     return comparer<T,std::less_equal<T>>(std::forward<T>(t));
 }

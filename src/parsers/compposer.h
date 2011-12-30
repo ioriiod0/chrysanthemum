@@ -16,6 +16,8 @@
 
 namespace chrysanthemum {
 
+namespace ops {
+
 template <typename Parser,typename Action>
 inline auto operator<= (Parser&& p,Action&& ac)
     -> decltype(_action_parser(std::forward<Parser>(p),
@@ -51,6 +53,8 @@ inline auto operator<= (char ch,Action&& c)
 {
     return _action_parser(_literal(ch),std::forward<Action>(c));
 }
+
+}//end namespace ops
 
 } // end namespace
 #endif

@@ -39,6 +39,9 @@ struct tuple_outputer<CharT,Traits,Tuple,1>
     }                                                                   
 };                                                                      
 
+namespace ops {
+
+
 template <typename CharT,typename Traits,typename Tuple>                               
 std::basic_ostream<CharT,Traits>& operator<<(std::basic_ostream<CharT,Traits>& os,const Tuple& t)           
 {                                                                                               
@@ -47,6 +50,8 @@ std::basic_ostream<CharT,Traits>& operator<<(std::basic_ostream<CharT,Traits>& o
     os<<END;                                                                                                   
     return os;                                                                                                  
 }
+
+} //end namespace ops
 
 
 }// end namespace
