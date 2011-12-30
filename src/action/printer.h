@@ -9,6 +9,7 @@
 
 #include <iostream>
 
+namespace chrysanthemum{
 
 struct line_printer
 {
@@ -23,6 +24,8 @@ struct line_printer
     /////////////////////////////
     std::ostream& os_;
 };
+
+} //end namespace
 
 
 #define _line_printer line_printer

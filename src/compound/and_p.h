@@ -14,6 +14,7 @@
 #include "../utility/meta_fuctions.h"
 #include "literal_p.h"
 
+namespace chrysanthemum{
 
 
 template <typename... Args>
@@ -70,6 +71,8 @@ inline auto _and(Args&&... args) -> and_p<Args...>
     return and_p<Args...>(std::forward<Args>(args)...);
 }
 
+
+namespace ops {
 ////////////////////////////////////////////////////////////////////////////
 template <typename T1,typename T2>
 inline auto  operator& (T1&& t1,T2&& t2) -> and_p<T1,T2> 
@@ -79,14 +82,14 @@ inline auto  operator& (T1&& t1,T2&& t2) -> and_p<T1,T2>
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T1>
 inline auto  operator& (T1&& t1,const char* str) 
-    -> decltype(_and(std::forward<T1>(t1),_literal(str)))
+    -> and_p<T1,literal_str_p> 
 {
     return _and(std::forward<T1>(t1),_literal(str));
 }
 // ////////////////////////////////////////////////////////////////////////////////
 template <typename T1>
 inline auto  operator& (const char* str,T1&& t1) 
-     -> decltype(_and(_literal(str),std::forward<T1>(t1)))
+     -> and_p<literal_str_p,T1> 
 
 {
     return _and(_literal(str),std::forward<T1>(t1));
@@ -94,16 +97,30 @@ inline auto  operator& (const char* str,T1&& t1)
 // ////////////////////////////////////////////////////////////////////////////////
 template <typename T1>
 inline auto  operator& (T1&& t1,const std::string& str) 
-     -> decltype(_and(std::forward<T1>(t1)),_literal(str))
+     -> and_p<T1,literal_str_p>
 {
     return _and(std::forward<T1>(t1),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator& (T1&& t1,std::string&& str) 
+     -> and_p<T1,literal_str_p>
+{
+    return _and(std::forward<T1>(t1),_literal(std::move(str)));
 }
 // ////////////////////////////////////////////////////////////////////////////////
 template <typename T1>
 inline auto  operator& (const std::string& str,T1&& t1) 
-     -> decltype(_and(_literal(str),std::forward<T1>(t1)))
+     -> and_p<literal_str_p,T1> 
 {
     return _and(_literal(str),std::forward<T1>(t1));
+}
+// ////////////////////////////////////////////////////////////////////////////////
+template <typename T1>
+inline auto  operator& (std::string&& str,T1&& t1) 
+     -> and_p<literal_str_p,T1> 
+{
+    return _and(_literal(std::move(str)),std::forward<T1>(t1));
 }
 // ////////////////////////////////////////////////////////////////////////////////
 template <typename T1>
@@ -121,4 +138,7 @@ inline auto  operator& (char ch,T1&& t1)
     return _and(_literal(ch),std::forward<T1>(t1));
 }
 
+} //end namespace ops
+
+} //end namespace
 #endif

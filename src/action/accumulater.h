@@ -10,7 +10,7 @@
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
 
-
+namespace chrysanthemum{
 
 template <typename Sum>
 struct accumulater
@@ -40,5 +40,6 @@ auto _accumulater(Sum&& sum)
     return accumulater<Sum>(std::forward<Sum>(sum));
 }
 
+}// end namespace
 #endif
 

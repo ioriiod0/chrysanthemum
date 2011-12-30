@@ -18,6 +18,7 @@
 #include "../utility/meta_fuctions.h"
 
 
+namespace chrysanthemum{
 
 template <typename... Args>
 class or_p
@@ -53,7 +54,7 @@ public:
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
                 return true;
             }
-            first = it;
+            //first = it;
             return false;
         }
     };
@@ -86,6 +87,8 @@ inline auto _or(Args&&... args) -> or_p<Args...>
     return or_p<Args...>(std::forward<Args>(args)...);
 }
 
+
+namespace ops {
 
 template <typename T1,typename T2>
 inline auto operator| (T1&& t1,T2&& t2)
@@ -149,4 +152,8 @@ inline auto operator| (char ch,T1&& t1)
 {
     return _or(_literal(ch),std::forward<T1>(t1));
 }
+
+} //end namespace ops
+
+} //end namespace
 #endif

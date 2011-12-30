@@ -11,7 +11,7 @@
 #include "../utility/meta_fuctions.h"
 
 //#include "data_holder.h"
-
+namespace chrysanthemum{
 
 template <typename Container>
 struct back_inserter
@@ -38,5 +38,6 @@ auto _back_inserter(Container&& c)
     return back_inserter<Container>(std::forward<Container>(c));
 }
 
+} //end namespace
 #endif
 

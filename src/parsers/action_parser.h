@@ -12,7 +12,7 @@
 #include <string> 
 
 
-
+namespace chrysanthemum{
 
 template <typename Parser,typename Action>
 class action_parser
@@ -43,6 +43,8 @@ inline auto _action_parser (Parser&& p,Action&& c)
     return action_parser<Parser,Action>(std::forward<Parser>(p),std::forward<Action>(c));
 }
 
+
+} //end namespace
 
 #endif
 

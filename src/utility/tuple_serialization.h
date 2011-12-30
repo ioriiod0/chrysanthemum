@@ -12,6 +12,9 @@
 #include <ostream>
 #include <tuple>
 
+
+namespace chrysanthemum{
+
 const static char SEP = ',';
 const static char BEG = '(';
 const static char END = ')';
@@ -44,5 +47,8 @@ std::basic_ostream<CharT,Traits>& operator<<(std::basic_ostream<CharT,Traits>& o
     os<<END;                                                                                                   
     return os;                                                                                                  
 }
+
+
+}// end namespace
 
 #endif

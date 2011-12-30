@@ -10,6 +10,7 @@
 
 #include "literal_p.h"
 
+namespace chrysanthemum{
 
 const static std::size_t INFINITE = 0;
 
@@ -96,5 +97,8 @@ inline auto _N(Arg&& arg) ->repeat_p<N,Arg,N>
 {
     return repeat_p<N,Arg,N>(std::forward<Arg>(arg));
 }
+
+
+}// end namespace
 
 #endif

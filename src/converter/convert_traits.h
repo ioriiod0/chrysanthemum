@@ -13,6 +13,7 @@
 #include "../utility/meta_fuctions.h"
 
 
+namespace chrysanthemum{
 
 #define DECLARE_CONVERT_FUNCTION_1_1(FUNC) \
     template <typename Iterator,typename T1> \
@@ -157,7 +158,6 @@ struct converter_traits<char>
 };
 
 
-
-
+} //end namespace
 
 #endif

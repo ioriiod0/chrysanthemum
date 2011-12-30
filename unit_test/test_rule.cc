@@ -25,7 +25,11 @@
 #include "../src/action/accumulater.h"
 #include "../src/parsers/compposer.h"
 #include "../src/action/function_wrapper.h"
-#include "../src/utility/analysis_stack.h"
+
+
+using namespace chrysanthemum;
+using namespace chrysanthemum::ops;
+
 
 struct list_node;
 struct string_node;

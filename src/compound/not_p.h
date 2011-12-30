@@ -10,6 +10,7 @@
 #include <string>
 #include "literal_p.h"
 
+namespace chrysanthemum{
 
 template <typename Parser>
 class not_p
@@ -37,5 +38,6 @@ inline auto _not(Arg&& arg) -> not_p<Arg>
 }
 
 
+}//end namespace
 
 #endif

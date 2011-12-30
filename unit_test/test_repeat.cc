@@ -11,13 +11,23 @@
 #include <iostream>
 #include <algorithm>
 
-//#include "../all.h"
-#include "../src/compound/repeat_p.h"
-#include "../src/compound/literal_p.h"
 #include "../src/compound/and_p.h"
 #include "../src/compound/or_p.h"
-#include "../src/action/converters.h"
-#include "../src/parsers/parsers.h"
+#include "../src/compound/repeat_p.h"
+#include "../src/compound/literal_p.h"
+#include "../src/compound/list_p.h"
+#include "../src/parsers/basic_parsers.h"
+#include "../src/parsers/rule.h"
+#include "../src/converter/converters.h"
+#include "../src/action/printer.h"
+#include "../src/action/back_inserter.h"
+#include "../src/action/accumulater.h"
+#include "../src/parsers/compposer.h"
+#include "../src/action/function_wrapper.h"
+
+
+using namespace chrysanthemum;
+using namespace chrysanthemum::ops;
 
 int main()
 {
@@ -29,7 +39,7 @@ int main()
         std::size_t sum=0;
         std::string str ="192"; // "192.168.1.1";
         auto it = str.begin();
-        auto p = _repeat<1,4>(_digit<IT>()) <= _converter(sum);
+        auto p = _repeat<1,4>(_digit()) <= _converter(sum);
 
         if(p(it,str.end()))
         {
@@ -48,13 +58,13 @@ int main()
         std::size_t adress3=0;
         std::size_t adress4=0; 
 
-        auto ip_parser =  (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress1)
+        auto ip_parser =  (_digit() & _repeat<0,2>(_digit())) <= _converter(adress1)
                         & '.'
-                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress2)
+                        & (_digit() & _repeat<0,2>(_digit())) <= _converter(adress2)
                         & '.'
-                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress3)
+                        & (_digit() & _repeat<0,2>(_digit())) <= _converter(adress3)
                         & '.'
-                        & (_digit<IT>() & _repeat<0,2>(_digit<IT>())) <= _converter(adress4);
+                        & (_digit() & _repeat<0,2>(_digit())) <= _converter(adress4);
                                  
 
         std::string str ="192.168.1.1"; // "192.168.1.1";

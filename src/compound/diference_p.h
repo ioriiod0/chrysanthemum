@@ -13,6 +13,8 @@
 #include <type_traits>
 #include "literal_p.h"
 
+namespace chrysanthemum{
+
 template <typename Parser1,typename Parser2>
 class difference_p
 {
@@ -46,6 +48,9 @@ inline auto _difference(Parser1&& p1,Parser2&& p2)
 {
     return difference_p<Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
 }
+
+namespace ops {
+
 
 template <typename Parser1,typename Parser2>
 inline auto operator- (Parser1&& p1,Parser2&& p2) 
@@ -89,5 +94,9 @@ inline auto operator- (Parser1&& p1,std::string&& str)
     return _difference(std::forward<Parser1>(p1),
                        _literal(std::move(str)));
 }
+
+} //end op
+
+} //end namespace
 #endif
 

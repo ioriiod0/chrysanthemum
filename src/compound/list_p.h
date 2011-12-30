@@ -12,6 +12,8 @@
 #include "../utility/meta_fuctions.h"
 #include "literal_p.h"
 
+namespace chrysanthemum {
+
 
 template <typename Parser1,typename Parser2>
 class list_p
@@ -54,6 +56,9 @@ inline auto _list(P1&& p1,P2&& p2) -> list_p<P1,P2>
     return list_p<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
 }
 
+namespace ops {
+
+
 template <typename P1,typename P2>
 inline auto operator% (P1&& p1,P2&& p2) -> list_p<P1,P2>
 {
@@ -91,6 +96,11 @@ inline auto operator% (T&& t,std::string&& str)
     return _list(std::forward<T>(t),_literal(std::move(str)));
 }
 
+
+} //end namespace op
+
+
+} //end namespace
 
 #endif
 

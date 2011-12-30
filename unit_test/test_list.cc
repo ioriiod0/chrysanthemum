@@ -29,6 +29,9 @@
 #include "../src/parsers/compposer.h"
 #include "../src/action/function_wrapper.h"
 
+using namespace chrysanthemum;
+using namespace chrysanthemum::ops;
+
 
 int main()
 {

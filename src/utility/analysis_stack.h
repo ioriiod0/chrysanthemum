@@ -13,6 +13,8 @@
 #include <stack>
 #include <memory>
 
+namespace chrysanthemum {
+
 template <typename Alloc = std::allocator<char> >
 class analysis_stack
 {
@@ -104,6 +106,8 @@ private:
 
 };
 
+
+} //end namespace
 
 
 

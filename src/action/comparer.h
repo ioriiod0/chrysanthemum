@@ -7,11 +7,13 @@
 #ifndef __COMPARER_H__
 #define __COMPARER_H__
 
+
 #include <tuple>
 #include <functional>
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
 
+namespace chrysanthemum{
 
 template <typename T,typename Comp>
 struct comparer
@@ -70,6 +72,9 @@ auto _greater_equal(T&& t)
 {
     return comparer<T,std::greater_equal<T>>(std::forward<T>(t));
 }
+
+
+}//end namespace
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 

@@ -7,6 +7,9 @@
 #ifndef __META_FUNCTIONS_H__
 #define __META_FUNCTIONS_H__
 
+
+namespace chrysanthemum{
+
 //  //////////////////////////////is_type_in_types/////////////////////////////////////////////////
     template <typename T,typename... Args>
     struct is_type_in_types;
@@ -104,6 +107,9 @@
     // };
 
     // };
+
+
+} //end namespace
 #endif
 
 

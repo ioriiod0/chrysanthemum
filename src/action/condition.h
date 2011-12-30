@@ -12,7 +12,7 @@
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
 
-
+namespace chrysanthemum{
 
 
 template <typename Condition,typename Handler>
@@ -80,5 +80,6 @@ auto _if_else(Condition&& c,Handler1&& h1,Handler2&& h2)
                                                 std::forward<Handler2>(h2));
 }
 
+} //end namespace
 
 #endif

@@ -11,6 +11,7 @@
 #include <string>
 #include <type_traits>
 
+namespace chrysanthemum{
 
 class literal_str_p
 {
@@ -82,5 +83,6 @@ inline auto _literal(char ch) -> literal_ch_p<char>
     return literal_ch_p<char>(ch);
 }
 
+} //end namespace
 
 #endif

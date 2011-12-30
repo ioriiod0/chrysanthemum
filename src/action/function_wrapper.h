@@ -12,7 +12,7 @@
 #include <type_traits>
 #include "../utility/meta_fuctions.h"
 
-
+namespace chrysanthemum {
 
 template <typename Converter,typename Handler>
 struct function_wrapper
@@ -45,5 +45,6 @@ auto _wrapper(C&& c,H&& h)
     return function_wrapper<C,H>(std::forward<C>(c),std::forward<H>(h));
 }
 
+} //end namespace
 #endif
 

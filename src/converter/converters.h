@@ -9,6 +9,8 @@
 
 #include "convert_traits.h"
 
+namespace chrysanthemum{
+
 template <template <class> class Traits,typename T,typename... Args>
 struct converter
 {
@@ -47,7 +49,7 @@ auto _converter(T&& t,Args&&... args)
 }
 
 
-
+} //end namespace
 
 
 

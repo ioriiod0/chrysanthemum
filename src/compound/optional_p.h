@@ -12,6 +12,9 @@
 #include "literal_p.h"
 
 
+namespace chrysanthemum{
+
+
 template <typename Parser>
 class optional_p
 {
@@ -44,6 +47,8 @@ inline auto _optional(Arg&& arg) -> optional_p<Arg>
     return optional_p<Arg>(std::forward<Arg>(arg));
 }
 
+
+} //end namespace
 
 #endif
 

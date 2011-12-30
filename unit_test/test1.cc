@@ -10,6 +10,9 @@
 #include <tuple>
 #include <iostream>
 #include <functional>
+#include <map>
+
+
 
 //#include "../all.h"
 
@@ -54,48 +57,7 @@ struct tester
 };
 
 
-struct test1;
-struct test2;
-test1 make1();
-test2 make2();
 
-struct test1
-{
-    static int n;
-    int id;
-
-    test1()
-    {
-        std::cout<<"test1"<<++n<<std::endl;
-        make2();
-    }
-};
-
-struct test2
-{
-    static int n;
-    int id;
-
-    test2()
-    {
-        std::cout<<"test2"<<++n<<std::endl;
-        make1();
-    }
-};
-
-int test1::n = 0;
-int test2::n = 0;
-
-
-test1 make1()
-{
-    return test1();
-}
-
-test2 make2()
-{
-    return test2();
-}
 
 int main()
 {
@@ -110,7 +72,14 @@ int main()
    // std::cout<<std::get<0>(t2)<<" "<<std::get<1>(t2)<<std::endl;
     // std::function<void(char*,char*)> f = tester();//[](char* p,char* q){ std::cout<<std::string(p,q)<<std::endl; };
     // f(NULL,NULL);
-    test1();
-
+    //test1();
+    std::map<std::string,std::string> m;
+    m["a"] = "a";
+    m["b"] = "b";
+    typedef std::map<std::string,std::string>::value_type value_type;
+    for(const value_type& v:m)
+    {
+        std::cout<<v.first<<":"<<v.second<<std::endl;
+    }
 }
 

@@ -10,6 +10,7 @@
 
 #include <cctype>
 
+namespace chrysanthemum{
 
 
 struct alpha_p
@@ -192,6 +193,9 @@ public:
 #define _upalpha upalpha_p
 #define _range range_p
 #define _void void_p
+
+
+} //end namespace
 
 #endif
 

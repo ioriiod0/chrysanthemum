@@ -24,6 +24,8 @@
 #include <iostream>
 
 
+using namespace chrysanthemum;
+using namespace chrysanthemum::ops;
 
 
 int main()
@@ -42,7 +44,7 @@ int main()
         /////////////////////////////////////////////////////////////
         std::string ret;
         char ch;
-        rule<IT,no_skip> p;
+        rule<IT,no_context,no_skip> p;
         p %= ( "HTTP://" <= _wrapper(_converter(ret),_line_printer(std::cout))
             & a1 <= _wrapper(_converter(ch1),_line_printer(std::cout))
             & d1 <= _wrapper(_converter(char()),_line_printer(std::cout))

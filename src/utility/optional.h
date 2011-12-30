@@ -8,6 +8,10 @@
 #ifndef __OPTIONAL_H__
 #define __OPTIONAL_H__
 
+namespace chrysanthemum{
+
+
+
 template <typename T>
 class optional
 {
@@ -80,5 +84,7 @@ private:
     T t_;
 
 }; // end class optional
+
+} // end namespace
 
 #endif

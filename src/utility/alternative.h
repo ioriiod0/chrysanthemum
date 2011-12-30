@@ -16,69 +16,46 @@
 
 #include "meta_fuctions.h"
 
+namespace chrysanthemum {
+
 // struct UNUSED;
 
-// template<std::size_t Idx,typename T>
-// struct choice
-// {
-//     const static std::size_t value = Idx;
-//     typedef T type;
-//     /////////////////////////
-//     choice(T&& t):under_lying_(std::forward<T>(t)) {}
-//     ~choice() {}
-//     ////////////////////////
-//     T under_lying_;
-// };
-
-// template <std::size_t Idx,typename T>
-// choice<Idx,T> _choice(T&& t)
-// {
-//     return choice<Idx,T>(std::forward<T>(t));
-// }
-/////////////////////////////helper..////////////////////////////////////////////
-// template <std::size_t Idx,typename... Args>
-// struct choices_selector;
-// template <std::size_t Idx,typename Head,typename... Tails>
-// struct choices_selector<Idx,Head,Tails...>
-// {
-//     typedef typename enable_if_else<Idx == Head::value,
-//                                     typename Head::type,
-//                                     typename choices_selector<Idx,Tails...>::type >::type type;
-// };
-// template <std::size_t Idx,typename T>
-// struct choices_selector<Idx,T>
-// {
-//     //static_assert(Idx == T::value,"the given Index is invalid!");
-//     typedef typename enable_if_else<Idx == T::value,
-//                                     typename T::type,
-//                                     UNUSED >::type type;
-// };
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-template <typename T>
-struct default_deleter
-{
-    void operator()(void* p)
-    {
-        static_cast<T*>(p)->~T();
-    }
-};
-
-template <typename T>
-struct deleter_traits
-{
-    typedef default_deleter<T> type;
-};
-
-template <typename... Args>
+template <typename ID,typename... Args>
 class alternative
 {
 public:
+
+    template <typename T>
+    struct default_deleter
+    {
+        void operator()(void* p)
+        {
+            static_cast<T*>(p)->~T();
+        }
+    };
+
+    template <typename T>
+    struct default_copyer
+    {
+        void operator()(void* dst,const void* src)
+        {
+            new(dst) T(*static_cast<const T*>(src));
+        }
+    };
+
+    // template <typename T>
+    // struct default_mover
+    // {
+    //     void operator()(void* dst,const void* src)
+    //     {
+    //         new(dst) T(std::move(*static_cast<const T*>(src)));
+    //     }
+    // };
+
     const static std::size_t buffer_size = max_size_of<Args...>::value;
     typedef std::function<void(void*)> delete_functor;
+    typedef std::function<void(void*,const void*)> copy_functor;
+
 public:
     alternative():is_inited_(false) {}
     ~alternative() 
@@ -86,10 +63,24 @@ public:
         if(is_inited_ && deleter_)
             deleter_(buffer_);
     }
-    //////////////disable copy-assignment//////
-    alternative& operator=(const alternative& t) = delete;
-    ////////////////disable copy-constructor/////////////
-    alternative(const alternative& t) = delete;
+    //////////////copy-assignment//////
+    alternative& operator=(const alternative& t)
+    {
+        if(this!=&t)
+        {
+            is_inited_ = t.is_inited_;
+            which_ = t.which_;
+            copyer_ = t.copyer_;
+            copyer_(buffer_,t.buffer_);
+            deleter_ = t.deleter_;
+        }
+        return *this;
+    }
+    ////////////////copy-constructor/////////////
+    alternative(const alternative& t)
+    {
+        *this = t;
+    }
     //////////////////////////////////////////////
     alternative& operator=(alternative&& t)
     {
@@ -98,6 +89,8 @@ public:
             is_inited_ = t.is_inited_;
             which_ = t.which_;
             memcpy(buffer_,t.buffer_,buffer_size);
+            deleter_ = t.deleter_;
+            copyer_ = t.copyer_;
             t.is_inited_ = false;
         }
         return *this;
@@ -115,25 +108,27 @@ public:
     {
         return is_inited_;
     }
-    std::size_t which()
+    ID which() const
     {
         return which_;
     }
     //////////////////////////////////
-    template <std::size_t Idx,typename T>
+    template <ID Idx,typename T>
     void set(T&& t)
     {        
         typedef typename at<Idx,Args...>::type ith_type;
-        typedef typename deleter_traits<ith_type>::type deleter_type;
+        typedef default_deleter<ith_type> deleter_type;
+        typedef default_copyer<ith_type> copyer_type;
         if(is_inited_ && deleter_)
             deleter_(buffer_);
         which_ = Idx;
         new(buffer_) ith_type(std::forward<T>(t));
-        deleter_ =  deleter_type();
+        deleter_ = deleter_type();
+        copyer_ = copyer_type();
         is_inited_ = true;
     }
     ////////////////////////////////////
-    template <std::size_t Idx>
+    template <ID Idx>
     typename at<Idx,Args...>::type& get()
     {
         typedef typename at<Idx,Args...>::type ith_type;
@@ -143,11 +138,11 @@ public:
         return *((ith_type*)buffer_);
     }
 
-    template <std::size_t Idx>
+    template <ID Idx>
     const typename at<Idx,Args...>::type& get() const
     {
         typedef typename at<Idx,Args...>::type ith_type;
-        if(which_!=Idx || is_inited_ = false)
+        if(which_!=Idx || is_inited_ == false)
             throw std::invalid_argument("the given idx is different from the"
                                         "value which() or the value has not been inited");
         return *((ith_type*)buffer_);
@@ -158,10 +153,16 @@ public:
 
 private:
     char buffer_[buffer_size];
-    std::size_t which_;
+    ID which_;
     bool is_inited_;
     delete_functor deleter_;
+    copy_functor copyer_;
+    
 
 };
+
+
+
+} //end namespace
 
 #endif
