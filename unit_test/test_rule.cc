@@ -28,7 +28,6 @@
 
 
 using namespace chrysanthemum;
-using namespace chrysanthemum::ops;
 
 
 struct list_node;
@@ -114,6 +113,8 @@ int main()
 
             grammer()
             {
+                using namespace chrysanthemum::ops;
+                
                 list %=  '{'
                        &  (member <= [=](IT first,IT last) 
                                     {

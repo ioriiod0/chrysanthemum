@@ -73,20 +73,20 @@ struct json_array
     std::vector<json_value> array_;
 };
 
-template <typename IT>
+
 struct json_grammar
 {
-    
+    typedef std::string::iterator IT;    
 
-    chrysanthemum::rule<IT,json_obj> obj;
-    chrysanthemum::rule<IT,json_member> member;
-    chrysanthemum::rule<IT,json_string> string;
-    chrysanthemum::rule<IT,json_value> value;
-    chrysanthemum::rule<IT,json_array> array;
-    chrysanthemum::rule<IT,json_real> real;
+    rule<IT,json_obj> obj;
+    rule<IT,json_member> member;
+    rule<IT,json_string> string;
+    rule<IT,json_value> value;
+    rule<IT,json_array> array;
+    rule<IT,json_real> real;
     ////////////helpers///////////////
-    chrysanthemum::rule<IT,no_context,no_skip> integer;
-    chrysanthemum::rule<IT,char,no_skip> character;
+    rule<IT,no_context,no_skip> integer;
+    rule<IT,char,no_skip> character;
 
     json_grammar()
     {
@@ -119,23 +119,23 @@ struct json_grammar
                 & '"';
         ///////////////////////////////////////
         value %= string <= [=](IT first,IT last){
-                            value.cur_ctx().template set<JSON_STRING>(std::move(string.cur_ctx()));
+                            value.cur_ctx().set<JSON_STRING>(std::move(string.cur_ctx()));
                             string.clear_ctx();return true;}
                 | real <= [=](IT first,IT last){
-                           value.cur_ctx().template set<JSON_REAL>(std::move(real.cur_ctx()));
+                           value.cur_ctx().set<JSON_REAL>(std::move(real.cur_ctx()));
                            real.clear_ctx();return true;}
                 | obj <= [=](IT first,IT last){
-                           value.cur_ctx().template set<JSON_OBJ>(std::move(obj.cur_ctx()));
+                           value.cur_ctx().set<JSON_OBJ>(std::move(obj.cur_ctx()));
                            obj.clear_ctx();return true;}
                 | array <= [=](IT first,IT last){
-                            value.cur_ctx().template set<JSON_ARRAY>(std::move(array.cur_ctx()));
+                            value.cur_ctx().set<JSON_ARRAY>(std::move(array.cur_ctx()));
                             array.clear_ctx();return true;}
                 | "true" <= [=](IT first,IT last){
-                            value.cur_ctx().template set<JSON_BOOLEAN>(true);return true; }
+                            value.cur_ctx().set<JSON_BOOLEAN>(true);return true; }
                 | "false" <= [=](IT first,IT last){
-                            value.cur_ctx().template set<JSON_BOOLEAN>(false); return true;}                
+                            value.cur_ctx().set<JSON_BOOLEAN>(false); return true;}                
                 | "null" <= [=](IT first,IT last){
-                            value.cur_ctx().template set<JSON_NULL>(json_null()); return true;};
+                            value.cur_ctx().set<JSON_NULL>(json_null()); return true;};
         /////////////////////////////////////////
         array %= '[' 
                 & (value <= [=](IT first,IT last){
@@ -274,7 +274,7 @@ int main(int argc,const char* argv[])
     std::string data = ss.str();
 
     IT it = data.begin();
-    json_grammar<IT> g;
+    json_grammar g;
 
     if(g.obj(it,data.end()))
     {

@@ -23,7 +23,7 @@ ALL_HEADER = all.h config.h \
 			 src/action/comparer.h \
 			 src/action/function_wrapper.h 
 
-all_test: test_and_p test_or_p test_repeat test_list test_optional test_alternative test_json test_rule
+all_test: test_and_p test_or_p test_repeat test_list test_optional test_rule test_json
 
 test_and_p: unit_test/test_and_p.cc ${ALL_HEADER}
 	g++ unit_test/test_and_p.cc -o bin/test_and_p -std=c++0x
@@ -40,9 +40,6 @@ test_list: unit_test/test_list.cc ${ALL_HEADER}
 test_optional: unit_test/test_optional.cc ${ALL_HEADER}
 	g++ unit_test/test_optional.cc -o bin/test_optional -std=c++0x
 	echo "test_optional done!"
-test_alternative: unit_test/test_alternative.cc
-	g++ unit_test/test_alternative.cc -o bin/test_alternative -std=c++0x
-	echo "test_alternative done!"
 test_difference: unit_test/test_difference.cc
 	g++ unit_test/test_difference.cc -o bin/test_difference -std=c++0x
 	echo "test_difference done!"
@@ -54,6 +51,6 @@ test_json: unit_test/test_json.cc
 	echo "test_json done!"
 test_rule: unit_test/test_rule.cc
 	g++ unit_test/test_rule.cc -o bin/test_rule -std=c++0x
-	echo "test_json done!"
+	echo "test_rule done!"
 clean: 
 	rm -f bin/*.o
