@@ -11,9 +11,10 @@
 
 namespace chrysanthemum{
 
+template <typename OS>
 struct line_printer
 {
-    line_printer(std::ostream& os):os_(os) {}
+    line_printer(OS& os):os_(os) {}
     ///////////////////////////
     template <typename T>
     bool operator() (const T& t)
@@ -22,13 +23,16 @@ struct line_printer
         return true;
     }
     /////////////////////////////
-    std::ostream& os_;
+    OS& os_;
 };
 
 } //end namespace
 
-
-#define _line_printer line_printer
+template <typename OS>
+line_printer<OS> _line_printer(OS& os)
+{
+    return line_printer<OS>(os);
+}
 
 
 #endif

@@ -10,6 +10,7 @@
 #include <tuple>
 #include <iostream>
 #include <functional>
+#include <type_traits>
 #include <map>
 
 
@@ -17,48 +18,103 @@
 //#include "../all.h"
 
 
+template <typename Derived>
+struct base
+{
+    Derived& derived()
+    {
+        return *(static_cast<Derived*>(this));
+    }
 
-// struct helper
-// {
-//     template <typename... Args>
-//     static std::tuple<Args...> f(data_holder<Args>... )
-//     {
-//         return std::tuple<Args...>();
-//     }
-// };
+    const Derived& derived() const
+    {
+        return *(static_cast<const Derived*>(this));
+    }
+};
 
-// template <typename... Args>
-// struct sequence_traits
-// {
-//     typedef decltype(helper::f(Args()...)) data_type;
-// };
-
-struct tester
+struct tester:public base<tester>
 {
     template <typename T>
     bool operator() (T p,T q)
     {
-        test(*this);
-        return true;
-    }
-    tester* p;
 
-    void test(tester&& t)
-    {
-        std::cout<<"right"<<std::endl;
     }
-    
-    void test(const tester& t)
-    {
-        std::cout<<"left"<<std::endl;
-    }
-
-
 };
 
 
+namespace xxx{
+struct BASE
+{
+    
+};
 
 
+struct Derived1:public BASE
+{
+    int a;
+};
+
+struct Derived2:public BASE
+{
+    int b;
+};
+
+template <typename T,typename U>
+struct decuce_policy
+{
+    typedef typename std::remove_reference<T>::type T1;
+    typedef typename std::remove_reference<U>::type U1;
+    const static bool value = std::is_base_of<BASE,T1>::value || std::is_base_of<BASE,U1>::value;
+    typedef std::integral_constant<bool,value> type;
+};
+
+
+template <typename T,typename U>
+void do_add(T&& t,U&& u,const std::true_type&)
+{
+    std::cout<<"lalala"<<std::endl;
+    return T();
+}
+
+template <typename T,typename U>
+typename std::remove_reference<T>::type do_add(T&& t,U&& u,const std::false_type&)
+{
+    return std::forward<T>(t)+std::forward<U>(u);
+}
+
+
+
+template <typename T,typename U>
+T operator+ (T&& t,U&& u)
+{
+    return do_add(std::forward<T>(t),std::forward<U>(u),typename decuce_policy<T,U>::type());    
+}
+
+} //end namespace xxx
+void fuck1(tester&& t)
+{
+    std::cout<<"right"<<std::endl;
+}
+
+void fuck1(const tester& t)
+{
+    std::cout<<"left"<<std::endl;
+}
+
+template <typename T>
+void fuck(const base<T>& t)
+{
+    fuck1(t.derived());
+}
+
+template <typename T>
+void fuck(base<T>&& t)
+{
+    fuck1(std::move(t.derived()));
+}
+
+
+using namespace xxx;
 int main()
 {
    // typename sequence_traits<data_holder<int> ,data_holder<char> ,data_holder<float> >::data_type t;
@@ -73,13 +129,29 @@ int main()
     // std::function<void(char*,char*)> f = tester();//[](char* p,char* q){ std::cout<<std::string(p,q)<<std::endl; };
     // f(NULL,NULL);
     //test1();
-    std::map<std::string,std::string> m;
-    m["a"] = "a";
-    m["b"] = "b";
-    typedef std::map<std::string,std::string>::value_type value_type;
-    for(const value_type& v:m)
-    {
-        std::cout<<v.first<<":"<<v.second<<std::endl;
-    }
+    // std::map<std::string,std::string> m;
+    // m["a"] = "a";
+    // m["b"] = "b";
+    // typedef std::map<std::string,std::string>::value_type value_type;
+    // for(const value_type& v:m)
+    // {
+    //     std::cout<<v.first<<":"<<v.second<<std::endl;
+    // }
+    // tester t;
+    // fuck(tester());
+    // fuck(t);
+
+    Derived1 d1;
+    Derived2 d2;
+
+    d1+d2;
+
+    int a = 3+4;
+    std::cout<<a<<std::endl;
+
+    // std::string bb = "aaa";
+    // std::string ddd = bb + "ddddd";
+
+    
 }
 

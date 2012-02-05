@@ -1,6 +1,6 @@
 
 ALL_HEADER = all.h config.h \
-		     src/compound/or_p.h \
+		     src/core/or_p.h \
 			 src/compound/diference_p.h \
 			 src/compound/list_p.h \
 			 src/compound/literal_p.h \

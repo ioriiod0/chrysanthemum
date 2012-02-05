@@ -39,7 +39,24 @@ int main()
         std::size_t sum=0;
         std::string str ="192"; // "192.168.1.1";
         auto it = str.begin();
-        auto p = _repeat<1,4>(_digit()) <= _converter(sum);
+        auto p = +_digit() <= _converter(sum);
+
+        if(p(it,str.end()))
+        {
+            std::cout<<sum<<std::endl;
+        }
+        else
+        {
+            std::cout<<"fuck"<<std::endl;
+        }
+    }
+
+    {
+        
+        std::size_t sum=0;
+        std::string str ="192"; // "192.168.1.1";
+        auto it = str.begin();
+        auto p = *_digit() <= _converter(sum);
 
         if(p(it,str.end()))
         {

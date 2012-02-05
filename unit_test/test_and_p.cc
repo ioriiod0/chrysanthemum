@@ -7,17 +7,11 @@
 
 
 
-//#include "../all.h"
-#include "../src/compound/and_p.h"
-#include "../src/compound/literal_p.h"
-#include "../src/parsers/basic_parsers.h"
-#include "../src/parsers/rule.h"
-#include "../src/converter/converters.h"
-#include "../src/action/printer.h"
-#include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-#include "../src/parsers/compposer.h"
-#include "../src/action/function_wrapper.h"
+#include "../src/core/and_p.h"
+#include "../src/core/literal_p.h"
+#include "../src/core/compposer.h"
+#include "../src/built_in_parsers/character_parsers.h"
+
 
 
 #include <string>
@@ -31,36 +25,34 @@ using namespace chrysanthemum::ops;
 int main()
 {
 
-    typedef std::string::iterator IT;
-    _alpha a1; char ch1;
-    _alpha a2; char ch2;
-    _digit d1; char ch3;
-    _digit d2; char ch4;
-    _space s1; char ch5;
-    _space s2; char ch6;
+
+    _alpha a1; 
+    _alpha a2;
+    _digit d1;
+    _digit d2;
+    _space s1;
+    _space s2;
 
     {
+        
         //////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////
-        std::string ret;
-        char ch;
-        rule<IT,no_context,no_skip> p;
-        p %= ( "HTTP://" <= _wrapper(_converter(ret),_line_printer(std::cout))
-            & a1 <= _wrapper(_converter(ch1),_line_printer(std::cout))
-            & d1 <= _wrapper(_converter(char()),_line_printer(std::cout))
-            & ' ' 
-            & a2 
-            & d2 
-            & ' ' 
-            & _alpha()
-            ) <= _wrapper(_converter(std::string()),_line_printer(std::cout));
-        // p %= "HTTP://" <= _converter(p.ctx()) <= _line_printer(std::cout)
-        //     & a1 <= _converter(ch1) <= _line_printer(std::cout);
-        std::string str = "HTTP://a3 b4 c";
+        typedef std::string::iterator IT;
+        auto str_printer = [](IT first,IT last){std::string str(first,last);std::cout<<str<<std::endl;return true;};
+        auto ch_printer = [](IT first,IT last){std::cout<<*first<<std::endl;return true;};
+        auto p =  (  "你的编号是：" <= str_printer
+                    & a1 <= ch_printer
+                    & d1 <= ch_printer
+                    & ' ' 
+                    & a2 
+                    & d2 
+                    & ' ' 
+                    & _alpha() <= ch_printer
+                  ) <= str_printer;
+        std::string str = "你的编号是：a3 b4 c";
         IT first = str.begin();
         if(p(first,str.end()))
         {
-            std::cout<<"lala"<<std::endl;
+            std::cout<<"ok"<<std::endl;
         }
         else
         {
@@ -69,6 +61,33 @@ int main()
         /////////////////////////////////////////////////////////////////
     }
 
+
+    {
+        //////////////////////////////////////////////////////////////
+        typedef std::wstring::iterator IT;
+        auto str_printer = [](IT first,IT last){std::wstring str(first,last);std::wcout<<str<<std::endl;return true;};
+        auto ch_printer = [](IT first,IT last){std::wcout<<*first<<std::endl;return true;};
+        auto p =  (  L"你好啊" <= str_printer
+                    & a1 <= ch_printer
+                    & d1 <= ch_printer
+                    & ' ' 
+                    & a2 
+                    & d2 
+                    & ' ' 
+                    & _alpha() <= ch_printer
+                  ) <= str_printer;
+        std::wstring str = L"你好啊a3 b4 c";
+        IT first = str.begin();
+        if(p(first,str.end()))
+        {
+            std::cout<<"ok"<<std::endl;
+        }
+        else
+        {
+            std::cout<<"err"<<std::endl;
+        }
+        /////////////////////////////////////////////////////////////////
+    }
 
 }
 
