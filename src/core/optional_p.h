@@ -16,7 +16,7 @@ namespace chrysanthemum{
 
 
 template <typename Parser>
-class optional_p
+class optional_p:public parser_base<optional_p<Parser>>
 {
 
 public:
@@ -47,6 +47,23 @@ inline auto _optional(Arg&& arg) -> optional_p<Arg>
     return optional_p<Arg>(std::forward<Arg>(arg));
 }
 
+namespace ops{
+
+template <typename T1>
+inline auto  operator! (parser_base<T1>&& t1)
+    -> optional_p<T1> 
+{
+    return _optional(std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator! (parser_base<T1>& t1) 
+    -> optional_p<T1&> 
+{
+    return _optional(t1.derived());
+}
+
+}//end namespace ops
 
 } //end namespace
 

@@ -9,15 +9,18 @@
 #ifndef __DIFFERENCE_P_H__
 #define __DIFFERENCE_P_H__
 
-#include <string>
+
 #include <type_traits>
+#include <tuple>
+#include "../utility/meta_fuctions.h"
 #include "literal_p.h"
 #include "parser_base.h"
+
 
 namespace chrysanthemum{
 
 template <typename Parser1,typename Parser2>
-class difference_p
+class difference_p:public parser_base<difference_p<Parser1,Parser2> >
 {
 public: 
     difference_p(Parser1&& p1,Parser2&& p2):
@@ -52,49 +55,160 @@ inline auto _difference(Parser1&& p1,Parser2&& p2)
 
 namespace ops {
 
-
-template <typename Parser1,typename Parser2>
-inline auto operator- (Parser1&& p1,Parser2&& p2) 
-    -> difference_p<Parser1,Parser2>
+//////////////////////////////////////////////////////////////////
+template <typename T1,typename T2>
+inline auto  operator- (parser_base<T1>&& t1,parser_base<T2>&& t2)
+    -> difference_p<T1,T2> 
 {
-    return difference_p<Parser1,Parser2>(std::forward<Parser1>(p1),std::forward<Parser2>(p2));
+    return _difference(std::move(t1.derived()),std::move(t2.derived()));
 }
 
-template <typename Parser1>
-inline auto operator- (Parser1&& p1,char ch) 
-    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(ch)))
-    -> difference_p<Parser1,literal_ch_p<char>>
+template <typename T1,typename T2>
+inline auto  operator- (parser_base<T1>& t1,parser_base<T2>& t2) 
+    -> difference_p<T1&,T2&> 
 {
-    return _difference(std::forward<Parser1>(p1),
-                       _literal(ch));
+    return _difference(t1.derived(),t2.derived());
 }
 
-template <typename Parser1>
-inline auto operator- (Parser1&& p1,const char* str) 
-    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
-    -> difference_p<Parser1,literal_str_p>
+template <typename T1,typename T2>
+inline auto  operator- (parser_base<T1>&& t1,parser_base<T2>& t2) 
+    -> difference_p<T1,T2&> 
 {
-    return _difference(std::forward<Parser1>(p1),
-                       _literal(str));
+    return _difference(std::move(t1.derived()),t2.derived());
 }
 
-template <typename Parser1>
-inline auto operator- (Parser1&& p1,const std::string& str) 
-    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
-    -> difference_p<Parser1,literal_str_p>
+template <typename T1,typename T2>
+inline auto  operator- (parser_base<T1>& t1,parser_base<T2>&& t2) 
+    -> difference_p<T1&,T2> 
 {
-    return _difference(std::forward<Parser1>(p1),
-                       _literal(str));
+    return _difference(t1.derived(),std::move(t2.derived()));
 }
 
-template <typename Parser1>
-inline auto operator- (Parser1&& p1,std::string&& str) 
-    //-> decltype(_difference(std::forward<Parser1>(p1),_literal(str)))
-    -> difference_p<Parser1,literal_str_p>
+///////////////////////////////////char right////////////////////////////////////////////
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,const char* str) 
+    -> difference_p<T1,literal_str_p<char>> 
 {
-    return _difference(std::forward<Parser1>(p1),
-                       _literal(std::move(str)));
+    return _difference(std::move(t1.derived()),_literal(str));
 }
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,const std::string& str) 
+     -> difference_p<T1,literal_str_p<char>>
+{
+    return _difference(std::move(t1.derived()),_literal(str));
+}
+
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,std::string&& str) 
+     -> difference_p<T1,literal_str_p<char>>
+{
+    return _difference(std::move(t1.derived()),_literal(std::move(str)));
+}
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,char ch) 
+    ->difference_p<T1,literal_ch_p<char>>
+{
+    return _difference(std::move(t1.derived()),_literal(ch));
+}
+
+
+///////////////////////////////////char left////////////////////////////////////
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,const char* str) 
+    -> difference_p<T1&,literal_str_p<char>> 
+{
+    return _difference(t1.derived(),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,const std::string& str) 
+     -> difference_p<T1&,literal_str_p<char>>
+{
+    return _difference(t1.derived(),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,std::string&& str) 
+     -> difference_p<T1&,literal_str_p<char>>
+{
+    return _difference(t1.derived(),_literal(std::move(str)));
+}
+
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,char ch) 
+    ->difference_p<T1&,literal_ch_p<char>>
+{
+    return _difference(t1.derived(),_literal(ch));
+}
+
+
+///////////////////////////////////wchar_t right////////////////////////////////////////////
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,const wchar_t* str) 
+    -> difference_p<T1,literal_str_p<wchar_t>> 
+{
+    return _difference(std::move(t1.derived()),_literal(str));
+}
+
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,const std::wstring& str) 
+     -> difference_p<T1,literal_str_p<wchar_t>>
+{
+    return _difference(std::move(t1.derived()),_literal(str));
+}
+
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,std::wstring&& str) 
+     -> difference_p<T1,literal_str_p<wchar_t>>
+{
+    return _difference(std::move(t1.derived()),_literal(std::move(str)));
+}
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>&& t1,wchar_t ch) 
+    ->difference_p<T1,literal_ch_p<wchar_t>>
+{
+    return _difference(std::move(t1.derived()),_literal(ch));
+}
+
+
+///////////////////////////////////wwchar_t_t left////////////////////////////////////
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,const wchar_t* str) 
+    -> difference_p<T1&,literal_str_p<wchar_t>> 
+{
+    return _difference(t1.derived(),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,const std::wstring& str) 
+     -> difference_p<T1&,literal_str_p<wchar_t>>
+{
+    return _difference(t1.derived(),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,std::wstring&& str) 
+     -> difference_p<T1&,literal_str_p<wchar_t>>
+{
+    return _difference(t1.derived(),_literal(std::move(str)));
+}
+
+
+template <typename T1>
+inline auto  operator- (parser_base<T1>& t1,wchar_t ch) 
+    ->difference_p<T1&,literal_ch_p<wchar_t>>
+{
+    return _difference(t1.derived(),_literal(ch));
+}
+
 
 } //end op
 

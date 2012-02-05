@@ -7,13 +7,15 @@
 #ifndef __NOT_P_H__
 #define __NOT_P_H__
 #include <type_traits>
-#include <string>
+#include <tuple>
+#include "../utility/meta_fuctions.h"
 #include "literal_p.h"
+#include "parser_base.h"
 
 namespace chrysanthemum{
 
 template <typename Parser>
-class not_p
+class not_p:public parser_base<not_p<Parser>>
 {
 
     public:
@@ -37,6 +39,23 @@ inline auto _not(Arg&& arg) -> not_p<Arg>
     return not_p<Arg>(std::forward<Arg>(arg));
 }
 
+namespace ops{
+
+template <typename T1>
+inline auto  operator! (parser_base<T1>&& t1)
+    -> not_p<T1> 
+{
+    return _not(std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator! (parser_base<T1>& t1) 
+    -> not_p<T1&> 
+{
+    return _not(t1.derived());
+}
+
+}//end namespace ops
 
 }//end namespace
 

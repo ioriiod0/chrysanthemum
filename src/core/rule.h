@@ -97,7 +97,7 @@ private:
 
 /////////////////////////no_skiper//////////////////
 template <typename Iterator,typename Context>
-struct rule<Iterator,Context,no_skip>
+struct rule<Iterator,Context,no_skip>:public parser_base<rule<Iterator,Context,no_skip>>
 {
 public:
     typedef std::function<bool(Iterator&,Iterator)> delegater;
@@ -149,7 +149,7 @@ private:
 
 ////////////////////no_context/////////////////
 template <typename Iterator,typename Skiper>
-struct rule<Iterator,no_context,Skiper>
+struct rule<Iterator,no_context,Skiper>:public parser_base<rule<Iterator,no_context,Skiper>>
 {
 public:
     typedef std::function<bool(Iterator&,Iterator)> delegater;
@@ -204,7 +204,7 @@ private:
 
 /////////////////////////no_context and no_skiper//////////////////
 template <typename Iterator>
-struct rule<Iterator,no_context,no_skip>
+struct rule<Iterator,no_context,no_skip>:public parser_base<rule<Iterator,no_context,no_skip>>
 {
 public:
     typedef std::function<bool(Iterator&,Iterator)> delegater;

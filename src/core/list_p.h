@@ -8,15 +8,16 @@
 #define __LIST_P_H__
 
 #include <type_traits>
-#include <string>
+#include <tuple>
 #include "../utility/meta_fuctions.h"
 #include "literal_p.h"
+#include "parser_base.h"
 
 namespace chrysanthemum {
 
 
 template <typename Parser1,typename Parser2>
-class list_p
+class list_p:public parser_base<list_p<Parser1,Parser2>>
 {
 
 public:
@@ -58,42 +59,257 @@ inline auto _list(P1&& p1,P2&& p2) -> list_p<P1,P2>
 
 namespace ops {
 
-
-template <typename P1,typename P2>
-inline auto operator% (P1&& p1,P2&& p2) -> list_p<P1,P2>
+/////////////////////////////////////////////////////////////////
+template <typename T1,typename T2>
+inline auto  operator% (parser_base<T1>&& t1,parser_base<T2>&& t2)
+    -> list_p<T1,T2> 
 {
-    return list_p<P1,P2>(std::forward<P1>(p1),std::forward<P2>(p2));
+    return _list(std::move(t1.derived()),std::move(t2.derived()));
 }
 
-template <typename T>
-inline auto operator% (T&& t,char ch)
-    -> list_p<T,literal_ch_p<char>>
+template <typename T1,typename T2>
+inline auto  operator% (parser_base<T1>& t1,parser_base<T2>& t2) 
+    -> list_p<T1&,T2&> 
 {
-    return _list(std::forward<T>(t),_literal(ch));
+    return _list(t1.derived(),t2.derived());
 }
 
-template <typename T>
-inline auto operator% (T&& t,const char* str)
-    //-> decltype(_list(std::forward<T>(t),_literal(str)))
-    -> list_p<T,literal_str_p>
+template <typename T1,typename T2>
+inline auto  operator% (parser_base<T1>&& t1,parser_base<T2>& t2) 
+    -> list_p<T1,T2&> 
 {
-    return _list(std::forward<T>(t),_literal(str));
+    return _list(std::move(t1.derived()),t2.derived());
 }
 
-template <typename T>
-inline auto operator% (T&& t,const std::string& str)
-    //-> decltype(_list(std::forward<T>(t),_literal(str)))
-    -> list_p<T,literal_str_p>
+template <typename T1,typename T2>
+inline auto  operator% (parser_base<T1>& t1,parser_base<T2>&& t2) 
+    -> list_p<T1&,T2> 
 {
-    return _list(std::forward<T>(t),_literal(str));
+    return _list(t1.derived(),std::move(t2.derived()));
+}
+///////////////////////////////////char right////////////////////////////////////////////
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,const char* str) 
+    -> list_p<T1,literal_str_p<char>> 
+{
+    return _list(std::move(t1.derived()),_literal(str));
 }
 
-template <typename T>
-inline auto operator% (T&& t,std::string&& str)
-    //-> decltype(_list(std::forward<T>(t),_literal(str)))
-    -> list_p<T,literal_str_p>
+template <typename T1>
+inline auto  operator% (const char* str,parser_base<T1>&& t1) 
+     -> list_p<literal_str_p<char>,T1> 
+
 {
-    return _list(std::forward<T>(t),_literal(std::move(str)));
+    return _list(_literal(str),std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,const std::string& str) 
+     -> list_p<T1,literal_str_p<char>>
+{
+    return _list(std::move(t1.derived()),_literal(str));
+}
+
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,std::string&& str) 
+     -> list_p<T1,literal_str_p<char>>
+{
+    return _list(std::move(t1.derived()),_literal(std::move(str)));
+}
+
+template <typename T1>
+inline auto  operator% (const std::string& str,parser_base<T1>&& t1) 
+     -> list_p<literal_str_p<char>,T1> 
+{
+    return _list(_literal(str),std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator% (std::string&& str,parser_base<T1>&& t1) 
+     -> list_p<literal_str_p<char>,T1> 
+{
+    return _list(_literal(std::move(str)),std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,char ch) 
+    ->list_p<T1,literal_ch_p<char>>
+{
+    return _list(std::move(t1.derived()),_literal(ch));
+}
+
+template <typename T1>
+inline auto  operator% (char ch,parser_base<T1>&& t1) 
+      -> list_p<literal_ch_p<char>,T1>
+{
+    return _list(_literal(ch),std::move(t1.derived()));
+}
+///////////////////////////////////char left////////////////////////////////////
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,const char* str) 
+    -> list_p<T1&,literal_str_p<char>> 
+{
+    return _list(t1.derived(),_literal(str));
+}
+template <typename T1>
+inline auto  operator% (const char* str,parser_base<T1>& t1) 
+     -> list_p<literal_str_p<char>,T1&> 
+
+{
+    return _list(_literal(str),t1.derived());
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,const std::string& str) 
+     -> list_p<T1&,literal_str_p<char>>
+{
+    return _list(t1.derived(),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,std::string&& str) 
+     -> list_p<T1&,literal_str_p<char>>
+{
+    return _list(t1.derived(),_literal(std::move(str)));
+}
+
+template <typename T1>
+inline auto  operator% (const std::string& str,parser_base<T1>& t1) 
+     -> list_p<literal_str_p<char>,T1&> 
+{
+    return _list(_literal(str),t1.derived());
+}
+template <typename T1>
+inline auto  operator% (std::string&& str,parser_base<T1>& t1) 
+     -> list_p<literal_str_p<char>,T1&> 
+{
+    return _list(_literal(std::move(str)),t1.derived());
+}
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,char ch) 
+    ->list_p<T1&,literal_ch_p<char>>
+{
+    return _list(t1.derived(),_literal(ch));
+}
+template <typename T1>
+inline auto  operator% (char ch,parser_base<T1>& t1) 
+      -> list_p<literal_ch_p<char>,T1&>
+{
+    return _list(_literal(ch),t1.derived());
+}
+
+///////////////////////////////////wchar_t right////////////////////////////////////////////
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,const wchar_t* str) 
+    -> list_p<T1,literal_str_p<wchar_t>> 
+{
+    return _list(std::move(t1.derived()),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator% (const wchar_t* str,parser_base<T1>&& t1) 
+     -> list_p<literal_str_p<wchar_t>,T1> 
+
+{
+    return _list(_literal(str),std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,const std::wstring& str) 
+     -> list_p<T1,literal_str_p<wchar_t>>
+{
+    return _list(std::move(t1.derived()),_literal(str));
+}
+
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,std::wstring&& str) 
+     -> list_p<T1,literal_str_p<wchar_t>>
+{
+    return _list(std::move(t1.derived()),_literal(std::move(str)));
+}
+
+template <typename T1>
+inline auto  operator% (const std::wstring& str,parser_base<T1>&& t1) 
+     -> list_p<literal_str_p<wchar_t>,T1> 
+{
+    return _list(_literal(str),std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator% (std::wstring&& str,parser_base<T1>&& t1) 
+     -> list_p<literal_str_p<wchar_t>,T1> 
+{
+    return _list(_literal(std::move(str)),std::move(t1.derived()));
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>&& t1,wchar_t ch) 
+    ->list_p<T1,literal_ch_p<wchar_t>>
+{
+    return _list(std::move(t1.derived()),_literal(ch));
+}
+
+template <typename T1>
+inline auto  operator% (wchar_t ch,parser_base<T1>&& t1) 
+      -> list_p<literal_ch_p<wchar_t>,T1>
+{
+    return _list(_literal(ch),std::move(t1.derived()));
+}
+///////////////////////////////////wwchar_t_t left////////////////////////////////////
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,const wchar_t* str) 
+    -> list_p<T1&,literal_str_p<wchar_t>> 
+{
+    return _list(t1.derived(),_literal(str));
+}
+template <typename T1>
+inline auto  operator% (const wchar_t* str,parser_base<T1>& t1) 
+     -> list_p<literal_str_p<wchar_t>,T1&> 
+
+{
+    return _list(_literal(str),t1.derived());
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,const std::wstring& str) 
+     -> list_p<T1&,literal_str_p<wchar_t>>
+{
+    return _list(t1.derived(),_literal(str));
+}
+
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,std::wstring&& str) 
+     -> list_p<T1&,literal_str_p<wchar_t>>
+{
+    return _list(t1.derived(),_literal(std::move(str)));
+}
+
+template <typename T1>
+inline auto  operator% (const std::wstring& str,parser_base<T1>& t1) 
+     -> list_p<literal_str_p<wchar_t>,T1&> 
+{
+    return _list(_literal(str),t1.derived());
+}
+template <typename T1>
+inline auto  operator% (std::wstring&& str,parser_base<T1>& t1) 
+     -> list_p<literal_str_p<wchar_t>,T1&> 
+{
+    return _list(_literal(std::move(str)),t1.derived());
+}
+template <typename T1>
+inline auto  operator% (parser_base<T1>& t1,wchar_t ch) 
+    ->list_p<T1&,literal_ch_p<wchar_t>>
+{
+    return _list(t1.derived(),_literal(ch));
+}
+template <typename T1>
+inline auto  operator% (wchar_t ch,parser_base<T1>& t1) 
+      -> list_p<literal_ch_p<wchar_t>,T1&>
+{
+    return _list(_literal(ch),t1.derived());
 }
 
 
