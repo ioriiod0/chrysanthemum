@@ -28,13 +28,13 @@ class literal_str_p:public parser_base<literal_str_p<CharT>>
 
         /////////////////////////////////////////
     public:
-        template <typename Iterator>
-        bool operator()(Iterator& first,Iterator last)
+        template <typename Scanner>
+        bool operator()(Scanner& scan)
         {
             auto it = data_.begin();
-            while(first!=last && it!=data_.end())
+            while(!scan.at_end() && it!=data_.end())
             {
-                if(*first++ != *it++)
+                if(scan.get_and_increase() != *it++)
                     return false;
             }
             if(it != data_.end())
@@ -53,10 +53,10 @@ class literal_ch_p:public parser_base<literal_ch_p<CharT>>
         //////////////////////////////
         literal_ch_p(CharT ch) {data_ = ch;}
     public:
-        template <typename Iterator>
-        bool operator()(Iterator& first,Iterator last)
+        template <typename Scanner>
+        bool operator()(Scanner& scan)
         {
-            if(first != last && *first++ == data_)
+            if(!scan.at_end() && scan.get_and_increase() == data_)
             {
                 return true;
             }

@@ -27,14 +27,14 @@ public:
                 parser1(std::forward<Parser1>(p1)),
                 parser2(std::forward<Parser2>(p2)) {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        Iterator it=first;
-        if(!parser2(first,last))
+        auto it=scan.save();
+        if(!parser2(scan))
         {   
-            first = it;
-            if(parser1(first,last))
+            scan.load(it);
+            if(parser1(scan))
             {
                 return true;
             }

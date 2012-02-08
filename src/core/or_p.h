@@ -26,51 +26,49 @@ class or_p :public parser_base<or_p<Args...>>
 {
 public:
 
-    template <typename Tuple,typename It,std::size_t N>
+    template <typename Tuple,typename Scan,std::size_t N>
     struct helper
     {
-        inline static bool do_parse(Tuple& t,It& first,It last)
+        inline static bool do_parse(Tuple& t,Scan& scan)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
-            It it = first;
-            if(std::get<Idx>(t)(first,last))
+            auto it = scan.save();
+            if(std::get<Idx>(t)(scan))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
                 return true;
             }
-            first = it;
-            return helper<Tuple,It,N-1>::do_parse(t,first,last);
+            scan.load(it);
+            return helper<Tuple,Scan,N-1>::do_parse(t,scan);
         }
     };
 
-    template <typename Tuple,typename It>
-    struct helper<Tuple,It,1>
+    template <typename Tuple,typename Scan>
+    struct helper<Tuple,Scan,1>
     {
-        inline static bool do_parse(Tuple& t,It& first,It last)
+        inline static bool do_parse(Tuple& t,Scan& scan)
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
-            It it = first;
-            if(std::get<Idx>(t)(first,last))
+            auto it = scan.save();
+            if(std::get<Idx>(t)(scan))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
                 return true;
             }
-            //first = it;
             return false;
         }
     };
 
     typedef std::tuple<Args...> tuple_type;
 
-
 public:
     or_p(Args&&... args):tuple_(std::forward<Args>(args)...) {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last) 
+    template <typename Scanner>
+    bool operator()(Scanner& scan) 
     {
        if(!helper<tuple_type,Iterator,
-               std::tuple_size<tuple_type>::value>::do_parse(tuple_,first,last))
+               std::tuple_size<tuple_type>::value>::do_parse(tuple_,scan))
            return false;
        return true; 
     }

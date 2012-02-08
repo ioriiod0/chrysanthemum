@@ -22,16 +22,16 @@ class optional_p:public parser_base<optional_p<Parser>>
 public:
     optional_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
         //////////////////////////////////////////
-        Iterator it = first;
-        if(parser_(first,last))
+        auto it = scan.save();
+        if(parser_(scan))
         {
             return true;
         }
-        first = it;
+        scan.load(it);
         return true;
     }
     

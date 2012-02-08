@@ -21,10 +21,10 @@ class not_p:public parser_base<not_p<Parser>>
     public:
         not_p(Parser&& p):parser_(std::forward<Parser>(p)) {}
     public:
-        template <typename Iterator>
-        bool operator()(Iterator& first,Iterator last)
+        template <typename Scanner>
+        bool operator()(Scanner& scan)
         {
-            if(!parser_(first,last))
+            if(!parser_(scan))
                 return true;
             return false;
         }

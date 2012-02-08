@@ -23,14 +23,14 @@ class repeat_p:public parser_base<repeat_p<N,Parser,M> >
 public:
     repeat_p(Parser&& t):parser_(std::forward<Parser>(t)) {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
         ///////////////////////////////////////
         std::size_t counter=0;
         while(counter++ < N)
         {
-            if(!parser_(first,last))
+            if(!parser_(scan))
                 return false;
         }
         //counter == N
@@ -38,7 +38,7 @@ public:
         while(counter++ <= M)
         {
             it = first;
-            if(!parser_(first,last))
+            if(!parser_(scan))
             {
                 first = it;
                 break;
@@ -60,23 +60,23 @@ public:
     repeat_p(Parser&& t):parser_(std::forward<Parser>(t)) {}
     ~repeat_p() {}
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
         std::size_t counter=0;
         while(counter++ < N)
         {
-            if(!parser_(first,last))
+            if(!parser_(scan))
                 return false;
         }
         /////////////////////////////////////////////
-        Iterator it;
+        typename Scanner::iterator it;
         for(;;)
         {
-            it = first;
-            if(!parser_(first,last))
+            it = scan.save();
+            if(!parser_(scan))
             {
-                first = it;
+                scan.load(it);
                 break;
             }
         }

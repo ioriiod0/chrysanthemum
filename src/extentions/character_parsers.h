@@ -70,7 +70,11 @@ struct character_type_traits<char>
    inline static bool ispunct(int ch)
    {
        return std::ispunct(ch);
-   }   
+   }
+   inline static bool isLF(int ch)
+   {
+       return ch == 10;
+   }
   
 };
 
@@ -125,6 +129,10 @@ struct character_type_traits<wchar_t>
    {
        return std::iswpunct(ch);
    }   
+   inline static bool isLF(wint_t ch)
+   {
+       return ch == 10;
+   }
   
 };
 
@@ -132,11 +140,11 @@ struct character_type_traits<wchar_t>
 struct alnum_p:public parser_base<alnum_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isalnum(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isalnum(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -146,11 +154,11 @@ struct alpha_p:public parser_base<alpha_p>
 {
     
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isalpha(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isalpha(scan.get_and_increase()))
             return false;
         return true;
     }  
@@ -159,11 +167,11 @@ public:
 struct upper_p:public parser_base<upper_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isupper(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isupper(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -173,11 +181,11 @@ public:
 struct lower_p:public parser_base<lower_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::islower(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::islower(scan.get_and_increase()))
             return false;
         return true; 
     }
@@ -188,11 +196,11 @@ struct digit_p :public parser_base<digit_p>
 {
 
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isdigit(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isdigit(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -202,11 +210,11 @@ public:
 struct xdigit_p:public parser_base<xdigit_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isxdigit(*first++)) 
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isxdigit(scan.get_and_increase())) 
             return false;
         return true;
     }
@@ -215,11 +223,11 @@ public:
 struct blank_p: public parser_base<blank_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isblank(*first++)) 
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isblank(scan.get_and_increase())) 
             return false;
         return true;
     }
@@ -228,11 +236,11 @@ public:
 struct cntrl_p:public parser_base<cntrl_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::iscntrl(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::iscntrl(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -242,11 +250,11 @@ public:
 struct graph_p:public parser_base<graph_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isgraph(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isgraph(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -256,11 +264,11 @@ public:
 struct space_p:public parser_base<space_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isspace(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isspace(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -269,11 +277,11 @@ public:
 struct print_p:public parser_base<print_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::isprint(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::isprint(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -283,11 +291,11 @@ public:
 struct punct_p:public parser_base<punct_p>
 {
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first == last || !character_type_traits<char_type>::ispunct(*first++))
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end() || !character_type_traits<char_type>::ispunct(scan.get_and_increase()))
             return false;
         return true;
     }
@@ -298,32 +306,20 @@ struct any_ch_p:public parser_base<any_ch_p>
 {
 
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        if(first == last)
+        if(scan.at_end())
             return false;
-        if((int)*first <0 || (int)*first > 127)
+        if((int)scan.get() <0 || (int)scan.get() > 127)
             return false;
-        ++first;
+        scan.increase();
         return true;
     }
 };
 
 
-// struct oct_p
-// {   
-// public:
-//     template <typename Iterator>
-//     bool operator()(Iterator& first,Iterator last)
-//     {
-//         typedef typename std::iterator_traits<Iterator>::value_type char_type;
-//         if(first == last)
-//             return false;
-//         ++first;
-//         return true;
-//     }
-//  };
+
 
 
 template <typename CharT,CharT Start,CharT End>
@@ -333,15 +329,15 @@ public:
     static_assert(Start<End,"Start must less than End");
 
 public:
-    template <typename Iterator>
-    bool operator()(Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator()(Scanner& scan)
     {
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        if(first==last)
+        typedef typename Scanner::value_type char_type;
+        if(scan.at_end())
             return false;
-        if(*first<Start || *first>End)
+        if(scan.get()<Start || scan.get()>End)
             return false;
-        ++first;
+        scan.increase();
         return true;
     }
 

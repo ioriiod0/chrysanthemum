@@ -17,38 +17,38 @@ struct no_context;
 
 
 ////////////////////Skiper & Context/////////////////
-template <typename Iterator,typename Context,typename Skiper = _space>
-struct rule:public parser_base<rule<Iterator,Context,Skiper>>
+template <typename Scanner,typename Context,typename Skiper = _space>
+struct rule:public parser_base<rule<Scanner,Context,Skiper>>
 {
 public:
-    typedef std::function<bool(Iterator&,Iterator)> delegater;
+    typedef std::function<bool(Scanner&)> delegater;
     rule(Skiper&& skiper = Skiper()):skiper_(std::forward<Skiper>(skiper)) {}
 
 public:
-    bool operator() (Iterator& first,Iterator last)
+    bool operator() (Scanner& scan)
     {
         if(dele_)
         {
             new_ctx();
-            Iterator it;
+            typename Scanner::iterator it;
             for(;;)
             {
-                it = first;
-                if(!skiper_(first,last))
+                it = scan.save();
+                if(!skiper_(scan))
                 {
-                    first = it;
+                    scan.load(it);
                     break;
                 }
             } 
 
-            if(dele_(first,last))
+            if(dele_(scan))
             {
                 for(;;)
                 {
-                    it = first;
-                    if(!skiper_(first,last))
+                    it = scan.save();
+                    if(!skiper_(scan))
                     {
-                        first = it;
+                        scan.load(it);
                         break;
                     }
                 }
@@ -99,18 +99,18 @@ private:
 
 
 /////////////////////////no_skiper//////////////////
-template <typename Iterator,typename Context>
-struct rule<Iterator,Context,no_skip>:public parser_base<rule<Iterator,Context,no_skip>>
+template <typename Scanner,typename Context>
+struct rule<Scanner,Context,no_skip>:public parser_base<rule<Scanner,Context,no_skip>>
 {
 public:
-    typedef std::function<bool(Iterator&,Iterator)> delegater;
+    typedef std::function<bool(Scanner&)> delegater;
 public:
-    bool operator() (Iterator& first,Iterator last)
+    bool operator() (Scanner& scan)
     {
         if(dele_)
         {
             new_ctx();
-            if(dele_(first,last))
+            if(dele_(scan))
                 return true;
             clear_ctx();
         }
@@ -151,36 +151,36 @@ private:
 
 
 ////////////////////no_context/////////////////
-template <typename Iterator,typename Skiper>
-struct rule<Iterator,no_context,Skiper>:public parser_base<rule<Iterator,no_context,Skiper>>
+template <typename Scanner,typename Skiper>
+struct rule<Scanner,no_context,Skiper>:public parser_base<rule<Scanner,no_context,Skiper>>
 {
 public:
-    typedef std::function<bool(Iterator&,Iterator)> delegater;
+    typedef std::function<bool(Scanner&)> delegater;
     rule(Skiper&& skiper = Skiper()):skiper_(std::forward<Skiper>(skiper)) {}
 
 public:
-    bool operator() (Iterator& first,Iterator last)
+    bool operator() (Scanner& scan)
     {
         if(dele_)
         {
-            Iterator it;
+            typename Scanner::iterator it;
             for(;;)
             {
-                it = first;
-                if(!skiper_(first,last))
+                it = scan.save();
+                if(!skiper_(scan))
                 {
-                    first = it;
+                    scan.load(it);
                     break;
                 }
             } 
-            if(dele_(first,last))
+            if(dele_(scan))
             {
                 for(;;)
                 {
-                    it = first;
-                    if(!skiper_(first,last))
+                    it = scan.save();
+                    if(!skiper_(scan))
                     {
-                        first = it;
+                        scan.load(it);
                         break;
                     }
                 }
@@ -206,17 +206,17 @@ private:
 };
 
 /////////////////////////no_context and no_skiper//////////////////
-template <typename Iterator>
-struct rule<Iterator,no_context,no_skip>:public parser_base<rule<Iterator,no_context,no_skip>>
+template <typename Scanner>
+struct rule<Scanner,no_context,no_skip>:public parser_base<rule<Scanner,no_context,no_skip>>
 {
 public:
-    typedef std::function<bool(Iterator&,Iterator)> delegater;
+    typedef std::function<bool(Scanner&)> delegater;
 public:
-    bool operator() (Iterator& first,Iterator last)
+    bool operator() (Scanner& scan)
     {
         if(dele_)
         {
-            if(dele_(first,last))
+            if(dele_(scan))
                 return true;
         }
         return false;

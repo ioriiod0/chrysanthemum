@@ -24,12 +24,12 @@ public:
                     p_(std::forward<Parser>(p)),
                     a_(std::forward<Action>(a)) {}
 public:
-    template <typename Iterator>
-    bool operator() (Iterator& first,Iterator last)
+    template <typename Scanner>
+    bool operator() (Scanner& scan)
     {
-        Iterator it = first;
-        if(p_(first,last))
-            return a_(it,first);
+        auto it = scan.save();
+        if(p_(scan))
+            return a_(it,scan.save());
         return false;
     }
 private:
