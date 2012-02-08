@@ -40,6 +40,7 @@ public:
                     break;
                 }
             } 
+
             if(dele_(first,last))
             {
                 for(;;)
@@ -53,8 +54,10 @@ public:
                 }
                 return true;
             }
+
+            clear_ctx();
         }
-        clear_ctx();
+       
         return false;
     }
 
@@ -109,8 +112,8 @@ public:
             new_ctx();
             if(dele_(first,last))
                 return true;
+            clear_ctx();
         }
-        clear_ctx();
         return false;
     }
     /////////////////////////////////
