@@ -26,12 +26,12 @@ public:
     bool operator()(Scanner& scan)
     {
         //////////////////////////////////////////
-        auto it = scan.save();
+        Scanner save = scan;
         if(parser_(scan))
         {
             return true;
         }
-        scan.load(it);
+        scan = save;
         return true;
     }
     

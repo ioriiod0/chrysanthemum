@@ -80,8 +80,10 @@ int main()
         if(p(scan))
         {
             std::cout<<"ok"<<std::endl;
-            std::cout<<"line_no:"<<scan.get_line_no()<<std::endl;
-            std::cout<<"col_no:"<<scan.get_col_no()<<std::endl;
+            std::cout<<"line_no:"<<scan.line_no<<std::endl;
+            std::cout<<"col_no:"<<scan.col_no<<std::endl;
+            std::cout<<"lalala"<<std::endl;
+            std::cout<<str.size()<<std::endl;
         }
         else
         {

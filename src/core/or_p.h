@@ -32,13 +32,13 @@ public:
         inline static bool do_parse(Tuple& t,Scan& scan)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
-            auto it = scan.save();
+            Scanner save = scan;
             if(std::get<Idx>(t)(scan))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
                 return true;
             }
-            scan.load(it);
+            scan = save;
             return helper<Tuple,Scan,N-1>::do_parse(t,scan);
         }
     };
@@ -49,7 +49,6 @@ public:
         inline static bool do_parse(Tuple& t,Scan& scan)
         { 
             const static std::size_t Idx = std::tuple_size<Tuple>::value-1; 
-            auto it = scan.save();
             if(std::get<Idx>(t)(scan))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;

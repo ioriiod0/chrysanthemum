@@ -31,13 +31,13 @@ public:
     {
         if(!parser1_(scan))
             return false;
-        typename Scanner::iterator it;
+        Scanner save;
         for(;;)
         {
-            it = scan.save();
+            save = scan;
             if(!parser2_(scan) || !parser1_(scan))
             {
-                scan.load(it);
+                scan = save;
                 break;
             } 
         }

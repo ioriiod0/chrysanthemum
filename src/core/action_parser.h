@@ -27,9 +27,9 @@ public:
     template <typename Scanner>
     bool operator() (Scanner& scan)
     {
-        auto it = scan.save();
+        auto it = scan.cur;
         if(p_(scan))
-            return a_(it,scan.save());
+            return a_(it,scan.cur);
         return false;
     }
 private:

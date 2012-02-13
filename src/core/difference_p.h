@@ -30,10 +30,10 @@ public:
     template <typename Scanner>
     bool operator()(Scanner& scan)
     {
-        auto it=scan.save();
+        Scanner save = scan;
         if(!parser2(scan))
         {   
-            scan.load(it);
+            scan = save;
             if(parser1(scan))
             {
                 return true;

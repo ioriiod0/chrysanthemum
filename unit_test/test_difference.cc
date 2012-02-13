@@ -10,40 +10,54 @@
 #include <algorithm>
 #include <vector>
 
-#include "../src/compound/and_p.h"
-#include "../src/compound/or_p.h"
-#include "../src/compound/repeat_p.h"
-#include "../src/compound/literal_p.h"
-#include "../src/compound/list_p.h"
-#include "../src/parsers/basic_parsers.h"
-#include "../src/parsers/rule.h"
-#include "../src/converter/converters.h"
+#include "../src/core/and_p.h"
+#include "../src/core/difference_p.h"
+#include "../src/core/repeat_p.h"
+#include "../src/core/literal_p.h"
+#include "../src/core/scanner.h"
+#include "../src/core/compposer.h"
+#include "../src/extentions/character_parsers.h"
+#include "../src/extentions/scanner_policy.h"
 #include "../src/action/printer.h"
-#include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-#include "../src/parsers/compposer.h"
-#include "../src/action/function_wrapper.h"
-#include "../src/compound/not_p.h"
-#include "../src/compound/diference_p.h"
-
+#include "../src/action/converters.h"
+#include "../src/action/combiner.h"
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
 
 int main()
 {
- 
-    typedef std::string::iterator IT;
-    std::string ret;
-    auto p = '{' & _repeat<0,INFINITE>(_oct()-'{'-'}') <= _converter(ret); //& '}';
-    std::string str = "{sdfs123214}fdsfsdf}";
-    auto it = str.begin();
-    if(p(it,str.end()))
     { 
-        std::cout<<ret<<std::endl;
+        typedef std::string::iterator IT;
+        auto f = _combine(_to_string(),_line_printer(std::cout)); 
+        auto p = '{' 
+                & *(_any()-'{'-'}')  <=  f 
+                & '}';
+        std::string str = "{hello world! 12345!} .......";
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(p(scan))
+        { 
+            std::cout<<"OK"<<std::endl;
+        }
+        else
+        {
+            std::cout<<"fuck"<<std::endl;
+        }
     }
-    else
-    {
-        std::cout<<"fuck"<<std::endl;
+
+    { 
+        typedef std::string::iterator IT;
+        auto f = _combine(_converter<int,10,not_strict_mode>(),_line_printer(std::cout)); 
+        auto p = *(_digit()-'0')  <=  f;
+        std::string str = "123406789 .......";
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(p(scan))
+        { 
+            std::cout<<"OK"<<std::endl;
+        }
+        else
+        {
+            std::cout<<"fuck"<<std::endl;
+        }
     }
 }

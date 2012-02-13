@@ -302,7 +302,7 @@ public:
 };
 
 //////////////////////////////////////////////////
-struct any_ch_p:public parser_base<any_ch_p>
+struct any_p:public parser_base<any_p>
 {
 
 public:
@@ -310,8 +310,6 @@ public:
     bool operator()(Scanner& scan)
     {
         if(scan.at_end())
-            return false;
-        if((int)scan.get() <0 || (int)scan.get() > 127)
             return false;
         scan.increase();
         return true;
@@ -356,7 +354,7 @@ public:
 #define _graph graph_p
 #define _print print_p
 #define _punct punct_p
-#define _any_ch any_ch_p
+#define _any any_p
 #define _range range_p
 
 

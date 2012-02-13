@@ -26,13 +26,16 @@ struct line_printer
     OS& os_;
 };
 
-} //end namespace
-
 template <typename OS>
 line_printer<OS> _line_printer(OS& os)
 {
     return line_printer<OS>(os);
 }
+
+
+} //end namespace
+
+
 
 
 #endif

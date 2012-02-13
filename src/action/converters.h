@@ -24,67 +24,67 @@ struct converter_character_type_traits;
 template <>
 struct converter_character_type_traits<char>
 {
-    inline static long strtol(const char* str,char** str_end,int base)
+    inline static long _strtol(const char* str,char** str_end,int base)
     {
-        return strtol(str,str_end,base);
+        return std::strtol(str,str_end,base);
     }
-    inline static long strtoul(const char* str,char** str_end,int base)
+    inline static long _strtoul(const char* str,char** str_end,int base)
     {
-        return strtoul(str,str_end,base);
+        return std::strtoul(str,str_end,base);
     }        
-    inline static long strtoll(const char* str,char** str_end,int base)
+    inline static long _strtoll(const char* str,char** str_end,int base)
     {
-        return strtoll(str,str_end,base);
+        return std::strtoll(str,str_end,base);
     }
-    inline static long strtoull(const char* str,char** str_end,int base)
+    inline static long _strtoull(const char* str,char** str_end,int base)
     {
-        return strtoull(str,str_end,base);
+        return std::strtoull(str,str_end,base);
     }
-    inline static long strtod(const char* str,char** str_end)
+    inline static long _strtod(const char* str,char** str_end)
     {
-        return strtod(str,str_end);
+        return std::strtod(str,str_end);
     }
-    inline static long strtold(const char* str,char** str_end)
+    inline static long _strtold(const char* str,char** str_end)
     {
-        return strtold(str,str_end);
+        return std::strtold(str,str_end);
     }
-    inline static long strtof(const char* str,char** str_end)
+    inline static long _strtof(const char* str,char** str_end)
     {
-        return strtof(str,str_end);
+        return std::strtof(str,str_end);
     }
 
 };
 
 template <>
-struct converter_wchar_tacter_type_traits<wwchar_t_t>
+struct converter_character_type_traits<wchar_t>
 {
-    inline static long strtol(const wchar_t* str,wchar_t** str_end,int base)
+    inline static long _strtol(const wchar_t* str,wchar_t** str_end,int base)
     {
-        return wcstol(str,str_end,base);
+        return std::wcstol(str,str_end,base);
     }
-    inline static long strtoul(const wchar_t* str,wchar_t** str_end,int base)
+    inline static long _strtoul(const wchar_t* str,wchar_t** str_end,int base)
     {
-        return wcstoul(str,str_end,base);
+        return std::wcstoul(str,str_end,base);
     }        
-    inline static long strtoll(const wchar_t* str,wchar_t** str_end,int base)
+    inline static long _strtoll(const wchar_t* str,wchar_t** str_end,int base)
     {
-        return wcstoll(str,str_end,base);
+        return std::wcstoll(str,str_end,base);
     }
-    inline static long strtoull(const wchar_t* str,wchar_t** str_end,int base)
+    inline static long _strtoull(const wchar_t* str,wchar_t** str_end,int base)
     {
-        return wcstoull(str,str_end,base);
+        return std::wcstoull(str,str_end,base);
     }
-    inline static long strtod(const wchar_t* str,wchar_t** str_end)
+    inline static long _strtod(const wchar_t* str,wchar_t** str_end)
     {
-        return wcstod(str,str_end);
+        return std::wcstod(str,str_end);
     }
-    inline static long strtold(const wchar_t* str,wchar_t** str_end)
+    inline static long _strtold(const wchar_t* str,wchar_t** str_end)
     {
-        return wcstold(str,str_end);
+        return std::wcstold(str,str_end);
     }
-    inline static long strtof(const wchar_t* str,wchar_t** str_end)
+    inline static long _strtof(const wchar_t* str,wchar_t** str_end)
     {
-        return wcstof(str,str_end);
+        return std::wcstof(str,str_end);
     }
 
 
@@ -98,8 +98,9 @@ struct converter_wchar_tacter_type_traits<wwchar_t_t>
         typedef typename std::iterator_traits<Iterator>::pointer pointer; \
         typedef typename std::iterator_traits<Iterator>::value_type value_type; \
         pointer p; \
-        ctx() = converter_character_type_traits<value_type>::FUNC(&*first,&p,DEC); \
-        return p == *&last; \
+        std::string str(first,last); \
+        ctx() = converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p,DEC); \
+        return p == &(*str.end()); \
     } \
     template <typename Iterator> \
     inline static bool do_convert(Iterator first,Iterator last, TYPE& t) \
@@ -107,8 +108,9 @@ struct converter_wchar_tacter_type_traits<wwchar_t_t>
         typedef typename std::iterator_traits<Iterator>::pointer pointer; \
         typedef typename std::iterator_traits<Iterator>::value_type value_type; \
         pointer p; \
-        t = converter_character_type_traits<value_type>::FUNC(&*first,&p,DEC); \
-        return p == *&last; \
+        std::string str(first,last); \
+        ctx() = converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p,DEC); \
+        return p == &(*str.end()); \
     } 
 
 #define NOT_STRICT_MODE_FUNC_IMPL(TYPE,FUNC,DEC) \
@@ -134,8 +136,9 @@ struct converter_wchar_tacter_type_traits<wwchar_t_t>
         typedef typename std::iterator_traits<Iterator>::pointer pointer; \
         typedef typename std::iterator_traits<Iterator>::value_type value_type; \
         pointer p; \
-        ctx() = converter_character_type_traits<value_type>::FUNC(&*first,&p); \
-        return p == *&last; \
+        std::string str(first,last); \
+        ctx() = converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p); \
+        return p == &(*str.end()); \
     } \
     template <typename Iterator> \
     inline static bool do_convert(Iterator first,Iterator last, TYPE& t) \
@@ -143,8 +146,9 @@ struct converter_wchar_tacter_type_traits<wwchar_t_t>
         typedef typename std::iterator_traits<Iterator>::pointer pointer; \
         typedef typename std::iterator_traits<Iterator>::value_type value_type; \
         pointer p; \
-        t = converter_character_type_traits<value_type>::FUNC(&*first,&p); \
-        return p == *&last; \
+        std::string str(first,last); \
+        ctx() = converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p); \
+        return p == &(*str.end()); \
     } 
 
 #define NOT_STRICT_MODE_FUNC_IMPL2(TYPE,FUNC) \
@@ -169,12 +173,14 @@ struct not_strict_mode;
 template <typename T>
 struct converter_base
 {
-    ctx_type& ctx()
+    typedef T ctx_type;
+
+    T& ctx()
     {
         return t_;
     }
 
-    const ctx_type& ctx() const
+    const T& ctx() const
     {
         return t_;
     }
@@ -185,14 +191,16 @@ struct converter_base
 template <typename T>
 struct emplace_converter_base
 {
+    typedef T ctx_type;
+
     emplace_converter_base(T& t):t_(t) {}
 
-    ctx_type& ctx()
+    T& ctx()
     {
         return t_;
     }
 
-    const ctx_type& ctx() const
+    const T& ctx() const
     {
         return t_;
     }
@@ -200,244 +208,268 @@ struct emplace_converter_base
     T& t_;
 };
 ////////////base/////////////
-template <typename T,std::size_t Dec = 10,typename Mode = strick_mode>
+template <typename T,std::size_t Dec = 10,typename Mode = strict_mode>
 struct converter;
-
+template <typename T,std::size_t Dec = 10,typename Mode = strict_mode>
+struct emplace_converter;
 /////////////int/////////////
 template <std::size_t Dec>
-struct converter<int,Dec,strick_mode>:public converter_base<int>
+struct converter<int,Dec,strict_mode>:public converter_base<int>
 {
-    STRICT_MODE_FUNC_IMPL(int,strtol,Dec)
+    STRICT_MODE_FUNC_IMPL(int,_strtol,Dec)
 };
 
 template <std::size_t Dec>
 struct converter<int,Dec,not_strict_mode>:public converter_base<int>
 {
-    NOT_STRICT_MODE_FUNC_IMPL(int,strtol,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(int,_strtol,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<int,Dec,strick_mode>:public emplace_converter_base<int>
+struct emplace_converter<int,Dec,strict_mode>:public emplace_converter_base<int>
 {
     emplace_converter(int& t):emplace_converter_base<int>(t) {};
-    STRICT_MODE_FUNC_IMPL(int,strtol,Dec)
+    STRICT_MODE_FUNC_IMPL(int,_strtol,Dec)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<int,Dec,not_strict_mode>:public emplace_converter_base<int>
 {
     emplace_converter(int& t):emplace_converter_base<int>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(int,strtol,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(int,_strtol,Dec)
 };
 /////////////////////unsigned int/////////////
 template <std::size_t Dec>
-struct converter<unsigned int,Dec,strick_mode>:public converter_base<unsigned int>
+struct converter<unsigned int,Dec,strict_mode>:public converter_base<unsigned int>
 {
-    STRICT_MODE_FUNC_IMPL(unsigned int,strtoul,Dec)
+    STRICT_MODE_FUNC_IMPL(unsigned int,_strtoul,Dec)
 };
 
 template <std::size_t Dec>
 struct converter<unsigned int,Dec,not_strict_mode>:public converter_base<unsigned int>
 {
-    NOT_STRICT_MODE_FUNC_IMPL(unsigned int,strtoul,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(unsigned int,_strtoul,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<unsigned int,Dec,strick_mode>:public emplace_converter_base<unsigned int>
+struct emplace_converter<unsigned int,Dec,strict_mode>:public emplace_converter_base<unsigned int>
 {
     emplace_converter(unsigned int& t):emplace_converter_base<unsigned int>(t) {};
-    STRICT_MODE_FUNC_IMPL(unsigned int,strtoul,Dec)
+    STRICT_MODE_FUNC_IMPL(unsigned int,_strtoul,Dec)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<unsigned int,Dec,not_strict_mode>:public emplace_converter_base<unsigned int>
 {
     emplace_converter(unsigned int& t):emplace_converter_base<unsigned int>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(unsigned int,strtoul,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(unsigned int,_strtoul,Dec)
 };
 ///////////////long/////////////////////////
 template <std::size_t Dec>
-struct converter<long,Dec,strick_mode>:public converter_base<long>
+struct converter<long,Dec,strict_mode>:public converter_base<long>
 {
-    STRICT_MODE_FUNC_IMPL(long,strtol,Dec)
+    STRICT_MODE_FUNC_IMPL(long,_strtol,Dec)
 };
 
 template <std::size_t Dec>
 struct converter<long,Dec,not_strict_mode>:public converter_base<long>
 {
-    NOT_STRICT_MODE_FUNC_IMPL(long,strtol,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(long,_strtol,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<long,Dec,strick_mode>:public emplace_converter_base<long>
+struct emplace_converter<long,Dec,strict_mode>:public emplace_converter_base<long>
 {
     emplace_converter(long& t):emplace_converter_base<long>(t) {};
-    STRICT_MODE_FUNC_IMPL(long,strtol,Dec)
+    STRICT_MODE_FUNC_IMPL(long,_strtol,Dec)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<long,Dec,not_strict_mode>:public emplace_converter_base<long>
 {
     emplace_converter(long& t):emplace_converter_base<long>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(long,strtol,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(long,_strtol,Dec)
 };
 ///////////////////unsigned long/////////////////////
 template <std::size_t Dec>
-struct converter<unsigned long,Dec,strick_mode>:public converter_base<unsigned long>
+struct converter<unsigned long,Dec,strict_mode>:public converter_base<unsigned long>
 {
-    STRICT_MODE_FUNC_IMPL(unsigned long,strtoul,Dec)
+    STRICT_MODE_FUNC_IMPL(unsigned long,_strtoul,Dec)
 };
 
 template <std::size_t Dec>
 struct converter<unsigned long,Dec,not_strict_mode>:public converter_base<unsigned long>
 {
-    NOT_STRICT_MODE_FUNC_IMPL(unsigned long,strtoul,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(unsigned long,_strtoul,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<unsigned long,Dec,strick_mode>:public emplace_converter_base<unsigned long>
+struct emplace_converter<unsigned long,Dec,strict_mode>:public emplace_converter_base<unsigned long>
 {
     emplace_converter(unsigned long& t):emplace_converter_base<unsigned long>(t) {};
-    STRICT_MODE_FUNC_IMPL(unsigned long,strtoul,Dec)
+    STRICT_MODE_FUNC_IMPL(unsigned long,_strtoul,Dec)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<unsigned long,Dec,not_strict_mode>:public emplace_converter_base<unsigned long>
 {
     emplace_converter(unsigned long& t):emplace_converter_base<unsigned long>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(unsigned long,strtoul,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(unsigned long,_strtoul,Dec)
 };
 //////////////////////long long///////////////////////////////////
 template <std::size_t Dec>
-struct converter<long long,Dec,strick_mode>:public converter_base<long long>
+struct converter<long long,Dec,strict_mode>:public converter_base<long long>
 {
-    STRICT_MODE_FUNC_IMPL(long long,strtoll,Dec)
+    STRICT_MODE_FUNC_IMPL(long long,_strtoll,Dec)
 };
 
 template <std::size_t Dec>
 struct converter<long long,Dec,not_strict_mode>:public converter_base<long long>
 {
-    NOT_STRICT_MODE_FUNC_IMPL(long long,strtoll,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(long long,_strtoll,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<long long,Dec,strick_mode>:public emplace_converter_base<long long>
+struct emplace_converter<long long,Dec,strict_mode>:public emplace_converter_base<long long>
 {
     emplace_converter(long long& t):emplace_converter_base<long long>(t) {};
-    STRICT_MODE_FUNC_IMPL(long long,strtoll,Dec)
+    STRICT_MODE_FUNC_IMPL(long long,_strtoll,Dec)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<long long,Dec,not_strict_mode>:public emplace_converter_base<long long>
 {
     emplace_converter(long long& t):emplace_converter_base<long long>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(long long ,strtoll,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(long long ,_strtoll,Dec)
 };
 ///////////////////////////unsigned long long //////////////////////
 template <std::size_t Dec>
-struct converter<unsigned long long,Dec,strick_mode>:public converter_base<unsigned long long>
+struct converter<unsigned long long,Dec,strict_mode>:public converter_base<unsigned long long>
 {
-    STRICT_MODE_FUNC_IMPL(unsigned long long,strtoull,Dec)
+    STRICT_MODE_FUNC_IMPL(unsigned long long,_strtoull,Dec)
 };
 
 template <std::size_t Dec>
 struct converter<unsigned long long,Dec,not_strict_mode>:public converter_base<unsigned long long>
 {
-    NOT_STRICT_MODE_FUNC_IMPL(unsigned long long,strtoull,Dec)
+    NOT_STRICT_MODE_FUNC_IMPL(unsigned long long,_strtoull,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<unsigned long long,Dec,strick_mode>:public emplace_converter_base<unsigned long long>
-{
-    emplace_converter(unsigned long long& t):emplace_converter_base<unsigned long long>(t) {};
-    STRICT_MODE_FUNC_IMPL(unsigned long long,strtoull,Dec)
-};
-
-template <std::size_t Dec>
-struct emplace_converter<unsigned long long,Dec,not_strict_mode>:public empalce_converter_base<unsigned long long>
+struct emplace_converter<unsigned long long,Dec,strict_mode>:public emplace_converter_base<unsigned long long>
 {
     emplace_converter(unsigned long long& t):emplace_converter_base<unsigned long long>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(unsigned long long,strtoull,Dec)
-};
-///////////////////////////double //////////////////////
-template <>
-struct converter<double,Dec,strick_mode>:public converter_base<double>
-{
-    STRICT_MODE_FUNC_IMPL2(unsigned long long,strtod)
-};
-
-template <>
-struct converter<double,Dec,not_strict_mode>:public converter_base<double>
-{
-    NOT_STRICT_MODE_FUNC_IMPL2(double,strtod)
+    STRICT_MODE_FUNC_IMPL(unsigned long long,_strtoull,Dec)
 };
 
 template <std::size_t Dec>
-struct emplace_converter<double,Dec,strick_mode>:public emplace_converter_base<double>
+struct emplace_converter<unsigned long long,Dec,not_strict_mode>:public emplace_converter_base<unsigned long long>
+{
+    emplace_converter(unsigned long long& t):emplace_converter_base<unsigned long long>(t) {}
+    NOT_STRICT_MODE_FUNC_IMPL(unsigned long long,_strtoull,Dec)
+};
+///////////////////////////double //////////////////////
+template <std::size_t Dec>
+struct converter<double,Dec,strict_mode>:public converter_base<double>
+{
+    STRICT_MODE_FUNC_IMPL2(unsigned long long,_strtod)
+};
+
+template <std::size_t Dec>
+struct converter<double,Dec,not_strict_mode>:public converter_base<double>
+{
+    NOT_STRICT_MODE_FUNC_IMPL2(double,_strtod)
+};
+
+template <std::size_t Dec>
+struct emplace_converter<double,Dec,strict_mode>:public emplace_converter_base<double>
 {
     emplace_converter(double& t):emplace_converter_base<double>(t) {};
-    STRICT_MODE_FUNC_IMPL(double,strtol)
+    STRICT_MODE_FUNC_IMPL2(double,_strtod)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<double,Dec,not_strict_mode>:public emplace_converter_base<double>
 {
     emplace_converter(double& t):emplace_converter_base<double>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(double,strtod)
+    NOT_STRICT_MODE_FUNC_IMPL2(double,_strtod)
 };
 ///////////////////////////float //////////////////////
-template <>
-struct converter<float,Dec,strick_mode>:public converter_base<float>
+template <std::size_t Dec>
+struct converter<float,Dec,strict_mode>:public converter_base<float>
 {
-    STRICT_MODE_FUNC_IMPL2(float,strtof)
+    STRICT_MODE_FUNC_IMPL2(float,_strtof)
 };
 
-template <>
+template <std::size_t Dec>
 struct converter<float,Dec,not_strict_mode>:public converter_base<float>
 {
-    NOT_STRICT_MODE_FUNC_IMPL2(float,strtof)
+    NOT_STRICT_MODE_FUNC_IMPL2(float,_strtof)
 };
 template <std::size_t Dec>
-struct emplace_converter<float,Dec,strick_mode>:public emplace_converter_base<float>
+struct emplace_converter<float,Dec,strict_mode>:public emplace_converter_base<float>
 {
     emplace_converter(float& t):emplace_converter_base<float>(t) {};
-    STRICT_MODE_FUNC_IMPL(float,strtof)
+    STRICT_MODE_FUNC_IMPL2(float,_strtof)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<float,Dec,not_strict_mode>:public emplace_converter_base<float>
 {
     emplace_converter(float& t):emplace_converter_base<float>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(float,strtof)
+    NOT_STRICT_MODE_FUNC_IMPL2(float,_strtof)
 };
 ///////////////////////////long double //////////////////////
-template <>
-struct converter<long double,Dec,strick_mode>:public converter_base<long double>
+template <std::size_t Dec>
+struct converter<long double,Dec,strict_mode>:public converter_base<long double>
 {
-    STRICT_MODE_FUNC_IMPL2(long double,strtold)
+    STRICT_MODE_FUNC_IMPL2(long double,_strtold)
 };
 
-template <>
+template <std::size_t Dec>
 struct converter<long double,Dec,not_strict_mode>:public converter_base<long double>
 {
-    NOT_STRICT_MODE_FUNC_IMPL2(long double,strtold)
+    NOT_STRICT_MODE_FUNC_IMPL2(long double,_strtold)
 };
 template <std::size_t Dec>
-struct emplace_converter<long double,Dec,strick_mode>:public emplace_converter_base<long double>
+struct emplace_converter<long double,Dec,strict_mode>:public emplace_converter_base<long double>
 {
     emplace_converter(long double& t):emplace_converter_base<long double>(t) {};
-    STRICT_MODE_FUNC_IMPL(long double,strtold)
+    STRICT_MODE_FUNC_IMPL2(long double,_strtold)
 };
 
 template <std::size_t Dec>
 struct emplace_converter<long double,Dec,not_strict_mode>:public emplace_converter_base<long double>
 {
     emplace_converter(long double& t):emplace_converter_base<long double>(t) {}
-    NOT_STRICT_MODE_FUNC_IMPL(long double,strtold)
+    NOT_STRICT_MODE_FUNC_IMPL2(long double,_strtold)
 };
 
+struct to_string:public converter_base<std::string>
+{
+    template <typename Iterator>
+    bool operator()(Iterator first,Iterator last)
+    {
+        ctx().assign(first,last);
+        return true;
+    }
+};
 
-#define converter _converter
+struct emplace_to_string:public emplace_converter_base<std::string>
+{
+    emplace_to_string(std::string str):emplace_converter_base<std::string>(str) {}
+    template <typename Iterator>
+    bool operator()(Iterator first,Iterator last)
+    {
+        ctx().assign(first,last);
+        return true;
+    }
+};
+
+#define _converter converter
+#define _emplace_converter emplace_converter
+#define _to_string to_string
+#define _emplace_to_string emplace_to_string
 
 } //end namespace
 

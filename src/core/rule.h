@@ -30,13 +30,13 @@ public:
         if(dele_)
         {
             new_ctx();
-            typename Scanner::iterator it;
+            Scanner save;
             for(;;)
             {
-                it = scan.save();
+                save = scan;
                 if(!skiper_(scan))
                 {
-                    scan.load(it);
+                    scan = save;
                     break;
                 }
             } 
@@ -45,10 +45,10 @@ public:
             {
                 for(;;)
                 {
-                    it = scan.save();
+                    save = scan;
                     if(!skiper_(scan))
                     {
-                        scan.load(it);
+                        scan = save;
                         break;
                     }
                 }
@@ -163,13 +163,13 @@ public:
     {
         if(dele_)
         {
-            typename Scanner::iterator it;
+            Scanner save;
             for(;;)
             {
-                it = scan.save();
+                save = scan;
                 if(!skiper_(scan))
                 {
-                    scan.load(it);
+                    scan = save;
                     break;
                 }
             } 
@@ -177,10 +177,10 @@ public:
             {
                 for(;;)
                 {
-                    it = scan.save();
+                    save = scan;
                     if(!skiper_(scan))
                     {
-                        scan.load(it);
+                        scan = save;
                         break;
                     }
                 }
