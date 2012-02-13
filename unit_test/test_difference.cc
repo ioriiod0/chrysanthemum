@@ -47,7 +47,7 @@ int main()
 
     { 
         typedef std::string::iterator IT;
-        auto f = _combine(_converter<int,10,not_strict_mode>(),_line_printer(std::cout)); 
+        auto f = _combine(_converter<int,10>(),_line_printer(std::cout)); 
         auto p = *(_digit()-'0')  <=  f;
         std::string str = "123406789 .......";
         scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());

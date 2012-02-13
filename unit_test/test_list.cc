@@ -13,21 +13,19 @@
 #include <algorithm>
 
 
-//#include "../all.h"
-#include "../src/compound/and_p.h"
-#include "../src/compound/list_p.h"
-#include "../src/compound/or_p.h"
-#include "../src/compound/diference_p.h"
-#include "../src/compound/repeat_p.h"
-#include "../src/compound/literal_p.h"
-#include "../src/parsers/basic_parsers.h"
-#include "../src/parsers/rule.h"
-#include "../src/converter/converters.h"
+#include "../src/core/and_p.h"
+#include "../src/core/difference_p.h"
+#include "../src/core/repeat_p.h"
+#include "../src/core/literal_p.h"
+#include "../src/core/scanner.h"
+#include "../src/core/compposer.h"
+#include "../src/core/list_p.h"
+#include "../src/extentions/character_parsers.h"
+#include "../src/extentions/scanner_policy.h"
 #include "../src/action/printer.h"
+#include "../src/action/converters.h"
+#include "../src/action/combiner.h"
 #include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-#include "../src/parsers/compposer.h"
-#include "../src/action/function_wrapper.h"
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
@@ -35,17 +33,23 @@ using namespace chrysanthemum::ops;
 
 int main()
 {
-
     typedef std::string::iterator IT;
     std::vector<std::size_t> vec;
-    auto ip_parser = (((_digit()-'0') & _repeat<0,2>(_digit())) 
-                      <= _wrapper(_converter(std::size_t()),_back_inserter(vec)))
+
+    auto f = _combine(_converter<int>(),_back_inserter(vec));
+
+    auto ip_parser = (
+                       (   
+                          (_digit()-'0') 
+                        & _repeat<0,2>(_digit())
+                       ) <=  f
+                     )
                      % '.';
 
     {
         std::string str = "192.168.1.1"; // "192.168.1.1";
-        auto it = str.begin();
-        if(ip_parser(it,str.end()))
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(ip_parser(scan))
         {
             std::for_each(vec.begin(),vec.end(),[](std::size_t i){
                           std::cout<<i<<"..."<<std::endl;
@@ -54,14 +58,14 @@ int main()
         }
         else
         {
-            std::cout<<"err..."<<std::endl;
+            std::cout<<"fuck..."<<std::endl;
         }
     }
 
     {
         std::string str = "092.168.1.1"; // "192.168.1.1";
-        auto it = str.begin();
-        if(ip_parser(it,str.end()))
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(ip_parser(scan))
         {
             std::for_each(vec.begin(),vec.end(),[](std::size_t i){
                           std::cout<<i<<"..."<<std::endl;
