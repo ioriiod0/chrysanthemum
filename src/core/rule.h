@@ -8,6 +8,11 @@
 
 #include <functional>
 #include <stack>
+#include <deque>
+#include <list>
+#include <vector>
+#include <memory>
+#include <ext/pool_allocator.h>
 #include "parser_base.h"
 
 namespace chrysanthemum{
@@ -17,7 +22,7 @@ struct no_context;
 
 
 ////////////////////Skiper & Context/////////////////
-template <typename Scanner,typename Context,typename Skiper = _space>
+template <typename Scanner,typename Context,typename Skiper>
 struct rule:public parser_base<rule<Scanner,Context,Skiper>>
 {
 public:
@@ -73,7 +78,6 @@ public:
     void new_ctx()
     {
         ctxs.emplace();
-
     }
     void clear_ctx()
     {
@@ -93,8 +97,8 @@ public:
 private:
     delegater dele_;
     Skiper skiper_;
+    // std::stack<Context,std::deque<Context,__gnu_cxx::__pool_alloc<Context> > > ctxs;
     std::stack<Context> ctxs;
-
 };
 
 
@@ -120,7 +124,6 @@ public:
     void new_ctx()
     {
         ctxs.emplace();
-
     }
     void clear_ctx()
     {
@@ -146,6 +149,7 @@ public:
     }
 private:
     delegater dele_;
+    //std::stack<Context,std::deque<Context,__gnu_cxx::__pool_alloc<Context> > > ctxs;
     std::stack<Context> ctxs;
 };
 

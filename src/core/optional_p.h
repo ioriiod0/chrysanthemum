@@ -50,14 +50,14 @@ inline auto _optional(Arg&& arg) -> optional_p<Arg>
 namespace ops{
 
 template <typename T1>
-inline auto  operator! (parser_base<T1>&& t1)
+inline auto  operator- (parser_base<T1>&& t1)
     -> optional_p<T1> 
 {
     return _optional(std::move(t1.derived()));
 }
 
 template <typename T1>
-inline auto  operator! (parser_base<T1>& t1) 
+inline auto  operator- (parser_base<T1>& t1) 
     -> optional_p<T1&> 
 {
     return _optional(t1.derived());

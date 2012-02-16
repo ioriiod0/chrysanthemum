@@ -32,7 +32,7 @@ public:
         inline static bool do_parse(Tuple& t,Scan& scan)
         {
             const static std::size_t Idx = std::tuple_size<Tuple>::value-N; 
-            Scanner save = scan;
+            Scan save = scan;
             if(std::get<Idx>(t)(scan))
             {
                 //typedef typename std::tuple_element<Idx,Tuple>::type ttype;
@@ -66,7 +66,7 @@ public:
     template <typename Scanner>
     bool operator()(Scanner& scan) 
     {
-       if(!helper<tuple_type,Iterator,
+       if(!helper<tuple_type,Scanner,
                std::tuple_size<tuple_type>::value>::do_parse(tuple_,scan))
            return false;
        return true; 

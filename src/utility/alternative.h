@@ -20,7 +20,7 @@ namespace chrysanthemum {
 
 // struct UNUSED;
 
-template <typename ID,typename... Args>
+template <typename... Args>
 class alternative
 {
 public:
@@ -43,18 +43,19 @@ public:
         }
     };
 
-    // template <typename T>
-    // struct default_mover
-    // {
-    //     void operator()(void* dst,const void* src)
-    //     {
-    //         new(dst) T(std::move(*static_cast<const T*>(src)));
-    //     }
-    // };
+    template <typename T>
+    struct default_mover
+    {
+        void operator()(void* dst,const void* src)
+        {
+            new(dst) T(std::move(*static_cast<const T*>(src)));
+        }
+    };
 
     const static std::size_t buffer_size = max_size_of<Args...>::value;
     typedef std::function<void(void*)> delete_functor;
     typedef std::function<void(void*,const void*)> copy_functor;
+    typedef std::function<void(void*,void*)> move_functor;
 
 public:
     alternative():is_inited_(false) {}
@@ -71,8 +72,9 @@ public:
             is_inited_ = t.is_inited_;
             which_ = t.which_;
             copyer_ = t.copyer_;
-            copyer_(buffer_,t.buffer_);
             deleter_ = t.deleter_;
+            mover_ = t.mover_;
+            copyer_(buffer_,t.buffer_);
         }
         return *this;
     }
@@ -88,10 +90,10 @@ public:
         {
             is_inited_ = t.is_inited_;
             which_ = t.which_;
-            memcpy(buffer_,t.buffer_,buffer_size);
             deleter_ = t.deleter_;
             copyer_ = t.copyer_;
-            t.is_inited_ = false;
+            mover_ = t.mover_;
+            mover_(buffer_,t.buffer_);
         }
         return *this;
     }
@@ -108,27 +110,29 @@ public:
     {
         return is_inited_;
     }
-    ID which() const
+    std::size_t which() const
     {
         return which_;
     }
     //////////////////////////////////
-    template <ID Idx,typename T>
+    template <std::size_t Idx,typename T>
     void set(T&& t)
     {        
         typedef typename at<Idx,Args...>::type ith_type;
         typedef default_deleter<ith_type> deleter_type;
         typedef default_copyer<ith_type> copyer_type;
+        typedef default_mover<ith_type> mover_type;
         if(is_inited_ && deleter_)
             deleter_(buffer_);
         which_ = Idx;
         new(buffer_) ith_type(std::forward<T>(t));
         deleter_ = deleter_type();
         copyer_ = copyer_type();
+        mover_ = mover_type();
         is_inited_ = true;
     }
     ////////////////////////////////////
-    template <ID Idx>
+    template <std::size_t Idx>
     typename at<Idx,Args...>::type& get()
     {
         typedef typename at<Idx,Args...>::type ith_type;
@@ -138,7 +142,7 @@ public:
         return *((ith_type*)buffer_);
     }
 
-    template <ID Idx>
+    template <std::size_t Idx>
     const typename at<Idx,Args...>::type& get() const
     {
         typedef typename at<Idx,Args...>::type ith_type;
@@ -153,10 +157,11 @@ public:
 
 private:
     char buffer_[buffer_size];
-    ID which_;
+    std::size_t which_;
     bool is_inited_;
     delete_functor deleter_;
     copy_functor copyer_;
+    move_functor mover_;
     
 
 };

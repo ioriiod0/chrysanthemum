@@ -78,7 +78,27 @@ int main()
         }
     }
 
+    {
+        typedef std::string::iterator IT;
+        std::vector<std::string> vec;
+        auto f = _combine(_to_string(),_back_inserter(vec));
+        auto parser =( +(_alpha()) <= f ) % ',';
+        std::string str = "apple,banana,pear,peach,"; // "192.168.1.1";
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(parser(scan))
+        {
+            std::for_each(vec.begin(),vec.end(),[](std::string i){
+                          std::cout<<i<<"..."<<std::endl;
+                          });
+            std::cout<<"................."<<std::endl;
+        }
+        else
+        {
+            std::cout<<"err..."<<std::endl;
+        }
 
+
+    }
 
 
     // {

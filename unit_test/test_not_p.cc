@@ -12,20 +12,21 @@
 #include <algorithm>
 
 
-#include "../src/compound/and_p.h"
-#include "../src/compound/or_p.h"
-#include "../src/compound/repeat_p.h"
-#include "../src/compound/literal_p.h"
-#include "../src/compound/list_p.h"
-#include "../src/parsers/basic_parsers.h"
-#include "../src/parsers/rule.h"
-#include "../src/converter/converters.h"
+#include "../src/core/and_p.h"
+#include "../src/core/difference_p.h"
+#include "../src/core/repeat_p.h"
+#include "../src/core/literal_p.h"
+#include "../src/core/scanner.h"
+#include "../src/core/compposer.h"
+#include "../src/core/list_p.h"
+#include "../src/core/not_p.h"
+#include "../src/extentions/character_parsers.h"
+#include "../src/extentions/scanner_policy.h"
 #include "../src/action/printer.h"
+#include "../src/action/converters.h"
+#include "../src/action/combiner.h"
 #include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-#include "../src/parsers/compposer.h"
-#include "../src/action/function_wrapper.h"
-#include "../src/compound/not_p.h"
+
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
@@ -33,16 +34,22 @@ using namespace chrysanthemum::ops;
 
 int main()
 {
-   typedef std::string::iterator IT;
    {
-       std::string ret;
-       std::string str = "*&^%%\r\nFDSFjjffh2351";
-       auto n = _not(_digit());
-       auto p = _repeat<0,INFINITE>(n) <= _converter(ret);
-       IT it = str.begin();
-       if(p(it,str.end()))
+       std::string str = "fs*&^%%\r\nFDSFjjffh2351sdfFF";
+       typedef std::string::iterator IT;
+       auto f = _combine(_to_string(),_line_printer(std::cout));
+       auto p = *(!_digit()) <= f;
+       scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end()); 
+       if(p(scan))
        {
-           std::cout<<ret<<std::endl;
+           std::cout<<"ok"<<std::endl;
+           std::cout<<scan.consumed<<std::endl;
+           std::cout<<scan.line_no<<std::endl;
+           std::cout<<scan.col_no<<std::endl;
+       }
+       else
+       {
+           std::cout<<"FUCK"<<std::endl;
        }
    }
 }

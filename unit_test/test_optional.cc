@@ -10,21 +10,23 @@
 #include <iostream>
 #include <algorithm>
 
-#include "../src/compound/and_p.h"
-#include "../src/compound/or_p.h"
-#include "../src/compound/repeat_p.h"
-#include "../src/compound/literal_p.h"
-#include "../src/compound/list_p.h"
-#include "../src/parsers/basic_parsers.h"
-#include "../src/parsers/rule.h"
-#include "../src/converter/converters.h"
+#include "../src/core/and_p.h"
+#include "../src/core/difference_p.h"
+#include "../src/core/repeat_p.h"
+#include "../src/core/literal_p.h"
+#include "../src/core/scanner.h"
+#include "../src/core/compposer.h"
+#include "../src/core/list_p.h"
+#include "../src/core/not_p.h"
+#include "../src/core/optional_p.h"
+#include "../src/extentions/character_parsers.h"
+#include "../src/extentions/scanner_policy.h"
 #include "../src/action/printer.h"
+#include "../src/action/converters.h"
+#include "../src/action/combiner.h"
 #include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-#include "../src/parsers/compposer.h"
-#include "../src/action/function_wrapper.h"
-#include "../src/compound/not_p.h"
-#include "../src/compound/optional_p.h"
+
+
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
@@ -32,18 +34,20 @@ using namespace chrysanthemum::ops;
 int main()
 {
     
-
+    
+    
     typedef std::string::iterator IT;
     {
         std::string ret1;
         std::string ret2;
-        auto p = _optional(_literal("abc")) <= _converter(ret1)
-               & _literal("defg") <= _converter(ret2);
+        auto p = -_literal("abc") <= _emplace_to_string(ret1)
+               & "defg" <= _emplace_to_string(ret2);
 
         std::string str = "abcdefg";
-        auto it = str.begin();
-        if(p(it,str.end()))
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(p(scan))
         {
+            std::cout<<"ok"<<std::endl;
             std::cout<<"1:"<<ret1<<std::endl;
             std::cout<<"2:"<<ret2<<std::endl;
         }
@@ -57,12 +61,13 @@ int main()
     {
         std::string ret1;
         std::string ret2;
-        auto p = _optional(_literal("abc")) <= _converter(ret1) 
-               & _literal("defg") <= _converter(ret2);
+        auto p = _optional(_literal("abc")) <= _emplace_to_string(ret1) 
+               & "defg" <= _emplace_to_string(ret2);
         std::string str = "defg";
-        auto it = str.begin();
-        if(p(it,str.end()))
+        scanner<IT,line_counter_scanner_policy> scan(str.begin(),str.end());
+        if(p(scan))
         {
+            std::cout<<"ok"<<std::endl;
             std::cout<<"1:"<<ret1<<std::endl;
             std::cout<<"2:"<<ret2<<std::endl;
         }

@@ -457,7 +457,7 @@ struct to_string:public converter_base<std::string>
 
 struct emplace_to_string:public emplace_converter_base<std::string>
 {
-    emplace_to_string(std::string str):emplace_converter_base<std::string>(str) {}
+    emplace_to_string(std::string& str):emplace_converter_base<std::string>(str) {}
     template <typename Iterator>
     bool operator()(Iterator first,Iterator last)
     {
