@@ -37,22 +37,53 @@
 using namespace chrysanthemum; 
 using namespace chrysanthemum::ops;
 
+/////////forward declaration/////////
+struct value_t;
 
-
-/////////////values///////////////
-
-enum json_value_type
+struct logical_OR_expression_t;
+struct logical_AND_expression_t;
+struct inclusive_OR_expression_t;
+struct exclusive_OR_expression_t;
+struct AND_expression_t;
+struct equality_expression_t;
+struct relational_expression_t;
+struct shift_expression_t;
+struct additive_expresssion_t;
+struct mutiplicative_expression_t;
+struct unary_expression_t;
+struct postfix_expression_t;
+struct expressions_t;
+struct expression_t;
+struct assignment_expression_t;
+struct conditional_expression_t;
+struct constant_expression_t;
+struct symbol;
+struct closure_t; //for block
+struct declaration_t;
+struct declarator_t;
+struct init_declarator_t;
+struct initializer_t;
+struct function_t;
+struct translation_unit_t;
+////////////////////
+struct symbol
 {
-    JSON_NULL = 0,
-    JSON_REAL ,
-    JSON_STRING ,
-    JSON_BOOLEAN ,
-    JSON_ARRAY ,
-    JSON_OBJ
+    std::string name;
+    std::size_t id;
 };
+/////////////values///////////////
 
 struct value_t
 {
+    enum json_value_type
+    {
+        JSON_NULL = 0,
+        JSON_REAL ,
+        JSON_STRING ,
+        JSON_BOOLEAN ,
+        JSON_ARRAY ,
+        JSON_OBJ
+    };
     json_value_type type;
     value_t(json_value_type t):type(t) {}
 };
@@ -85,7 +116,7 @@ struct json_string_t :public value_t
 
 struct json_real_t:public value_t
 {
-    double num;
+    double n;
     json_real_t():value_t(JSON_REAL) {}
 };
 
@@ -113,24 +144,28 @@ struct json_obj_t:public value_t
 };
 
 //////////////statement//////////////
-enum statement_type
-{
-    IF_S = 0,
-    IF_ELSE_S ,
-    WHILE_S ,
-    DO_WHILE_S ,
-    FOR_S ,
-    CONTINUE_S,
-    BREAK_S,
-    RETURN_S,
-};
 
-struct expression_t;
 
 struct statement_t
 {
+    enum statement_type
+    {
+        IF_S = 0,
+        IF_ELSE_S ,
+        WHILE_S ,
+        DO_WHILE_S ,
+        FOR_S ,
+        CONTINUE_S,
+        BREAK_S,
+        RETURN_S,
+    };
     statement_type type;
     statement_t(statement_type t):type(t) {}
+};
+
+struct statement_wrapper
+{
+    statement_t* s;
 };
 
 struct if_statement_t:public statement_t
@@ -186,28 +221,27 @@ struct return_statement_t:public statement_t
 
 //////////////////expression_t////////////////////
 
-enum expression_type
-{
-    ASSIGNMENT_E=0,
-    CONDITIONAL_E,
-    CONSTANT_E,
-    LOGICAL_OR_E,
-    LOGICAL_AND_E,
-    INCLUSIVE_OR_E,
-    EXCLUSIVE_OR_E,
-    AND_E,
-    EQUALITY_E,
-    RELATIONAL_E,
-    SHIFT_E,
-    ADDITIVE_E,
-    MUTIPLICATIVE_E,
-    UNARY_E,
-    POSTFIX_E,
-
-};
-
 struct expression_t 
 {
+    enum expression_type
+    {
+        ASSIGNMENT_E=0,
+        CONDITIONAL_E,
+        CONSTANT_E,
+        LOGICAL_OR_E,
+        LOGICAL_AND_E,
+        INCLUSIVE_OR_E,
+        EXCLUSIVE_OR_E,
+        AND_E,
+        EQUALITY_E,
+        RELATIONAL_E,
+        SHIFT_E,
+        ADDITIVE_E,
+        MUTIPLICATIVE_E,
+        UNARY_E,
+        POSTFIX_E,
+
+    };
     expression_type type;
     expression_t(expression_type t):type(t) {}
 };
@@ -217,44 +251,395 @@ struct expressions_t ////for expression
     std::list<expression_t*> l;
 };
 
+
+
 struct assignment_expression_t
 {
-    unary_expression_t* l;
+    enum assignment_type
+    {
+        ASSIGNMENT = 0;
+        MUTIPLE_ASSIGNMENT,
+        DEVIVED_ASSIGNMENT,
+        MODULO_ASSIGNMENT,
+        ADD_ASSIGNMENT,
+        MINUS_ASSIGNMENT,
+        LEFT_SHIFT_ASSIGNMENT,
+        RIGHT_SHIFT_ASSIGNMENT,
+        AND_ASSIGNMENT,
+        EXCLUSIVE_OR_ASSIGNMENT,
+        INCLUSIVE_OR_ASSIGNMENT
+    };
+    struct obj_t { unary_expression_t* e; assignment_type type;};
+    std::list<obj_t> l;
     conditional_expression_t* e;
     assignment_expression_t():expression_t(ASSIGNMENT_E),l(NULL),e(NULL) {}
 };
 
+struct conditional_expression_t
+{
+    logical_OR_expression_t* e;
+    conditional_expression_t():expression_t(LOGICAL_OR_E),e(NULL) {}
+};
+
+struct constant_expression_t
+{
+    conditional_expression_t* e;
+    constant_expression_t():expression_t(CONSTANT_E),e(NULL) {}
+};
+
+struct logical_OR_expression_t
+{
+    logical_AND_expression_t* e;
+    std::list<logical_AND_expression_t*> l;
+    logical_OR_expression_t():expression_t(LOGICAL_OR_E),e(NULL) {}
+};
+
+struct logical_AND_expression_t
+{
+    inclusive_OR_expression_t *e;
+    std::list<inclusive_OR_expression_t*> l;
+    logical_AND_expression_t():expression_t(LOGICAL_AND_E),e(NULL) {}
+};
+
+struct inclusive_OR_expression_t
+{
+    exclusive_OR_expression_t* e;
+    std::list<exclusive_OR_expression_t*> l;
+    inclusive_OR_expression_t():expression_t(INCLUSIVE_OR_E),e(NULL) {}
+};
+
+struct exclusive_OR_expression_t
+{
+    AND_expression_t* e;
+    std::list<AND_expression_t*> l;
+    exclusive_OR_expression_t():expression_t(EXCLUSIVE_OR_E),e(NULL) {}
+};
+
+struct AND_expression_t
+{
+    equality_expression_t* e;
+    std::list<equality_expression_t*> l;
+    AND_expression_t():expression_t(AND_E),e(NULL) {}
+};
+
+struct equality_expression_t
+{
+    enum equality_type
+    {
+        EQUAL = 0;
+        NOT_EQUAL;
+    };
+    struct obj_t { relational_expression_t* e;equality_type type; };
+    relational_expression_t* e;
+    std::list<obj_t> l;
+    equality_expression_t():expression_t(EQUALITY_E),e(NULL) {}
+};
+
+
+struct relational_expression_t
+{
+    enum relational_type
+    {
+        LESS = 0,
+        NOT_GREATER,
+        GREATER,
+        NOT LESS,
+    }
+    struct obj_t { shift_expression_t* e; relational_type type; };
+    shift_expression_t* e;
+    std::list<obj_t> l;
+    relational_expression_t():expression_t(RELATIONAL_E),e(NULL) {}
+};
 
 
 
+struct shift_expression_t
+{
+    enum shift_type
+    {
+        LEFT_SHIFT = 0;
+        RIGHT_SHIFT;
+    };
+    struct obj_t {additive_expresssion_t* e;shift_type type;};
+    additive_expresssion_t* e;
+    std::list<obj_t> l;
+    shift_expression_t():expression_t(SHIFT_E),e(NULL) {}
+};
 
+
+
+struct additive_expresssion_t
+{
+    enum additive_type
+    {
+        ADD = 0,
+        MINUS ,
+    };
+    struct subject {mutiplicative_expression_t* e;additive_type type;};
+    mutiplicative_expression_t* e;
+    std::list<subject> l;
+    additive_expresssion_t():expression_t(ADDITIVE_E),e(NULL) {}
+};
+
+
+struct mutiplicative_expression_t
+{
+    enum mutiplicative_type
+    {
+        MUTIPLICATE = 0,
+        DEVIVE ,
+    };
+    struct subject {unary_expression_t* e;mutiplicative_type type;};
+    unary_expression_t* e;
+    std::list<subject> l;
+    mutiplicative_expression_t():expression_t(MUTIPLICATIVE_E),e(NULL) {}
+};
+
+
+struct unary_expression_t
+{
+    enum unary_type_1
+    {
+        INCREASEMENT = 0;
+        DECREASEMENT,
+    }
+    enum unary_type_2
+    {
+        POSITIVE = 0,
+        NEGATIVE,
+        NOT,
+        BITWISE,
+    };
+
+    std::vector<unary_type_1> inc_or_dec;
+    expression_t* e; // unary_expression_t or postfix_expression_t
+    unary_type_2 type; //only for unary_expression_t;
+    unary_expression_t():expression_t(UNARY_E),e(NULL) {}
+};
+
+
+struct postfix_expression_t
+{
+    enum obj_type
+    {
+        ID = 0,
+        VALUE,
+        EXPRESSION,
+    };
+
+    struct obj_t
+    {
+        obj_type type;
+        obj_t(obj_type t):type(t) {}
+    }
+
+    struct id_obj_t:public obj_t
+    {
+        symbol s;
+        id_obj_t():obj_t(ID) {}
+    };
+
+    struct value_obj_t:public obj_t
+    {
+        value_t* v;
+        value_obj_t():obj_t(VALUE),v(NULL) {}
+    };
+
+    struct expression_obj_t:public obj_t
+    {
+        expression_t* e;
+        expression_obj_t():obj_t(EXPRESSION),e(NULL) {}
+    };
+    
+
+    enum op_type
+    {
+        PARENTHESE = 0,
+        SQUARE_BRACKETS,
+        DOT,
+        INC,
+        DEC,
+    };
+
+    struct op_t
+    {
+        op_type type;
+        op_t(op_type t):type(t) {}
+    }
+    
+    struct square_bracket_op_t:public op_t
+    {
+        square_bracket_op():op_t(SQUARE_BRACKETS),e(NULL) {}
+        expression_t* e;
+    };
+
+    struct parenthese_op_t:public op_t
+    {
+        assignment_expression_t* e;
+        parenthese_op_t():op_t(PARENTHESE),e(NULL) {}
+    };
+
+    struct dot_op_t:public op_t
+    {
+        symbol s;
+        dot_op_t():op_t(DOT) {}
+    };
+
+    struct increasement_op_t:public op_t
+    {
+        increasement_op_t():op_t(INC) {}
+    };
+
+    struct decreasement_op_t:public op_t
+    {
+        decreasement_op_t():op_t(DEC) {}
+    };
+
+    //////////////////////
+    obj_t* o;
+    op_t* op;
+ 
+};
+
+struct closure_t //for block
+{
+    std::size_t idx;
+
+};
+
+struct declaration_t
+{
+    std::list<init_declarator_t*> l;
+};
+
+struct declarator_t
+{   
+    enum obj_type
+    {   
+        ID = 0,
+        DECLARATOR,
+    };
+    enum op_type
+    {
+        PARENTHESE = 0,
+        SQUARE_BRACKETS,
+    };
+
+    struct obj_t
+    {
+        obj_type type;
+        obj_t(obj_type t):type(t) {}
+    };
+
+    struct obj_id_t:public obj_t
+    {
+        symbol s;
+        obj_id_t():obj_t(ID) {}
+    };
+
+    struct obj_declarator_t:public obj_t
+    {
+        declarator_t* d;
+        obj_declarator_t():obj_t(DECLARATOR),d(NULL) {}
+    };
+
+    struct op_t
+    {
+        op_type type;
+        op_t(op_type t):type(t) {}
+    };
+
+    struct parenthese_op_t:public op_t
+    {
+        std::list<declaration_t*> l;
+        parenthese_op_t():op_t(PARENTHESE) {}
+    };
+
+    struct square_bracket_op_t:public op_t
+    {
+        constant_expression_t* e;
+        square_bracket_op_t():op_t(SQUARE_BRACKETS),e(NULL) {}
+    };
+
+
+};
+
+struct init_declarator_t
+{
+    declarator_t* d;
+    initializer_t* i;
+};
+
+struct initializer_t
+{
+    assignment_expression_t* e;
+};
+
+struct function_t
+{
+    
+};
+
+struct translation_unit_t
+{
+    
+};
 struct json_script_grammar
 {
     typedef std::string::iterator IT;    
     typedef scanner<IT,line_counter_scanner_policy> scanner_t;
-
+    //////////////////////////declaration/////////////////////////////
+    rule<scanner_t,translation_unit_t,_space> translation_unit;
+    rule<scanner_t,function_t,_space> function_definition;
+    rule<scanner_t,declaration_t,_space> declaration;
+    rule<scanner_t,init_declarator_t,_space> init_declarator;
+    rule<scanner_t,declarator_t,_space> declarator;
+    rule<scanner_t,initializer_t,_space> initializer;
+    rule<scanner_t,statement_wrapper,_space> statement;
+    rule<scanner_t,closure_t,_space> block;
+    rule<scanner_t,expressions_t,_space> expression;
+    rule<scanner_t,assignment_expression_t,_space> assignment_expression;
+    rule<scanner_t,conditional_expression_t,_space> conditional_expression;
+    rule<scanner_t,constant_expression_t,_space> constant_expression;
+    rule<scanner_t,logical_OR_expression_t,_space> logical_OR_expression;
+    rule<scanner_t,logical_AND_expression_t,_space> logical_AND_expression;
+    rule<scanner_t,exclusive_OR_expression_t,_space> exclusive_OR_expression;
+    rule<scanner_t,inclusive_OR_expression_t,_space> inclusive_OR_expression;
+    rule<scanner_t,AND_expression_t,_space> AND_expression;
+    rule<scanner_t,equality_expression_t,_space> equality_expression;
+    rule<scanner_t,relational_expression_t,_space> relational_expression;
+    rule<scanner_t,shift_expression_t,_space> shift_expression;
+    rule<scanner_t,additive_expresssion_t,_space> additive_expresssion;
+    rule<scanner_t,mutiplicative_expression_t,_space> mutiplicative_expression;
+    rule<scanner_t,unary_expression_t,_space> unary_expression;
+    rule<scanner_t,postfix_expression_t,_space> postfix_expression;
+    rule<scanner_t,json_value,_space> value;
     rule<scanner_t,json_obj,_space> obj;
     rule<scanner_t,json_member,_space> member;
     rule<scanner_t,json_string,_space> string;
-    rule<scanner_t,json_value,_space> value;
     rule<scanner_t,json_array,_space> array;
     rule<scanner_t,json_real,_space> real;
-    ////////////helpers///////////////
+    ////////////helpers//////////////////////////
     rule<scanner_t,no_context,no_skip> integer;
     rule<scanner_t,char,no_skip> character;
-
+    //////////////////////////defination/////////////////////////
     json_script_grammar()
     {
         translation_unit %= +(function_definition | declaration);
 
         function_definition %= "function" & declarator & *(declarator % ',') & block;
+
         declaration %= *(init_declarator % ',');
-        init_declaration %= declarator & -( '=' & initializer );
+
+        init_declarator %= declarator & -( '=' & initializer );
+
         declarator %=  ( identifier | ('(' & declarator & ')'))
-                      & *(   ( '[' & -(constant_expression) & ']' )
+                      & *(   
+                             ( '[' & -(constant_expression) & ']' )
                            //| ( '(' & parameter_list & ')' )
-                           | ( '(' & (identifier % ',') & ')')
+                           | ( '(' & (declarator % ',') & ')')
                          );
+
         initializer %= assignment_expression;
 
         statement %= (*identifier & -expression) 
