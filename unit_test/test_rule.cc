@@ -140,7 +140,7 @@ int main()
 
         
         grammer g; 
-        std::string str = "{ aaa \r\n , bbb \t\n, { ccc , ddd } \r\n,{ eee , { fff } } } ";
+        std::string str = "{ aaa  , bbb , { ccc , ddd } ,{ eee , { fff } } } ";
         std::cout<<str<<std::endl;
         scanner_t scan(str.begin(),str.end());
         if(g.obj(scan))

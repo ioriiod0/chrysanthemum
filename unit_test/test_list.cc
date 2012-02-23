@@ -36,7 +36,7 @@ int main()
     typedef std::string::iterator IT;
     std::vector<std::size_t> vec;
 
-    auto f = _combine(_converter<int>(),_back_inserter(vec));
+    auto f = _combine(_converter<int>(),_less_equal(255));//_back_inserter(vec));
 
     auto ip_parser = (
                        (   

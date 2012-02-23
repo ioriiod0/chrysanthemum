@@ -38,8 +38,8 @@ using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
 
 /////////forward declaration/////////
+struct obj_t;
 struct value_t;
-
 struct logical_OR_expression_t;
 struct logical_AND_expression_t;
 struct inclusive_OR_expression_t;
@@ -71,31 +71,36 @@ struct symbol
     std::string name;
     std::size_t id;
 };
+
+struct tree_node_t
+{
+    enum tree_node_type
+    {
+        VALUE = 0,
+        EXPRESSION,
+        STATEMENT,
+    };
+    tree_node_type type;
+};
 /////////////values///////////////
 
-struct value_t
+struct value_t:public tree_node_t
 {
-    enum json_value_type
+    enum value_type
     {
-        JSON_NULL = 0,
-        JSON_REAL ,
-        JSON_STRING ,
-        JSON_BOOLEAN ,
-        JSON_ARRAY ,
-        JSON_OBJ
+        V_NULL = 0,
+        V_REAL ,
+        V_STRING ,
+        V_BOOLEAN ,
+        V_ARRAY ,
+        V_OBJ ,
     };
     json_value_type type;
-    value_t(json_value_type t):type(t) {}
+    value_t(json_value_type t):type(t):tree_node_t(VALUE) {}
 };
 
-struct json_string_t :public value_t
+struct v_string_t :public value_t
 {
-    std::string str;
-    json_string_t():value_t(JSON_STRING) 
-    {
-        str.reverse(32);
-    }
-
     struct hasher
     {
         std::size_t operator()(const json_string& t) const
@@ -112,32 +117,39 @@ struct json_string_t :public value_t
         }
     };
 
+    std::string str;
+    json_string_t():value_t(JSON_STRING) 
+    {
+        str.reverse(32);
+    }
+
+
 };
 
-struct json_real_t:public value_t
+struct v_real_t:public value_t
 {
     double n;
     json_real_t():value_t(JSON_REAL) {}
 };
 
-struct json_boolean_t :public value_t
+struct v_boolean_t :public value_t
 {
     bool b;
     json_boolean_t():value_t(JSON_BOOLEAN) {}
 };
 
-struct json_null_t:public value_t
+struct v_null_t:public value_t
 {
     json_null_t():value_t(JSON_NULL) {}
 };
 
-struct json_array_t:public value_t
+struct v_array_t:public value_t
 {
     std::vector<value_t*> v;
     json_array_t():value_t(JSON_ARRAY) {}
 };
 
-struct json_obj_t:public value_t
+struct v_obj_t:public value_t
 {
     std::unordered_map<json_string,value_t*,json_string::hasher,json_string::equal_to> m;
     json_obj_t():value_t(JSON_OBJ) {}
@@ -146,7 +158,7 @@ struct json_obj_t:public value_t
 //////////////statement//////////////
 
 
-struct statement_t
+struct statement_t:public tree_node_t
 {
     enum statement_type
     {
@@ -160,7 +172,8 @@ struct statement_t
         RETURN_S,
     };
     statement_type type;
-    statement_t(statement_type t):type(t) {}
+    statement_t(statement_type t):type(t),tree_node_t(STATEMENT) {}
+
 };
 
 struct statement_wrapper
@@ -170,14 +183,17 @@ struct statement_wrapper
 
 struct if_statement_t:public statement_t
 {
+    expression_t* e;
+    statement_t* s;
     if_statement_t():statement_t(IF_S),e(NULL),s(NULL){}
 };
 
 struct if_else_statement_t:public statement_t
 {
     expression_t* e;
-    statement_t* s;
-    if_else_statement_t():statement_t(IF_ELSE_S),e(NULL),s(NULL){}
+    statement_t* s1;
+    statement_t* s2;
+    if_else_statement_t():statement_t(IF_ELSE_S),e(NULL),s1(NULL),s2(NULL){}
 };
 
 struct while_statement_t:public statement_t
@@ -577,13 +593,22 @@ struct initializer_t
 
 struct function_t
 {
-    
+    std::vector<symbol> symbol_tabs;
+    std::vector<value_t*> constant;
+
+
 };
 
 struct translation_unit_t
 {
     
 };
+
+struct closure_t
+{
+
+};
+
 struct json_script_grammar
 {
     typedef std::string::iterator IT;    
