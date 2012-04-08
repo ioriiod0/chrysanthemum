@@ -14,25 +14,26 @@
 #include <ext/pool_allocator.h>
 #include <chrono>
 
-#include "../src/core/and_p.h"
-#include "../src/core/difference_p.h"
-#include "../src/core/repeat_p.h"
-#include "../src/core/literal_p.h"
-#include "../src/core/scanner.h"
-#include "../src/core/compposer.h"
-#include "../src/core/list_p.h"
-#include "../src/core/not_p.h"
-#include "../src/core/or_p.h"
-#include "../src/core/optional_p.h"
-#include "../src/core/rule.h"
-#include "../src/extentions/character_parsers.h"
-#include "../src/extentions/scanner_policy.h"
-#include "../src/action/printer.h"
-#include "../src/action/converters.h"
-#include "../src/action/combiner.h"
-#include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-#include "../src/utility/alternative.h"
+#include "../all.h"
+// #include "../src/core/and_p.h"
+// #include "../src/core/difference_p.h"
+// #include "../src/core/repeat_p.h"
+// #include "../src/core/literal_p.h"
+// #include "../src/core/scanner.h"
+// #include "../src/core/compposer.h"
+// #include "../src/core/list_p.h"
+// #include "../src/core/not_p.h"
+// #include "../src/core/or_p.h"
+// #include "../src/core/optional_p.h"
+// #include "../src/core/rule.h"
+// #include "../src/extentions/character_parsers.h"
+// #include "../src/extentions/scanner_policy.h"
+// #include "../src/action/printer.h"
+// #include "../src/action/converters.h"
+// #include "../src/action/combiner.h"
+// #include "../src/action/back_inserter.h"
+// #include "../src/action/accumulater.h"
+// #include "../src/utility/alternative.h"
 
 
 using namespace chrysanthemum; 
@@ -50,12 +51,6 @@ enum json_value_type
 };
 
 typedef std::string json_string;
-
-// struct json_string
-// {
-//     json_string() {str.reverse(32);}
-//     std::basic_string<char,std::char_traits<char>,__gnu_cxx::__pool_alloc<char> > str;
-// };
 typedef double json_real;
 typedef bool json_boolean;
 struct json_null {};
@@ -240,125 +235,7 @@ struct json_grammar
     
 };
 
-//json_obj = load(string)
-//json_obj.key 
-//
 
-
-struct command_t {};
-struct var_t {}; //for identifier
-typedef alternative<var_t,std::string,int> value_t;
-typedef std::vector<value_t> value_list_t;
-struct access_exp_t //for access_expression
-{
-    var_t subject;
-    var_t attr;
-}; 
-struct assignment_t
-{
-    var_t left;
-    value_t right;
-};
-
-struct command_exp_t 
-{
-    command_t command;
-    value_list_t args;
-};
-
-
-typedef alternative<access_exp_t,command_exp_t> postfix_exp_t;
-
-
-
-
-
-struct
-
-struct promt_grammar
-{
-    typedef std::string::iterator IT;    
-    typedef scanner<IT,line_counter_scanner_policy> scanner_t;
-    rule<scanner_t,command_t,_space> command;
-    rule<scanner_t,var_t,_space> identifier;
-    rule<scanner_t,,_space> 
-
-
-    rule<scanner_t,json_string,_space> string;
-    ////////////helpers///////////////
-    rule<scanner_t,no_context,no_skip> integer;
-    rule<scanner_t,char,no_skip> character;
-
-    promt_grammar()
-    {
-        ////////////////////////////////////
-        command %= literal_p("load") | "print";
-        identifier %= _alpha() & *(_alnum() | '_');
-        value %= identifier | string | constant;
-        value_list %= value % ',';
-        access_expression %=     identifier
-                                & * (    
-                                          ('[' & identifier &']')
-                                        | ('.' & identifier )
-                                    );
-        command_expression %=  command & ('(' & value_list &')' );
-        postfix_expression %= access_expression
-                            | command_expression;
-                            
-        assignment_expression %= postfix_expression & '=' & postfix_expression;
-        constant %=    integer_constant
-                    |  character_constant;
-
-        string %= '"' 
-                & +(character  <= [=](IT first,IT last)
-                                   {
-                                        string.cur_ctx() += character.cur_ctx();
-                                        character.clear_ctx();
-                                        return true;
-                                   }
-                   )
-                & '"';
-        character %=  (_any() - _cntrl() - '"' - '\\') 
-                            <= [=](IT first,IT last)
-                                {
-                                    character.cur_ctx() = *first;
-                                    return true;
-                                }
-                    | "\\\"" <= [=](IT first,IT last) {character.cur_ctx() = '"';return true;}
-                    | "\\\\" <= [=](IT first,IT last) {character.cur_ctx() = '\\';return true;}
-                    | "\\/" <= [=](IT first,IT last) {character.cur_ctx() = '/';return true;}
-                    | "\\b" <= [=](IT first,IT last) {character.cur_ctx() = '\b';return true;}
-                    | "\\f" <= [=](IT first,IT last) {character.cur_ctx() = '\f';return true;}
-                    | "\\n" <= [=](IT first,IT last) {character.cur_ctx() = '\n';return true;}
-                    | "\\r" <= [=](IT first,IT last) {character.cur_ctx() = '\r';return true;}
-                    | "\\t" <= [=](IT first,IT last) {character.cur_ctx() = '\t';return true;}
-                    | (
-                       "\\u"
-                       & (_digit()&_digit()) 
-                                <= [=](IT first,IT last) {
-                                    int i = *first++ - '0';
-                                    i = i*10 + (*first-'0');
-                                    character.cur_ctx() = (char)i;
-                                    return true;}
-                      );
-        integer_constant %=  -(_literal('+') | '-') 
-                   & +_digit() ;
-        character_constant %= '\'' & alnum_p() &'\'';
- 
-
-        
-
-
-
-
-
-
-
-    }
-
-    
-};
-// a[i] f() a.  load(), a.key
 
 void print_json_obj(const json_obj& t);
 void print_json_array(const json_array& t);

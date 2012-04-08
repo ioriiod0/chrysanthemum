@@ -26,6 +26,7 @@
 #include "../src/action/converters.h"
 #include "../src/action/combiner.h"
 #include "../src/action/back_inserter.h"
+#include "../src/action/comparer.h"
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;

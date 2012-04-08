@@ -1,27 +1,31 @@
 
 ALL_HEADER = all.h config.h \
-		     src/core/or_p.h \
-			 src/compound/diference_p.h \
-			 src/compound/list_p.h \
-			 src/compound/literal_p.h \
-			 src/compound/not_p.h \
-			 src/compound/optional_p.h \
-			 src/compound/repeat_p.h \
-			 src/compound/and_p.h \
-			 src/parsers/basic_parsers.h \
-			 src/parsers/rule.h \
-			 src/parsers/compposer.h \
-			 src/parsers/action_parser.h \
-			 src/utility/meta_fuctions.h \
-			 src/utility/tuple_serialization.h \
-			 src/converter/converters.h \
-			 src/converter/convert_traits.h \
-			 src/action/accumulater.h \
-			 src/action/back_inserter.h \
-			 src/action/printer.h \
-			 src/action/condition.h \
-			 src/action/comparer.h \
-			 src/action/function_wrapper.h 
+		     src\core\or_p.h \
+			 src\core\and_p.h \
+			 src\core\not_p.h \
+			 src\core\optional_p.h \
+			 src\core\parser_base.h \
+			 src\core\rule.h \
+			 src\core\scanner.h \
+			 src\core\repeat_p.h \
+			 src\core\literal_p.h \
+			 src\core\list_p.h \
+			 src\core\difference_p.h \
+			 src\core\action_parser.h \
+			 src\core\compposer.h \
+			 src\extentions\character_parsers.h \
+			 src\extentions\scanner_policy.h \
+			 src\utility\meta_fuctions.h \
+			 src\utility\tuple_serialization.h \
+			 src\utility\optional.h \
+			 src\utility\alternative.h \
+			 src\action\converters.h \
+			 src\action\accumulater.h \
+			 src\action\back_inserter.h \
+			 src\action\combiner.h \
+			 src\action\printer.h \
+			 src\action\condition.h \
+			 src\action\comparer.h \
 
 all_test: test_and_p test_or_p test_repeat test_list test_optional test_rule test_json
 
