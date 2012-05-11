@@ -317,7 +317,16 @@ public:
 };
 
 
-
+////////////////////////////////////////////////////////////
+struct nothing_p:public parser_base<nothing_p>
+{
+public:
+  template <typename Scanner>
+  bool operator()(Scanner& scan)
+  {
+      return true;
+  }
+};
 
 
 template <typename CharT,CharT Start,CharT End>
@@ -356,6 +365,7 @@ public:
 #define _punct punct_p
 #define _any any_p
 #define _range range_p
+#define _nothing nothing_p
 
 
 } //end namespace

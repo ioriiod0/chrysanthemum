@@ -22,8 +22,8 @@ chrysanthemum 完全以C++0X新标准写成，因此只能用于对C++0X支持�
 注意：编译时请加上 -std=c++0x 参数以打开C++0X支持//////////////
 ////////////////////////////////////////////////////////////////
 
-chrysanthemum 很大程度上受到 Joel de Guzman 所编写的boost.spirit库的启发，但是力求更灵活，更高效，且更具收缩性。
+chrysanthemum 很大程度上受到 Joel de Guzman 所编写的boost.spirit库的启发，但是力求更灵活，更高效，且更具申缩性。
 
-本版本（V 0.2.1版）是chrysanthemum第一个正式对外发布的版本，必然存在许多不足和缺陷。如果您有好的建议或问题请发送至ioriiod0@gmail.com
+本版本（V 0.2.1版）是chrysanthemum第一个正式对外发布的版本，必然存在许多不足和缺陷。如果您有好的建议或问题请发送至ioriiod0@gmail.com和wqhoior@163.com
 
 
