@@ -14,7 +14,6 @@
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
 
-
 struct grammer
 {
 
@@ -32,31 +31,16 @@ struct grammer
 
         term %=   integer <= [&](IT first,IT last){ term.cur_ctx() = integer.pop_ctx(); return true;}
                 & *(
-                                ('*' & integer ) <= [&](IT first,IT last){ 
-                                                                          term.cur_ctx() *= integer.pop_ctx();
-                                                                          return true;
-                                                                      } 
-                               
-                              | ('/' & integer ) <= [&](IT first,IT last){ 
-                                                                          term.cur_ctx() /= integer.pop_ctx();
-                                                                          return true;
-                                                                      }                       
+                                ('*' & integer ) <= [&](IT first,IT last){  term.cur_ctx() *= integer.pop_ctx(); return true; } 
+                              | ('/' & integer ) <= [&](IT first,IT last){  term.cur_ctx() /= integer.pop_ctx(); return true; }                       
                     );
 
         expression %=   term <= [&](IT first,IT last){ expression.cur_ctx() = term.pop_ctx(); return true; }
                       & *(
-                                ('+' & term ) <= [&](IT first,IT last){
-                                                                          expression.cur_ctx() += term.pop_ctx();
-                                                                          return true;
-                                                                      } 
-                               
-                              | ('-' & term ) <= [&](IT first,IT last){ 
-                                                                          expression.cur_ctx() -= term.pop_ctx();
-                                                                          return true;
-                                                                      }
+                                ('+' & term ) <= [&](IT first,IT last){ expression.cur_ctx() += term.pop_ctx(); return true; } 
+                              | ('-' & term ) <= [&](IT first,IT last){  expression.cur_ctx() -= term.pop_ctx(); return true; }
                          ) ;
     }
-
 
     int excute(std::string& str)
     {
@@ -71,7 +55,6 @@ struct grammer
         }
     }
     
-
 };
 
 int main()
