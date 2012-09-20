@@ -27,7 +27,7 @@ ALL_HEADER = all.h config.h \
 			 src\action\condition.h \
 			 src\action\comparer.h \
 
-all_test: test_and_p test_or_p test_repeat test_list test_optional test_rule test_json
+all: test_and_p test_or_p test_repeat test_list test_optional test_rule test_json test_alternative calc
 
 test_and_p: unit_test/test_and_p.cc ${ALL_HEADER}
 	g++ unit_test/test_and_p.cc -o bin/test_and_p -std=c++0x
@@ -50,11 +50,22 @@ test_difference: unit_test/test_difference.cc
 test_not_p: unit_test/test_not_p.cc
 	g++ unit_test/test_not_p.cc -o bin/test_not_p -std=c++0x
 	echo "test_not_p done!"
-test_json: unit_test/test_json.cc
-	g++ unit_test/test_json.cc -o bin/test_json -std=c++0x
-	echo "test_json done!"
+
 test_rule: unit_test/test_rule.cc
 	g++ unit_test/test_rule.cc -o bin/test_rule -std=c++0x
 	echo "test_rule done!"
+
+test_alternative: unit_test/test_alternative.cc
+	g++ unit_test/test_alternative.cc -o bin/test_alternative -std=c++0x
+	echo "test_alternative done!"
+
+test_json: unit_test/test_json.cc
+	g++ unit_test/test_json.cc -o bin/test_json -std=c++0x -g
+	echo "test_json done!"
+
+calc: unit_test/calc.cc
+	g++ unit_test/calc.cc -o bin/calc -std=c++0x
+	echo "calc done!"
+
 clean: 
 	rm -f bin/*.o

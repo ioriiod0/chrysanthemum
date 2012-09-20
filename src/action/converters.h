@@ -103,14 +103,13 @@ struct converter_character_type_traits<wchar_t>
         return p == &(*str.end()); \
     } \
     template <typename Iterator> \
-    inline static bool do_convert(Iterator first,Iterator last, TYPE& t) \
+    inline static TYPE do_convert(Iterator first,Iterator last) \
     { \
         typedef typename std::iterator_traits<Iterator>::pointer pointer; \
         typedef typename std::iterator_traits<Iterator>::value_type value_type; \
         pointer p; \
         std::string str(first,last); \
-        ctx() = converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p,DEC); \
-        return p == &(*str.end()); \
+        return converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p,DEC); \
     } 
 
  // #define NOT_STRICT_MODE_FUNC_IMPL(TYPE,FUNC,DEC) \
@@ -141,14 +140,13 @@ struct converter_character_type_traits<wchar_t>
         return p == &(*str.end()); \
     } \
     template <typename Iterator> \
-    inline static bool do_convert(Iterator first,Iterator last, TYPE& t) \
+    inline static TYPE do_convert(Iterator first,Iterator last) \
     { \
         typedef typename std::iterator_traits<Iterator>::pointer pointer; \
         typedef typename std::iterator_traits<Iterator>::value_type value_type; \
         pointer p; \
         std::string str(first,last); \
-        ctx() = converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p); \
-        return p == &(*str.end()); \
+        return converter_character_type_traits<value_type>::FUNC(&(*str.begin()),&p); \
     } 
 
 // #define NOT_STRICT_MODE_FUNC_IMPL2(TYPE,FUNC) \

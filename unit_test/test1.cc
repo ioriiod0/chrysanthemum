@@ -114,10 +114,35 @@ void fuck(base<T>&& t)
 }
 
 
+template <typename T>
+struct B
+{
+public:
+    const T& operator=(int i)
+    {
+        p->set (10);
+        return *p;
+    }
+};
+
+
+struct A:public B<A>
+{
+    int i;
+    void set(int j)
+    {
+        i = j;
+    }
+};
+
 using namespace xxx;
 int main()
 {
-   // typename sequence_traits<data_holder<int> ,data_holder<char> ,data_holder<float> >::data_type t;
+
+    A a;
+    a=10;
+    std::cout<<a.i<<std::endl;
+    // typename sequence_traits<data_holder<int> ,data_holder<char> ,data_holder<float> >::data_type t;
    //  t = std::make_tuple(3,'a',0.2f); 
 
 
@@ -141,13 +166,13 @@ int main()
     // fuck(tester());
     // fuck(t);
 
-    Derived1 d1;
-    Derived2 d2;
+    // Derived1 d1;
+    // Derived2 d2;
 
-    d1+d2;
+    // d1+d2;
 
-    int a = 3+4;
-    std::cout<<a<<std::endl;
+    // int a = 3+4;
+    // std::cout<<a<<std::endl;
 
     // std::string bb = "aaa";
     // std::string ddd = bb + "ddddd";

@@ -35,6 +35,7 @@ public:
         if(dele_)
         {
             new_ctx();
+
             Scanner save;
             for(;;)
             {
@@ -89,10 +90,18 @@ public:
         return ctxs.top();
     }
 
+    Context pop_ctx()
+    {
+        Context tmp = std::move(cur_ctx());
+        clear_ctx();
+        return tmp;
+    }
+
     const Context& cur_ctx() const
     {
         return ctxs.top();
     }
+
 
 private:
     delegater dele_;
@@ -120,6 +129,7 @@ public:
         }
         return false;
     }
+
     /////////////////////////////////
     void new_ctx()
     {
@@ -140,6 +150,12 @@ public:
         return ctxs.top();
     }
 
+    Context pop_ctx()
+    {
+        Context tmp = std::move(cur_ctx());
+        clear_ctx();
+        return tmp;
+    }
 
     //////////////////////////////////////
     template <typename Delegater>
@@ -147,10 +163,12 @@ public:
     {
         dele_ = std::forward<Delegater>(dele);
     }
+
 private:
     delegater dele_;
     //std::stack<Context,std::deque<Context,__gnu_cxx::__pool_alloc<Context> > > ctxs;
     std::stack<Context> ctxs;
+
 };
 
 

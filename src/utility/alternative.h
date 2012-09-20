@@ -13,12 +13,58 @@
 #include <type_traits>
 #include <stdexcept>
 #include <functional>
+#include <typeinfo>
 
 #include "meta_fuctions.h"
 
 namespace chrysanthemum {
 
 // struct UNUSED;
+
+
+// template <typename T,typename... Args>
+// class assignment;
+
+// template <typename T,typename Head,typename... Tails>
+// class assignment<T,Head,Tails...>:public assignment<T,Tails...>
+// {
+// public:
+//     const T& operator=(const Head& t)
+//     {
+//         T* p = static_cast<T*>(this);
+//         p->set(t);
+//         return *p;
+//     }
+
+//     const T& operator=(Head&& t)
+//     {
+//         T* p = static_cast<T*>(this);
+//         p->set(std::move(t));
+//         return *p;
+//     }
+
+// };
+
+// template <typename T,typename T1>
+// class assignment<T,T1>
+// {
+// public:
+//     const T& operator=(const T1& t)
+//     {
+//         T* p = static_cast<T*>(this);
+//         p->set(t);
+//         return *p;
+//     }
+
+//     const T& operator=(T1&& t)
+//     {
+//         T* p = static_cast<T*>(this);
+//         p->set(std::move(t));
+//         return *p;
+//     }
+
+// };
+
 
 template <typename... Args>
 class alternative
@@ -58,6 +104,7 @@ public:
     typedef std::function<void(void*,void*)> move_functor;
 
 public:
+
     alternative():is_inited_(false) {}
     ~alternative() 
     {
@@ -65,12 +112,12 @@ public:
             deleter_(buffer_);
     }
     //////////////copy-assignment//////
-    alternative& operator=(const alternative& t)
+    const alternative& operator=(const alternative& t)
     {
         if(this!=&t)
         {
             is_inited_ = t.is_inited_;
-            which_ = t.which_;
+            type_id_ = t.type_id_;
             copyer_ = t.copyer_;
             deleter_ = t.deleter_;
             mover_ = t.mover_;
@@ -84,12 +131,12 @@ public:
         *this = t;
     }
     //////////////////////////////////////////////
-    alternative& operator=(alternative&& t)
+    const alternative& operator=(alternative&& t)
     {
         if(this!=&t)
         {
             is_inited_ = t.is_inited_;
-            which_ = t.which_;
+            type_id_ = t.type_id_;
             deleter_ = t.deleter_;
             copyer_ = t.copyer_;
             mover_ = t.mover_;
@@ -97,10 +144,20 @@ public:
         }
         return *this;
     }
+
+    // template <typename T>
+    // const alternative& operator=(T&& t)
+    // {
+    //     static_assert(is_type_in_types<T,Args...>::value,"the given type is not in variant's types!");
+    //     set(std::forward<T>(t));
+    //     return *this;
+    // }
+
     alternative(alternative&& t)
     {
         *this = std::move(t);
     }
+
 public:
     operator bool() const
     {
@@ -110,46 +167,46 @@ public:
     {
         return is_inited_;
     }
-    std::size_t which() const
+    std::size_t type_id() const
     {
-        return which_;
+        return type_id_;
     }
     //////////////////////////////////
-    template <std::size_t Idx,typename T>
+    template <typename T>
     void set(T&& t)
     {        
-        typedef typename at<Idx,Args...>::type ith_type;
-        typedef default_deleter<ith_type> deleter_type;
-        typedef default_copyer<ith_type> copyer_type;
-        typedef default_mover<ith_type> mover_type;
+        static_assert(is_type_in_types<T,Args...>::value,"the given type is not in alternative's types!");
+        typedef typename std::remove_reference<T>::type type;
+        typedef default_deleter<type> deleter_type;
+        typedef default_copyer<type> copyer_type;
+        typedef default_mover<type> mover_type; 
         if(is_inited_ && deleter_)
             deleter_(buffer_);
-        which_ = Idx;
-        new(buffer_) ith_type(std::forward<T>(t));
+        type_id_ = typeid(type).hash_code();
+        new(buffer_) type(std::forward<T>(t));
         deleter_ = deleter_type();
         copyer_ = copyer_type();
         mover_ = mover_type();
         is_inited_ = true;
     }
+
     ////////////////////////////////////
-    template <std::size_t Idx>
-    typename at<Idx,Args...>::type& get()
+    template <typename T>
+    T& get()
     {
-        typedef typename at<Idx,Args...>::type ith_type;
-        if(which_!=Idx || is_inited_ == false)
-            throw std::invalid_argument("the given idx is different from the"
-                                        "value which() or the value has not been inited");
-        return *((ith_type*)buffer_);
+        static_assert(is_type_in_types<T,Args...>::value,"the given type is not in alternative's types!");
+        if(type_id_!=typeid(T).hash_code() || is_inited_ == false)
+            throw std::runtime_error("wrong type_id!! or the value has not been inited");
+        return *((T*)buffer_);
     }
 
-    template <std::size_t Idx>
-    const typename at<Idx,Args...>::type& get() const
+    template <typename T>
+    const T& get() const
     {
-        typedef typename at<Idx,Args...>::type ith_type;
-        if(which_!=Idx || is_inited_ == false)
-            throw std::invalid_argument("the given idx is different from the"
-                                        "value which() or the value has not been inited");
-        return *((ith_type*)buffer_);
+        static_assert(is_type_in_types<T,Args...>::value,"the given type is not in alternative's types!");
+        if(type_id_!=typeid(T).hash_code() || is_inited_ == false)
+            throw std::runtime_error("wrong type_id!! or the value has not been inited");
+        return *((T*)buffer_);
     }
 
 
@@ -157,7 +214,7 @@ public:
 
 private:
     char buffer_[buffer_size];
-    std::size_t which_;
+    std::size_t type_id_;
     bool is_inited_;
     delete_functor deleter_;
     copy_functor copyer_;
@@ -167,7 +224,15 @@ private:
 };
 
 
+template <typename T>
+std::size_t type_id()
+{
+   return typeid(T).hash_code();
+}
+
 
 } //end namespace
+
+
 
 #endif

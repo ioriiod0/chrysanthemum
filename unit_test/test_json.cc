@@ -57,7 +57,6 @@ struct json_null {};
 struct json_array;
 struct json_obj;
 
-
 typedef chrysanthemum::alternative<
                     json_null, //JSON_NULL
                     json_real, //JSON_REAL
@@ -82,7 +81,6 @@ struct json_array
     std::vector<json_value,__gnu_cxx::__pool_alloc<json_value> > array_;
 };
 
-
 struct json_grammar
 {
     typedef std::string::iterator IT;    
@@ -101,115 +99,36 @@ struct json_grammar
     {
 
 
-        obj %= '{' 
-                &   (member <= [=](IT first,IT last)
-                               {
-                                    obj.cur_ctx().map_.insert(std::move(member.cur_ctx()));
-                                    member.clear_ctx();
-                                    return true; 
-                               }
-                    ) % ','
+        obj %=    '{' 
+                &   ( member <= [=](IT first,IT last) { obj.cur_ctx().map_.insert(member.pop_ctx());return true;} ) % ','
                 & '}';
         ////////////////////////////////////
-        member %= string <= [=](IT first,IT last) 
-                             {
-                                member.cur_ctx().first = std::move(string.cur_ctx());
-                                string.clear_ctx();
-                                return true; 
-                             }
-                & ':' 
-                & value <= [=](IT first,IT last) 
-                            {
-                                member.cur_ctx().second = std::move(value.cur_ctx());
-                                value.clear_ctx();
-                                return true;
-                            };
+        member %=   string <= [=](IT first,IT last) { member.cur_ctx().first = string.pop_ctx(); return true;}
+                  & ':' 
+                  & value <= [=](IT first,IT last) { member.cur_ctx().second = value.pop_ctx(); return true;};
         /////////////////////////////////////
-        string %= '"' 
-                & +(character  <= [=](IT first,IT last)
-                                   {
-                                        string.cur_ctx() += character.cur_ctx();
-                                        character.clear_ctx();
-                                        return true;
-                                   }
-                   )
+        string %=  '"' 
+                  & +(character  <= [=](IT first,IT last){ string.cur_ctx() += character.pop_ctx(); return true; })
                 & '"';
         ///////////////////////////////////////
-        value %= string <= [=](IT first,IT last)
-                            {
-                                value.cur_ctx().set<JSON_STRING>(std::move(string.cur_ctx()));
-                                string.clear_ctx();
-                                return true;
-                            }
-                | real <= [=](IT first,IT last)
-                            {
-                                value.cur_ctx().set<JSON_REAL>(std::move(real.cur_ctx()));
-                                real.clear_ctx();
-                                return true;
-                            }
-                | obj <= [=](IT first,IT last)
-                          {
-                                value.cur_ctx().set<JSON_OBJ>(std::move(obj.cur_ctx()));
-                                obj.clear_ctx();
-                                return true;
-                          }
-                | array <= [=](IT first,IT last)
-                            {
-                                value.cur_ctx().set<JSON_ARRAY>(std::move(array.cur_ctx()));
-                                array.clear_ctx();
-                                return true;
-                            }
-                | "true" <= [=](IT first,IT last)
-                            {
-                                value.cur_ctx().set<JSON_BOOLEAN>(true);
-                                return true; 
-                            }
-                | "false" <= [=](IT first,IT last)
-                             {
-                                value.cur_ctx().set<JSON_BOOLEAN>(false); 
-                                return true;
-                             }                
-                | "null" <= [=](IT first,IT last)
-                            {
-                                value.cur_ctx().set<JSON_NULL>(json_null());
-                                return true;
-                            };
+        value %=  string <= [=](IT first,IT last){ value.cur_ctx().set<json_string>(string.pop_ctx()); return true;}
+                | real <= [=](IT first,IT last) { value.cur_ctx().set<json_real>(real.pop_ctx()); return true; }
+                | obj <= [=](IT first,IT last) { value.cur_ctx().set<json_obj>(obj.pop_ctx()); return true; }
+                | array <= [=](IT first,IT last) { value.cur_ctx().set<json_array>(array.pop_ctx()); return true; }
+                | "true" <= [=](IT first,IT last) { value.cur_ctx().set<json_boolean>(true); return true;  }
+                | "false" <= [=](IT first,IT last) { value.cur_ctx().set<json_boolean>(false);  return true; }                
+                | "null" <= [=](IT first,IT last) { value.cur_ctx().set<json_null>(json_null()); return true; };
         /////////////////////////////////////////
         array %= '[' 
-                & (value <= [=](IT first,IT last)
-                             {
-                                array.cur_ctx().array_.push_back(std::move(value.cur_ctx()));
-                                value.clear_ctx();
-                                return true;
-                             }
-                  ) % ','
+                & (value <= [=](IT first,IT last) { array.cur_ctx().array_.push_back(value.pop_ctx()); return true; }) % ','
                 & ']';
         ////////////////////////////////////////////
-        real %= (   integer 
-                  & -(  
-                        '.' 
-                       & +_digit()
-                       & -(   
-                            ( _literal('e') | 'E' ) 
-                            & integer 
-                          )
-                      )
-                ) <= [=](IT first,IT last) 
-                      {
-                            real.cur_ctx() = strtod(&(*first),NULL);
-                            return true;
-                      };
-
+        real %= (  integer & -( '.'  & +_digit() & -( ( _literal('e') | 'E' )  & integer ) ) ) 
+                            <= [=](IT first,IT last)  { real.cur_ctx() = converter<double>::do_convert(first,last); return true; };
         ////////////////////////////////////////////
-        integer %=  -(_literal('+') | '-') 
-                   & +_digit() ;
-
-        character %=  (_any() - _cntrl() - '"' - '\\') 
-                            <= [=](IT first,IT last)
-                                {
-                                    character.cur_ctx() = *first;
-                                    return true;
-                                }
+        integer %=  -(_literal('+') | '-') & +_digit() ;
+        ///////////////////////////////////////////////////////////////////////
+        character %=  (_any() - _cntrl() - '"' - '\\') <= [=](IT first,IT last) { character.cur_ctx() = *first; return true; }
                     | "\\\"" <= [=](IT first,IT last) {character.cur_ctx() = '"';return true;}
                     | "\\\\" <= [=](IT first,IT last) {character.cur_ctx() = '\\';return true;}
                     | "\\/" <= [=](IT first,IT last) {character.cur_ctx() = '/';return true;}
@@ -218,24 +137,15 @@ struct json_grammar
                     | "\\n" <= [=](IT first,IT last) {character.cur_ctx() = '\n';return true;}
                     | "\\r" <= [=](IT first,IT last) {character.cur_ctx() = '\r';return true;}
                     | "\\t" <= [=](IT first,IT last) {character.cur_ctx() = '\t';return true;}
-                    | (
-                       "\\u"
-                       & (_digit()&_digit()) 
-                                <= [=](IT first,IT last) {
-                                    int i = *first++ - '0';
-                                    i = i*10 + (*first-'0');
-                                    character.cur_ctx() = (char)i;
-                                    return true;}
+                    | ( "\\u" & (_digit()&_digit())  
+                                <= [=](IT first,IT last) { int i = *first++ - '0'; i = i*10 + (*first-'0'); character.cur_ctx() = (char)i; return true;}
                       );
-
-
-
     }
 
     
 };
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void print_json_obj(const json_obj& t);
 void print_json_array(const json_array& t);
@@ -265,34 +175,26 @@ void print_json_null(const json_null& t)
 
 void print_json_value(const json_value& t)
 {
-    switch(t.which())
-    {
-        case JSON_STRING: 
-            print_json_string(t.get<JSON_STRING>());
-            break;
-        case JSON_BOOLEAN:
-            print_json_boolean(t.get<JSON_BOOLEAN>());  
-            break;         
-        case JSON_ARRAY:
-            print_json_array(t.get<JSON_ARRAY>());   
-            break;
-        case JSON_OBJ:
-            print_json_obj(t.get<JSON_OBJ>());  
-            break;
-        case JSON_REAL:
-            print_json_real(t.get<JSON_REAL>());  
-            break;
-        case JSON_NULL:
-            print_json_null(t.get<JSON_NULL>()); 
-            break;
-        default:
-            break;
-    }
-   
+    auto id = t.type_id();
+
+    if(type_id<json_string>() == id)
+        print_json_string(t.get<json_string>());  
+    if(type_id<json_boolean>() == id) 
+        print_json_boolean(t.get<json_boolean>());
+    if(type_id<json_array>() == id)
+        print_json_array(t.get<json_array>());   
+    if(type_id<json_obj>() == id)
+        print_json_obj(t.get<json_obj>());
+    if(type_id<json_real>() == id)
+        print_json_real(t.get<json_real>());  
+    if(type_id<json_null>() == id)
+        print_json_null(t.get<json_null>());
+
 }
 
 void print_json_obj(const json_obj& t)
 {
+
     std::cout<<"{";
     typedef typename std::map<json_string,json_value>::value_type value_type;
     std::for_each(t.map_.begin(),t.map_.end(),[](const value_type& v){
@@ -336,17 +238,16 @@ int main(int argc,const char* argv[])
         std::cout<<"FAILED"<<std::endl;
     }
 
-    auto t1 = std::chrono::system_clock::now();
-    for(std::size_t i=0;i<100000;++i)
-    {
-        scanner_t scan(data.begin(),data.end());
-        g.obj(scan);
-        g.obj.clear_ctx();
-    }
-    auto t2 = std::chrono::system_clock::now();
-    auto delta = t2 - t1;
-    std::cout<<delta.count()<<std::endl;
-
+    // auto t1 = std::chrono::system_clock::now();
+    // for(std::size_t i=0;i<100000;++i)
+    // {
+    //     scanner_t scan(data.begin(),data.end());
+    //     g.obj(scan);
+    //     g.obj.clear_ctx();
+    // }
+    // auto t2 = std::chrono::system_clock::now();
+    // auto delta = t2 - t1;
+    // std::cout<<delta.count()<<std::endl;
 
 }
 
