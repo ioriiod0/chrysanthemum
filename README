@@ -1,4 +1,4 @@
-chrysanthemum （中文名“菊花”）是一个由C++写成的小巧灵活、高度可伸缩、模块化的词法/语法分析框架。
+chrysanthemum 是一个由C++写成的小巧灵活、高度可伸缩、模块化的词法/语法分析框架。
 chrysanthemum 是一个纯模板库，包含头文件即可使用,且无任何第三方依赖。chrysanthemum 很大程度上受到 Joel de Guzman
 所编写的boost.spirit库的启发。
 
