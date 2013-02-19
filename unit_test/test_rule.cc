@@ -12,40 +12,16 @@
 #include <vector>
 #include <stack>
 
-#include "../src/core/and_p.h"
-#include "../src/core/difference_p.h"
-#include "../src/core/repeat_p.h"
-#include "../src/core/literal_p.h"
-#include "../src/core/scanner.h"
-#include "../src/core/compposer.h"
-#include "../src/core/list_p.h"
-#include "../src/core/not_p.h"
-#include "../src/core/or_p.h"
-#include "../src/core/optional_p.h"
-#include "../src/core/rule.h"
-#include "../src/extentions/character_parsers.h"
-#include "../src/extentions/scanner_policy.h"
-#include "../src/action/printer.h"
-#include "../src/action/converters.h"
-#include "../src/action/combiner.h"
-#include "../src/action/back_inserter.h"
-#include "../src/action/accumulater.h"
-
+#include "../chrysanthemum/all.h"
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
 using namespace std::placeholders;
 
-
-struct list_node;
-struct string_node;
-struct member_node;
-
-
 enum NODE_TYPE
 {
     STRING_NODE = 0,
-    OBJ_NODE = 1,
+    LIST_NODE = 1,
 };
 
 struct node 
@@ -56,17 +32,18 @@ struct node
     virtual ~node() {}
 };
 
-struct obj_node:public node
+struct list_node:public node
 {
-    obj_node():node(OBJ_NODE) {}
+    list_node():node(LIST_NODE) {}
     std::vector<node*> nodes_;
 
     void add_child(node* p)
+
     {
         nodes_.push_back(p);
     }
 
-    virtual ~obj_node() 
+    virtual ~list_node() 
     {
         std::for_each(nodes_.begin(),nodes_.end(),[](node* p){delete p;} );
     }
@@ -75,6 +52,7 @@ struct obj_node:public node
 struct string_node:public node
 {
     string_node():node(STRING_NODE) {}
+    virtual ~string_node() {}
 
     template <typename IT>
     void assign(IT first,IT last) 
@@ -83,18 +61,16 @@ struct string_node:public node
     }
 
     std::string str;
-    virtual ~string_node() {}
 };
 
 
-void print_obj(obj_node* p)
+void print_obj(list_node* p)
 {
     std::cout<<"{";
     for_each(p->nodes_.begin(),p->nodes_.end(),[](node* q){
-                switch(q->type)
-                {
-                    case OBJ_NODE:
-                        print_obj(static_cast<obj_node*>(q));
+                switch(q->type) {
+                    case LIST_NODE:
+                        print_obj(static_cast<list_node*>(q));
                         break;
                     case STRING_NODE:
                         std::cout<< static_cast<string_node*>(q)->str<<',';
@@ -116,34 +92,33 @@ int main()
 
         struct grammer
         {
-            rule<scanner_t,obj_node*,_space> obj;
+            rule<scanner_t,list_node*,_space> obj;
             rule<scanner_t,string_node*,_space> str;
 
             grammer()
             {
-                
-                obj %=  '{' <= [=](IT first,IT last){ obj.cur_ctx() = new obj_node(); return true;}
+                obj.on_init([](list_node*& p){p=new list_node();});
+                obj.on_error([](list_node*& p){delete p;});
+                obj %=  '{'
                        & (   
-                             str <= [=](IT first,IT last)
-                                       {
-                                            obj.cur_ctx()->add_child(str.pop_ctx());
-                                            return true;
-                                       }
-                           | obj <= [=](IT first,IT last)
-                                       {    
-                                            auto tmp = obj.pop_ctx();
-                                            obj.cur_ctx()->add_child(tmp);
-                                            return true;
-                                       } 
+                             str <= [=](IT first,IT last) {
+                                        obj.cur_ctx()->add_child(str.pop_ctx());
+                                        return true;
+                                    }
+                           | obj <= [=](IT first,IT last) {    
+                                        auto p = obj.pop_ctx();
+                                        obj.cur_ctx()->add_child(p);
+                                        return true;
+                                    } 
                          )  % ','
                        & '}';
 
-                str %= +_lower() <= [=](IT first,IT last)
-                                       {
-                                            str.cur_ctx() = new string_node();
+                str.on_init([](string_node*& p){p=new string_node();});
+                str.on_error([](string_node*& p){delete p;});
+                str %= +_lower() <= [=](IT first,IT last) {
                                             str.cur_ctx()->assign(first,last);
                                             return true;
-                                       }; 
+                                    };
                      
             }
             
@@ -151,14 +126,16 @@ int main()
         };
 
         
-        grammer g; 
-        std::string str = "{ aaa  , bbb , { ccc , ddd } ,{ eee , { fff } } } ";
+        grammer g;
+        std::string str = "{ aaa  , bbb ,{ccc}, {{ddd},eee} } ";
         std::cout<<str<<std::endl;
         scanner_t scan(str.begin(),str.end());
         if(g.obj(scan))
         {
             std::cout<<"OK"<<std::endl;
-            print_obj(g.obj.pop_ctx());
+            auto p = g.obj.pop_ctx();
+            print_obj(p);
+            delete p;
             std::cout<<std::endl;
         }
         else

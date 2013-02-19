@@ -1,9 +1,11 @@
-// ======================================================================================
+// ====================================================================================
+// Copyright (c) 2013, ioriiod0@gmail.com All rights reserved.
 // File         : test_json.cc
-// Author       : Gao Lei
-// Last Change  : 12/18/2011 | 01:24:49 AM | Sunday,December
+// Author       : ioriiod0@gmail.com
+// Last Change  : 02/02/2013 03:20 PM
 // Description  : 
-// ======================================================================================
+// ====================================================================================
+
 #include <string>
 #include <cstring>
 #include <iostream>
@@ -11,30 +13,9 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <ext/pool_allocator.h>
 #include <chrono>
-
-#include "../all.h"
-// #include "../src/core/and_p.h"
-// #include "../src/core/difference_p.h"
-// #include "../src/core/repeat_p.h"
-// #include "../src/core/literal_p.h"
-// #include "../src/core/scanner.h"
-// #include "../src/core/compposer.h"
-// #include "../src/core/list_p.h"
-// #include "../src/core/not_p.h"
-// #include "../src/core/or_p.h"
-// #include "../src/core/optional_p.h"
-// #include "../src/core/rule.h"
-// #include "../src/extentions/character_parsers.h"
-// #include "../src/extentions/scanner_policy.h"
-// #include "../src/action/printer.h"
-// #include "../src/action/converters.h"
-// #include "../src/action/combiner.h"
-// #include "../src/action/back_inserter.h"
-// #include "../src/action/accumulater.h"
-// #include "../src/utility/alternative.h"
-
+#include <cassert>
+#include "../chrysanthemum/all.h"
 
 using namespace chrysanthemum; 
 using namespace chrysanthemum::ops;
@@ -50,170 +31,254 @@ enum json_value_type
     JSON_OBJ
 };
 
-typedef std::string json_string;
-typedef double json_real;
-typedef bool json_boolean;
-struct json_null {};
-struct json_array;
-struct json_obj;
+typedef std::string::iterator IT;
 
-typedef chrysanthemum::alternative<
-                    json_null, //JSON_NULL
-                    json_real, //JSON_REAL
-                    json_string, //JSON_STRING
-                    json_boolean, //JSON_BOOLEAN
-                    json_array, //JSON_BOOLEAN
-                    json_obj /*JSON_OBJ*/ > json_value;
+struct json_value {
+    int type;
+    json_value(int t):type(t) {
 
-typedef std::pair<json_string,json_value> json_member;
-
-struct json_obj
-{
-    std::map<json_string,
-             json_value,
-             std::less<json_string>,
-             __gnu_cxx::__pool_alloc<std::pair<const json_string,json_value>>
-            > map_;
+    }
+    virtual ~json_value() {}
+    virtual void print()=0;
 };
 
-struct json_array
-{
-    std::vector<json_value,__gnu_cxx::__pool_alloc<json_value> > array_;
+struct json_string:public json_value {
+    json_string():json_value(JSON_STRING) {
+
+    }
+    virtual ~json_string() {}
+    virtual void print() {
+        std::cout<<data;
+    }
+    std::string data;
 };
+
+struct json_null:public json_value {
+    json_null():json_value(JSON_NULL) {
+
+    }
+    virtual ~json_null() {}
+    virtual void print() {
+        std::cout<<"null";
+    }
+};
+
+struct json_real:public json_value {
+    json_real():json_value(JSON_REAL) {
+
+    }
+    virtual ~json_real() {}
+    virtual void print() {
+        std::cout<<data;
+    }
+    double data;
+};
+
+struct json_boolean:public json_value {
+    json_boolean():json_value(JSON_BOOLEAN) {
+
+    }
+    virtual ~json_boolean() {}
+    virtual void print() {
+        if(data)
+            std::cout<<"true";
+        else
+            std::cout<<"false";
+    }
+    bool data;
+};
+
+struct json_array:public json_value {
+    json_array():json_value(JSON_ARRAY) {
+
+    }
+    virtual ~json_array() {
+        for(auto v:data) {
+            delete v;
+        }
+    }
+    virtual void print() {
+        std::cout<<"[";
+        for(auto v:data) {
+            v->print();
+            std::cout<<",";
+        }
+        std::cout<<"]";
+    }
+    std::vector<json_value*> data;
+};
+
+struct json_obj:public json_value {
+    json_obj():json_value(JSON_OBJ) {
+
+    }
+    virtual ~json_obj() {
+        for(const auto& v:data) {
+            delete v.second;
+        }
+    }
+    virtual void print() {
+        std::cout<<"{";
+        for(const auto& v:data) {
+            std::cout<<v.first<<":";
+            v.second->print();
+            std::cout<<",";
+        }
+        std::cout<<"}";
+    }
+    std::map<std::string,json_value*> data;
+};
+
+////////////////////////////////////////////////////////////////////////////
+std::string unescope_string(IT first,IT last);
 
 struct json_grammar
 {
     typedef std::string::iterator IT;    
     typedef scanner<IT,line_counter_scanner_policy> scanner_t;
-    rule<scanner_t,json_obj,_space> obj;
-    rule<scanner_t,json_member,_space> member;
-    rule<scanner_t,json_string,_space> string;
-    rule<scanner_t,json_value,_space> value;
-    rule<scanner_t,json_array,_space> array;
-    rule<scanner_t,json_real,_space> real;
-    ////////////helpers///////////////
+    
+    ///////////////////////////////////////////
+    rule<scanner_t,json_obj*,_space> obj;
+    rule<scanner_t,json_string*,_space> string;
+    rule<scanner_t,json_value*,_space> value;
+    rule<scanner_t,json_array*,_space> array;
+    rule<scanner_t,json_real*,_space> real;
+    rule<scanner_t,json_boolean*,_space> boolean;
+    rule<scanner_t,json_null*,_space> null;
+    //////////////////
     rule<scanner_t,no_context,no_skip> integer;
-    rule<scanner_t,char,no_skip> character;
+    rule<scanner_t,no_context,no_skip> character;
 
     json_grammar()
     {
-
-
-        obj %=    '{' 
-                &   ( member <= [=](IT first,IT last) { obj.cur_ctx().map_.insert(member.pop_ctx());return true;} ) % ','
-                & '}';
-        ////////////////////////////////////
-        member %=   string <= [=](IT first,IT last) { member.cur_ctx().first = string.pop_ctx(); return true;}
-                  & ':' 
-                  & value <= [=](IT first,IT last) { member.cur_ctx().second = value.pop_ctx(); return true;};
-        /////////////////////////////////////
-        string %=  '"' 
-                  & +(character  <= [=](IT first,IT last){ string.cur_ctx() += character.pop_ctx(); return true; })
-                & '"';
-        ///////////////////////////////////////
-        value %=  string <= [=](IT first,IT last){ value.cur_ctx().set<json_string>(string.pop_ctx()); return true;}
-                | real <= [=](IT first,IT last) { value.cur_ctx().set<json_real>(real.pop_ctx()); return true; }
-                | obj <= [=](IT first,IT last) { value.cur_ctx().set<json_obj>(obj.pop_ctx()); return true; }
-                | array <= [=](IT first,IT last) { value.cur_ctx().set<json_array>(array.pop_ctx()); return true; }
-                | "true" <= [=](IT first,IT last) { value.cur_ctx().set<json_boolean>(true); return true;  }
-                | "false" <= [=](IT first,IT last) { value.cur_ctx().set<json_boolean>(false);  return true; }                
-                | "null" <= [=](IT first,IT last) { value.cur_ctx().set<json_null>(json_null()); return true; };
+        ///////////////////helpers//////////////////////
+        integer %=  -(_literal('+') | '-') & +_digit() ;
+        character %=  (_any() - _cntrl() - '"' - '\\')
+                    | "\\\"" | "\\\\" | "\\/" | "\\b"
+                    | "\\f" | "\\n" | "\\r" | "\\t"
+                    | ( "\\u" & (_N<4>(_digit())));
         /////////////////////////////////////////
-        array %= '[' 
-                & (value <= [=](IT first,IT last) { array.cur_ctx().array_.push_back(value.pop_ctx()); return true; }) % ','
+        obj.on_init([](json_obj*& p){p = new json_obj();});
+        obj.on_error([](json_obj*& p){delete p;});
+        obj %=  '{'
+                &((string & ':' & value)
+                    <=  [=](IT first,IT last) {
+                            obj.cur_ctx()->data[string.pop_ctx()->data] = value.pop_ctx();
+                            return true;
+                        }) % ','
+                &'}';
+        ///////////////////////////////////////
+        string.on_init([](json_string*& p){p=new json_string();});
+        string.on_error([](json_string*& p){delete p;});
+        string %=   '"'
+                    &(+(character)) <=  [=](IT first,IT last) {
+                                            //std::cout<<std::string(first,last);
+                                            string.cur_ctx()->data = unescope_string(first,last);
+                                            return true;
+                                        }
+                    &'"';
+        ///////////////////////////////////////
+        null.on_init([](json_null*& p){p=new json_null();});
+        null.on_error([](json_null*& p){delete p;});
+        null %= _literal("null");
+        /////////////////////////////////
+        boolean.on_init([](json_boolean*& p){p=new json_boolean();});
+        boolean.on_error([](json_boolean*& p){delete p;});
+        boolean %= "true" <=    [=](IT first,IT last) {
+                                    boolean.cur_ctx()->data = true;
+                                    return true;
+                                }
+                | "false" <=    [=](IT first,IT last) {
+                                    boolean.cur_ctx()->data = false;
+                                    return true;
+                                };
+        /////////////////////////////////////////
+        value %=  string <= [=](IT first,IT last) {
+                                value.cur_ctx() = string.pop_ctx();
+                                return true;
+                            }
+                |real  <=   [=](IT first,IT last) {
+                                value.cur_ctx() = real.pop_ctx();
+                                return true;
+                            }
+                |obj   <=   [=](IT first,IT last) {
+                                value.cur_ctx() = obj.pop_ctx();
+                                return true; 
+                            }
+                |array <=   [=](IT first,IT last) {
+                                value.cur_ctx() = array.pop_ctx();
+                                return true;
+                            }
+                |boolean<=  [=](IT first,IT last) {
+                                value.cur_ctx() = boolean.pop_ctx();
+                                return true;
+                            }
+                |null <=    [=](IT first,IT last) {
+                                value.cur_ctx() = null.pop_ctx();
+                                return true; 
+                            };
+        /////////////////////////////////////////
+        array.on_init([](json_array*& p){p=new json_array();});
+        array.on_error([](json_array*& p){delete p;});
+        array %= '['
+                & (value <= [=](IT first,IT last) {
+                                array.cur_ctx()->data.push_back(value.pop_ctx());
+                                return true; 
+                            }) % ','
                 & ']';
         ////////////////////////////////////////////
-        real %= (  integer & -( '.'  & +_digit() & -( ( _literal('e') | 'E' )  & integer ) ) ) 
-                            <= [=](IT first,IT last)  { real.cur_ctx() = converter<double>::do_convert(first,last); return true; };
-        ////////////////////////////////////////////
-        integer %=  -(_literal('+') | '-') & +_digit() ;
-        ///////////////////////////////////////////////////////////////////////
-        character %=  (_any() - _cntrl() - '"' - '\\') <= [=](IT first,IT last) { character.cur_ctx() = *first; return true; }
-                    | "\\\"" <= [=](IT first,IT last) {character.cur_ctx() = '"';return true;}
-                    | "\\\\" <= [=](IT first,IT last) {character.cur_ctx() = '\\';return true;}
-                    | "\\/" <= [=](IT first,IT last) {character.cur_ctx() = '/';return true;}
-                    | "\\b" <= [=](IT first,IT last) {character.cur_ctx() = '\b';return true;}
-                    | "\\f" <= [=](IT first,IT last) {character.cur_ctx() = '\f';return true;}
-                    | "\\n" <= [=](IT first,IT last) {character.cur_ctx() = '\n';return true;}
-                    | "\\r" <= [=](IT first,IT last) {character.cur_ctx() = '\r';return true;}
-                    | "\\t" <= [=](IT first,IT last) {character.cur_ctx() = '\t';return true;}
-                    | ( "\\u" & (_digit()&_digit())  
-                                <= [=](IT first,IT last) { int i = *first++ - '0'; i = i*10 + (*first-'0'); character.cur_ctx() = (char)i; return true;}
-                      );
+        real.on_init([](json_real*& p){p=new json_real();});
+        real.on_error([](json_real*& p){delete p;});
+        real %= (integer & -( '.'  & +_digit()) & -( ( _literal('e') | 'E' ) & integer))
+                    <= [=](IT first,IT last) {
+                        real.cur_ctx()->data = converter<double>::do_convert(first,last);
+                        return true;
+                    };
     }
-
     
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void print_json_obj(const json_obj& t);
-void print_json_array(const json_array& t);
-
-void print_json_string(const json_string& t)
-{
-    std::cout<<t;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::string unescope_string(IT first,IT last) {
+    std::string ret;
+    ret.reserve(32);
+    for(;first!=last;++first) {
+        if(*first == '\\') {
+            switch(*++first) {
+                case '\\':
+                    ret+='\\';
+                    break;
+                case 'b':
+                    ret+='\b';
+                    break;
+                case 'f':
+                    ret+='\f';
+                    break;
+                case 't':
+                    ret+='\t';
+                    break;
+                case 'r':
+                    ret+='\r';
+                    break;
+                case 'n':
+                    ret+='\n';
+                    break;
+                case 'u':
+                    ret+=(char) converter<int,16>::do_convert(first+1,first+5);
+                    first+=4;
+                    break;
+                default:
+                    assert(false);
+                    break;         
+            }
+        } else {
+            ret += *first;
+        }
+    }
+    return ret;
 }
 
-void print_json_boolean(const json_boolean& t)
-{
-    if(t)
-        std::cout<<"true";
-    else
-        std::cout<<"false";
-}
 
-void print_json_real(const json_real& t)
-{
-    std::cout<<t;
-}
-void print_json_null(const json_null& t)
-{
-    std::cout<<"null";
-}
-
-
-void print_json_value(const json_value& t)
-{
-    auto id = t.type_id();
-
-    if(type_id<json_string>() == id)
-        print_json_string(t.get<json_string>());  
-    if(type_id<json_boolean>() == id) 
-        print_json_boolean(t.get<json_boolean>());
-    if(type_id<json_array>() == id)
-        print_json_array(t.get<json_array>());   
-    if(type_id<json_obj>() == id)
-        print_json_obj(t.get<json_obj>());
-    if(type_id<json_real>() == id)
-        print_json_real(t.get<json_real>());  
-    if(type_id<json_null>() == id)
-        print_json_null(t.get<json_null>());
-
-}
-
-void print_json_obj(const json_obj& t)
-{
-
-    std::cout<<"{";
-    typedef typename std::map<json_string,json_value>::value_type value_type;
-    std::for_each(t.map_.begin(),t.map_.end(),[](const value_type& v){
-                  std::cout<<v.first<<":";
-                  print_json_value(v.second);
-                  std::cout<<",";
-                  });
-    std::cout<<"}";
-}
-void print_json_array(const json_array& t)
-{
-  std::cout<<"[";
-    std::for_each(t.array_.begin(),t.array_.end(),[](const json_value& v){
-                  print_json_value(v);
-                  std::cout<<",";
-                  });
-    std::cout<<"]";
-
-}
 
 int main(int argc,const char* argv[])
 {
@@ -229,8 +294,9 @@ int main(int argc,const char* argv[])
     if(g.obj(scan))
     {
         std::cout<<"OK"<<std::endl;
-        print_json_obj(g.obj.cur_ctx()); 
-        g.obj.clear_ctx();
+        auto p = g.obj.pop_ctx();
+        p->print();
+        delete p;
         std::cout<<std::endl;
     }
     else
@@ -248,6 +314,6 @@ int main(int argc,const char* argv[])
     // auto t2 = std::chrono::system_clock::now();
     // auto delta = t2 - t1;
     // std::cout<<delta.count()<<std::endl;
-
+    return 0;
 }
 

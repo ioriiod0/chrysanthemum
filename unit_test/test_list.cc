@@ -13,20 +13,7 @@
 #include <algorithm>
 
 
-#include "../src/core/and_p.h"
-#include "../src/core/difference_p.h"
-#include "../src/core/repeat_p.h"
-#include "../src/core/literal_p.h"
-#include "../src/core/scanner.h"
-#include "../src/core/compposer.h"
-#include "../src/core/list_p.h"
-#include "../src/extentions/character_parsers.h"
-#include "../src/extentions/scanner_policy.h"
-#include "../src/action/printer.h"
-#include "../src/action/converters.h"
-#include "../src/action/combiner.h"
-#include "../src/action/back_inserter.h"
-#include "../src/action/comparer.h"
+#include "../chrysanthemum/all.h"
 
 using namespace chrysanthemum;
 using namespace chrysanthemum::ops;
